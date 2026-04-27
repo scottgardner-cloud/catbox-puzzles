@@ -1,0 +1,188 @@
+/* ───────────────────────────────────────────
+   Pix-a-Pix Grid Layout
+   ─────────────────────────────────────────── */
+
+.pap-grid-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  user-select: none;
+  gap: 2px;
+}
+
+/* ── Column clues ── */
+.pap-col-clues {
+  display: grid;
+  gap: 1px;
+  justify-self: end;
+}
+
+.pap-col-clue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 2px 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* ── Column validation row ── */
+.pap-col-validation {
+  display: grid;
+  gap: 1px;
+  justify-self: end;
+}
+
+/* ── Rows container ── */
+.pap-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.pap-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ── Row clues ── */
+.pap-row-clue {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  padding-right: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Clue number ── */
+.pap-clue-num {
+  min-width: 14px;
+  text-align: center;
+}
+
+/* ── Cells row (the actual grid) ── */
+.pap-cells-row {
+  display: grid;
+  gap: 1px;
+}
+
+/* ── Line validation indicator (row / col) ── */
+.pap-line-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 30px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pap-line-indicator--correct {
+  color: #2e7d32;
+}
+
+.pap-line-indicator--incorrect {
+  color: #c62828;
+}
+
+.pap-line-indicator--incomplete {
+  color: transparent;
+}
+
+/* ── Cell ── */
+.pap-cell {
+  box-sizing: border-box;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.1s ease;
+}
+
+.pap-cell:hover {
+  outline: 2px solid #42a5f5;
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+/* State variants */
+.pap-cell--unknown {
+  background-color: #f5f5f5;
+}
+
+.pap-cell--empty {
+  background-color: #e0e0e0;
+}
+
+.pap-cell__mark {
+  font-size: 16px;
+  font-weight: 700;
+  color: #616161;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* filled cells get their color via inline style */
+
+/* ── Validation overlays ── */
+.pap-cell--wrong-filled {
+  box-shadow: inset 0 0 0 3px #e53935;
+}
+
+.pap-cell--wrong-empty {
+  box-shadow: inset 0 0 0 3px #e53935;
+}
+
+.pap-cell--wrong-empty .pap-cell__mark {
+  color: #e53935;
+}
+
+.pap-cell--wrong-color {
+  box-shadow: inset 0 0 0 3px #ef6c00;
+}
+
+.pap-cell--correct {
+  box-shadow: inset 0 0 0 2px #43a047;
+}
+
+/* ── 5-cell grid dividers ── */
+.pap-cell--border-right {
+  border-right: 2px solid #333;
+}
+
+.pap-cell--border-bottom > .pap-cell {
+  border-bottom: 2px solid #333;
+}
+
+/* ── Hidden spacers for alignment (used by wrapper) ── */
+.pap-clue-spacer,
+.pap-clue-spacer-col {
+  /* These are invisible sizing aids rendered outside the visible grid */
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ── Responsive scaling ── */
+@media (max-width: 600px) {
+  .pap-col-clue,
+  .pap-row-clue {
+    font-size: 10px;
+  }
+
+  .pap-cell__mark {
+    font-size: 12px;
+  }
+
+  .pap-line-indicator {
+    width: 16px;
+    font-size: 12px;
+  }
+}

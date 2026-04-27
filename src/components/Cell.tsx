@@ -1,0 +1,75 @@
+import type { PlayerCellState, CellValidation } from '../types';
+
+/** Props for the {@link Cell} component. */
+export interface CellProps {
+  /** Current cell state as set by the player. */
+  readonly state: PlayerCellState;
+  /** Current validation result for this cell. */
+  readonly validation: CellValidation;
+  /** CSS color string for filled cells (resolved from palette). */
+  readonly fillColor?: string;
+  /** Called when the cell is clicked. */
+  readonly onClick: () => void;
+  /** Called when a drag enters this cell. */
+  readonly onDragEnter: () => void;
+  /** Cell size in pixels (for responsive sizing). */
+  readonly size: number;
+}
+
+/**
+ * Renders a single Pix-a-Pix grid cell.
+ *
+ * - Unknown cells show a neutral background.
+ * - Filled cells use the resolved palette color as background.
+ * - Empty cells display an × mark.
+ * - Validation overlays are applied via CSS classes.
+ */
+export function Cell({
+  state,
+  validation,
+  fillColor,
+  onClick,
+  onDragEnter,
+  size,
+}: CellProps): React.JSX.Element {
+  const classNames = ['pap-cell'];
+
+  // State class
+  classNames.push(`pap-cell--${state.kind}`);
+
+  // Validation class (skip unchecked to avoid noise)
+  if (validation !== 'unchecked') {
+    classNames.push(`pap-cell--${validation}`);
+  }
+
+  const style: React.CSSProperties = {
+    width: size,
+    height: size,
+  };
+
+  if (state.kind === 'filled' && fillColor) {
+    style.backgroundColor = fillColor;
+  }
+
+  return (
+    <div
+      className={classNames.join(' ')}
+      style={style}
+      onClick={onClick}
+      onMouseEnter={onDragEnter}
+      role="gridcell"
+      aria-label={cellAriaLabel(state, validation)}
+    >
+      {state.kind === 'empty' && <span className="pap-cell__mark">×</span>}
+    </div>
+  );
+}
+
+/** Build an accessible label describing the cell's current state. */
+function cellAriaLabel(state: PlayerCellState, validation: CellValidation): string {
+  const stateLabel =
+    state.kind === 'filled' ? 'filled' : state.kind === 'empty' ? 'marked empty' : 'unknown';
+
+  if (validation === 'unchecked') return stateLabel;
+  return `${stateLabel} (${validation})`;
+}
