@@ -179,6 +179,30 @@
   pointer-events: none;
 }
 
+/* ── Row/column hover highlighting ── */
+.pap-row--highlight {
+  background-color: rgba(66, 165, 245, 0.06);
+}
+
+.pap-row-clue--highlight {
+  background-color: rgba(66, 165, 245, 0.15);
+  border-radius: 4px;
+}
+
+.pap-col-clue--highlight {
+  background-color: rgba(66, 165, 245, 0.15);
+  border-radius: 4px;
+}
+
+.pap-cell--crosshair > .pap-cell {
+  background-color: rgba(66, 165, 245, 0.08);
+}
+
+/* Don't override filled cells with crosshair background */
+.pap-cell--crosshair > .pap-cell.pap-cell--filled {
+  /* filled color takes precedence via inline style */
+}
+
 /* ── Responsive scaling ── */
 @media (max-width: 600px) {
   .pap-col-clue,

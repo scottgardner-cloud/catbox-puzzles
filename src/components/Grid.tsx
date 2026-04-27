@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type {
   PlayerCellState,
   CellValidation,
@@ -45,10 +45,11 @@ const DEFAULT_CELL_SIZE = 30;
  * Renders the full Pix-a-Pix puzzle grid including clues, validation
  * indicators, and the interactive cell grid.
  *
- * Layout:
+ * Layout (validation indicators are OUTSIDE the clues):
  * ```
- *              [col clues]  [col validation]
- * [row clues] [row valid.]  [grid of cells]
+ *                          [col validation]
+ *                          [col clues]
+ * [row validation] [row clues] [grid of cells]
  * ```
  */
 export function Grid({
@@ -68,7 +69,10 @@ export function Grid({
   const rows = board.length;
   const cols = rows > 0 ? board[0].length : 0;
 
-  // Build a lookup map: ColorId → CSS color string
+  // Hover tracking for row/column highlighting
+  const [hoverRow, setHoverRow] = useState<number | null>(null);
+  const [hoverCol, setHoverCol] = useState<number | null>(null);
+
   const colorMap = useMemo(() => {
     const map = new Map<ColorId, string>();
     for (const c of palette) {
@@ -79,12 +83,8 @@ export function Grid({
 
   const resolveColor = useCallback((id: ColorId): string => colorMap.get(id) ?? '#000', [colorMap]);
 
-  // Determine whether this is a color puzzle (more than one palette entry)
   const isColorPuzzle = palette.length > 1;
-
-  // Max clue length for sizing the clue areas
   const maxRowClueLen = Math.max(1, ...rowClues.map((c) => c.length));
-  const maxColClueLen = Math.max(1, ...colClues.map((c) => c.length));
 
   const handleMouseDown = useCallback(
     (row: number, col: number) => {
@@ -98,14 +98,39 @@ export function Grid({
     onDragEnd();
   }, [onDragEnd]);
 
+  const handleCellHover = useCallback((row: number, col: number) => {
+    setHoverRow(row);
+    setHoverCol(col);
+  }, []);
+
+  const handleGridLeave = useCallback(() => {
+    setHoverRow(null);
+    setHoverCol(null);
+    onDragEnd();
+  }, [onDragEnd]);
+
   return (
     <div
       className="pap-grid-wrapper"
       onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      onMouseLeave={handleGridLeave}
       role="grid"
     >
-      {/* ── Column clues ── */}
+      {/* ── Column validation indicators (OUTSIDE, above clues) ── */}
+      <div
+        className={`pap-col-validation${isValidationActive ? '' : ' pap-col-validation--hidden'}`}
+        style={{
+          gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
+        }}
+      >
+        {colValidation.map((v, ci) => (
+          <div key={ci} className={`pap-line-indicator pap-line-indicator--${v}`}>
+            {v === 'correct' ? '✓' : v === 'incorrect' ? '✗' : ''}
+          </div>
+        ))}
+      </div>
+
+      {/* ── Column clues (closer to grid) ── */}
       <div
         className="pap-col-clues"
         style={{
@@ -113,7 +138,10 @@ export function Grid({
         }}
       >
         {colClues.map((clue, ci) => (
-          <div key={ci} className="pap-col-clue">
+          <div
+            key={ci}
+            className={`pap-col-clue${hoverCol === ci ? ' pap-col-clue--highlight' : ''}`}
+          >
             {clue.length === 0 ? (
               <span className="pap-clue-num">0</span>
             ) : (
@@ -131,26 +159,22 @@ export function Grid({
         ))}
       </div>
 
-      {/* ── Column validation indicators (always rendered for stable layout) ── */}
-      <div
-        className={`pap-col-validation${isValidationActive ? '' : ' pap-col-validation--hidden'}`}
-        style={{
-          gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
-        }}
-      >
-        {colValidation.map((v, ci) => (
-          <div key={ci} className={`pap-line-indicator pap-line-indicator--${v}`}>
-            {v === 'correct' ? '✓' : v === 'incorrect' ? '✗' : ''}
-          </div>
-        ))}
-      </div>
-
-      {/* ── Row area (clues + validation + cells) ── */}
+      {/* ── Row area (validation + clues + cells) ── */}
       <div className="pap-rows">
         {board.map((row, ri) => (
-          <div key={ri} className="pap-row">
-            {/* Row clues */}
-            <div className="pap-row-clue" style={{ minWidth: maxRowClueLen * 24 }}>
+          <div key={ri} className={`pap-row${hoverRow === ri ? ' pap-row--highlight' : ''}`}>
+            {/* Row validation indicator (OUTSIDE, left of clues) */}
+            <div
+              className={`pap-line-indicator pap-line-indicator--${rowValidation[ri]}${isValidationActive ? '' : ' pap-line-indicator--hidden'}`}
+            >
+              {rowValidation[ri] === 'correct' ? '✓' : rowValidation[ri] === 'incorrect' ? '✗' : ''}
+            </div>
+
+            {/* Row clues (closer to grid) */}
+            <div
+              className={`pap-row-clue${hoverRow === ri ? ' pap-row-clue--highlight' : ''}`}
+              style={{ minWidth: maxRowClueLen * 24 }}
+            >
               {rowClues[ri].length === 0 ? (
                 <span className="pap-clue-num">0</span>
               ) : (
@@ -166,13 +190,6 @@ export function Grid({
               )}
             </div>
 
-            {/* Row validation indicator (always rendered for stable layout) */}
-            <div
-              className={`pap-line-indicator pap-line-indicator--${rowValidation[ri]}${isValidationActive ? '' : ' pap-line-indicator--hidden'}`}
-            >
-              {rowValidation[ri] === 'correct' ? '✓' : rowValidation[ri] === 'incorrect' ? '✗' : ''}
-            </div>
-
             {/* Cells */}
             <div
               className="pap-cells-row"
@@ -184,19 +201,21 @@ export function Grid({
                 const fillColor =
                   cellState.kind === 'filled' ? resolveColor(cellState.colorId) : undefined;
 
-                // Extra class for 5-cell grid dividers
-                // Extra class for 5-cell grid dividers
                 const dividerClasses: string[] = [];
                 if ((ci + 1) % 5 === 0 && ci + 1 < cols)
                   dividerClasses.push('pap-cell--border-right');
                 if ((ri + 1) % 5 === 0 && ri + 1 < rows)
                   dividerClasses.push('pap-cell--border-bottom');
 
+                // Highlight cells in the hovered row or column
+                if (hoverRow === ri || hoverCol === ci) dividerClasses.push('pap-cell--crosshair');
+
                 return (
                   <div
                     key={ci}
                     className={dividerClasses.join(' ') || undefined}
                     onMouseDown={() => handleMouseDown(ri, ci)}
+                    onMouseEnter={() => handleCellHover(ri, ci)}
                   >
                     <Cell
                       state={cellState}
@@ -215,10 +234,6 @@ export function Grid({
           </div>
         ))}
       </div>
-
-      {/* Hidden spacer to reserve room for clue columns */}
-      <div className="pap-clue-spacer" style={{ width: maxRowClueLen * 24 + 24 }} />
-      <div className="pap-clue-spacer-col" style={{ height: maxColClueLen * 20 + 20 }} />
     </div>
   );
 }
