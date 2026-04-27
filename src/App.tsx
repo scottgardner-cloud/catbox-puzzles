@@ -20,7 +20,8 @@ import './App.css';
 function initGameState(entry: PuzzleEntry): GameState {
   const save = loadGame(entry.entryId);
   if (save) {
-    return restoreGameState(save, entry.puzzle.rows, entry.puzzle.cols);
+    const restored = restoreGameState(save, entry.puzzle.rows, entry.puzzle.cols);
+    if (restored) return restored;
   }
   return createInitialGameState(entry.puzzle);
 }
@@ -93,7 +94,7 @@ function App() {
 
   const handleCellDragEnter = useCallback(
     (row: number, col: number) => {
-      if (!isDragging.current || solved || !dragTarget.current || !gameState) return;
+      if (!isDragging.current || solved || !dragTarget.current || !gameState || !puzzle) return;
 
       const current = gameState.board[row][col];
       let next: PlayerCellState;
@@ -114,16 +115,33 @@ function App() {
 
       const change: CellChange = { row, col, prev: current, next };
       dragChanges.current.push(change);
-      setGameState((s) => (s && puzzle ? setCells(s, [change], puzzle) : s));
+
+      // Apply visually without pushing to undo stack (board update only)
+      setGameState((s) => {
+        if (!s) return s;
+        const newBoard = s.board.map((r, ri) =>
+          ri === row ? r.map((c, ci) => (ci === col ? next : c)) : r,
+        );
+        return {
+          ...s,
+          board: newBoard,
+          isValidationActive: false,
+        };
+      });
     },
     [gameState, puzzle, solved, setGameState],
   );
 
   const handleDragEnd = useCallback(() => {
+    // Commit all accumulated drag changes as a single undo action
+    if (isDragging.current && dragChanges.current.length > 0 && puzzle) {
+      const changes = [...dragChanges.current];
+      setGameState((s) => (s ? setCells(s, changes, puzzle) : s));
+    }
     isDragging.current = false;
     dragTarget.current = null;
     dragChanges.current = [];
-  }, []);
+  }, [puzzle, setGameState]);
 
   const handleUndo = useCallback(
     () => setGameState((s) => (s && puzzle ? undo(s, puzzle) : s)),

@@ -95,14 +95,29 @@ export function hasSave(entryId: string): boolean {
 
 /**
  * Restores a GameState from a SavedGameState.
- * Re-initializes ephemeral fields (validation inactive, etc.).
+ * Validates board dimensions against the puzzle. Returns null if incompatible.
+ * Re-initializes ephemeral fields (validation inactive, line validation derived).
  */
-export function restoreGameState(save: SavedGameState, rows: number, cols: number): GameState {
+export function restoreGameState(
+  save: SavedGameState,
+  rows: number,
+  cols: number,
+): GameState | null {
+  // Validate board dimensions match the puzzle
+  if (
+    !Array.isArray(save.board) ||
+    save.board.length !== rows ||
+    save.board.some((row) => !Array.isArray(row) || row.length !== cols)
+  ) {
+    return null;
+  }
+
   return {
     puzzleId: save.puzzleId,
     board: save.board,
     isValidationActive: false,
     cellValidation: makeUncheckedGrid(rows, cols),
+    // Line validation will be recomputed by the caller or on first action
     rowValidation: Array.from({ length: rows }, () => 'incomplete' as const),
     colValidation: Array.from({ length: cols }, () => 'incomplete' as const),
     selectedColorId: save.selectedColorId,

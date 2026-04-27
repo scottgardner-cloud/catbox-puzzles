@@ -24,6 +24,7 @@ function getEntryStatus(entry: PuzzleEntry): PuzzleStatus {
     const save = loadGame(entry.entryId);
     if (!save) return 'new';
     const state = restoreGameState(save, entry.puzzle.rows, entry.puzzle.cols);
+    if (!state) return 'new';
     return isSolved(state, entry.puzzle) ? 'solved' : 'in-progress';
   } catch {
     return 'new';

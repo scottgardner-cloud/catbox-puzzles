@@ -81,6 +81,11 @@ export function validatePuzzleDefinition(
     errors.push({ message: 'Palette must contain at least one color' });
   }
 
+  // Palette IDs must be unique
+  if (paletteIds.size !== puzzle.palette.length) {
+    errors.push({ message: 'Palette contains duplicate color IDs' });
+  }
+
   // Dimension checks
   if (puzzle.rowClues.length !== puzzle.rows) {
     errors.push({
