@@ -107,6 +107,53 @@ const heartDefinition: PuzzleDefinition = {
   ],
 };
 
+/**
+ * 5×5 Color puzzle — a simple flag (red and blue stripes).
+ *
+ * Solution (R = red, B = blue):
+ *   RRRRR
+ *   BBBBB
+ *   RRRRR
+ *   BBBBB
+ *   RRRRR
+ */
+const R = colorId('red');
+const BL = colorId('blue');
+
+// prettier-ignore
+const flagDefinition: PuzzleDefinition = {
+  id: 'sample-flag-5x5',
+  name: 'Flag 5×5 (Color)',
+  kind: 'color',
+  rows: 5,
+  cols: 5,
+  palette: [
+    { id: R, name: 'Red', value: '#e53935' },
+    { id: BL, name: 'Blue', value: '#1e88e5' },
+  ],
+  solution: [
+    [R,  R,  R,  R,  R ],
+    [BL, BL, BL, BL, BL],
+    [R,  R,  R,  R,  R ],
+    [BL, BL, BL, BL, BL],
+    [R,  R,  R,  R,  R ],
+  ],
+  rowClues: [
+    [{ length: 5, colorId: R }],
+    [{ length: 5, colorId: BL }],
+    [{ length: 5, colorId: R }],
+    [{ length: 5, colorId: BL }],
+    [{ length: 5, colorId: R }],
+  ],
+  colClues: [
+    [{ length: 1, colorId: R }, { length: 1, colorId: BL }, { length: 1, colorId: R }, { length: 1, colorId: BL }, { length: 1, colorId: R }],
+    [{ length: 1, colorId: R }, { length: 1, colorId: BL }, { length: 1, colorId: R }, { length: 1, colorId: BL }, { length: 1, colorId: R }],
+    [{ length: 1, colorId: R }, { length: 1, colorId: BL }, { length: 1, colorId: R }, { length: 1, colorId: BL }, { length: 1, colorId: R }],
+    [{ length: 1, colorId: R }, { length: 1, colorId: BL }, { length: 1, colorId: R }, { length: 1, colorId: BL }, { length: 1, colorId: R }],
+    [{ length: 1, colorId: R }, { length: 1, colorId: BL }, { length: 1, colorId: R }, { length: 1, colorId: BL }, { length: 1, colorId: R }],
+  ],
+};
+
 function assertValid(def: PuzzleDefinition): ValidatedPuzzle {
   const result = validatePuzzleDefinition(def);
   if (Array.isArray(result)) {
@@ -123,7 +170,10 @@ export const crossPuzzle: ValidatedPuzzle = assertValid(crossDefinition);
 /** Validated 10×10 heart puzzle. */
 export const heartPuzzle: ValidatedPuzzle = assertValid(heartDefinition);
 
+/** Validated 5×5 color flag puzzle. */
+export const flagPuzzle: ValidatedPuzzle = assertValid(flagDefinition);
+
 /** Returns all sample puzzles. */
 export function getSamplePuzzles(): ValidatedPuzzle[] {
-  return [crossPuzzle, heartPuzzle];
+  return [crossPuzzle, heartPuzzle, flagPuzzle];
 }

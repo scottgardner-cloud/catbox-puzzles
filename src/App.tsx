@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { Grid } from './components';
+import { Grid, PaletteBar } from './components';
 import {
   createInitialGameState,
   cycleCell,
@@ -11,7 +11,7 @@ import {
   isSolved,
 } from './engine';
 import { getSamplePuzzles } from './puzzles/samples';
-import type { ValidatedPuzzle, CellChange, PlayerCellState } from './types';
+import type { ValidatedPuzzle, CellChange, PlayerCellState, ColorId } from './types';
 import './App.css';
 
 const puzzles = getSamplePuzzles();
@@ -96,6 +96,10 @@ function App() {
   const handleReset = useCallback(() => setGameState(resetBoard), []);
   const handleCheck = useCallback(() => setGameState((s) => checkErrors(s, puzzle)), [puzzle]);
 
+  const handleSelectColor = useCallback((id: ColorId) => {
+    setGameState((s) => ({ ...s, selectedColorId: id }));
+  }, []);
+
   const handlePuzzleChange = useCallback((index: number) => {
     setPuzzleIndex(index);
     setGameState(createInitialGameState(puzzles[index]));
@@ -121,6 +125,13 @@ function App() {
 
       {/* Status */}
       {solved && <div className="pap-solved">🎉 Puzzle Solved!</div>}
+
+      {/* Color palette (hidden for B&W puzzles) */}
+      <PaletteBar
+        palette={puzzle.palette}
+        selectedColorId={gameState.selectedColorId}
+        onSelectColor={handleSelectColor}
+      />
 
       {/* Grid */}
       <Grid

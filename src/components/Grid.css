@@ -195,3 +195,34 @@
     font-size: 12px;
   }
 }
+
+/* ── Palette bar ── */
+.pap-palette-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.pap-palette-swatch {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #999;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.pap-palette-swatch:hover {
+  transform: scale(1.1);
+  border-color: #333;
+}
+
+.pap-palette-swatch--selected {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.4);
+  transform: scale(1.1);
+}
