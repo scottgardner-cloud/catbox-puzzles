@@ -203,6 +203,24 @@
   /* filled color takes precedence via inline style */
 }
 
+/* ── Keyboard focus indicator ── */
+.pap-cell--focused {
+  outline: 3px solid #7c4dff;
+  outline-offset: -3px;
+  z-index: 2;
+}
+
+/* Don't show the browser's default focus ring on the grid wrapper */
+.pap-grid-wrapper:focus {
+  outline: 2px solid #7c4dff;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.pap-grid-wrapper:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* ── Responsive scaling ── */
 @media (max-width: 600px) {
   .pap-col-clue,

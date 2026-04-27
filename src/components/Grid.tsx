@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type {
   PlayerCellState,
   CellValidation,
@@ -36,6 +36,8 @@ export interface GridProps {
   readonly onDragStart: (row: number, col: number) => void;
   /** Called when a drag gesture ends. */
   readonly onDragEnd: () => void;
+  /** Callback to announce a message to screen readers via live region. */
+  readonly onAnnounce?: (message: string) => void;
 }
 
 /** Default cell size in pixels. */
@@ -65,6 +67,7 @@ export function Grid({
   onCellDragEnter,
   onDragStart,
   onDragEnd,
+  onAnnounce,
 }: GridProps): React.JSX.Element {
   const rows = board.length;
   const cols = rows > 0 ? board[0].length : 0;
@@ -72,6 +75,11 @@ export function Grid({
   // Hover tracking for row/column highlighting
   const [hoverRow, setHoverRow] = useState<number | null>(null);
   const [hoverCol, setHoverCol] = useState<number | null>(null);
+
+  // Keyboard focus tracking (-1 means grid is not keyboard-focused)
+  const [focusRow, setFocusRow] = useState(-1);
+  const [focusCol, setFocusCol] = useState(-1);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const colorMap = useMemo(() => {
     const map = new Map<ColorId, string>();
@@ -109,12 +117,103 @@ export function Grid({
     onDragEnd();
   }, [onDragEnd]);
 
+  const handleGridKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (rows === 0 || cols === 0) return;
+
+      // Clamp current focus to valid bounds (handles puzzle switches)
+      const curRow = Math.min(Math.max(focusRow, 0), rows - 1);
+      const curCol = Math.min(Math.max(focusCol, 0), cols - 1);
+      let nextRow = curRow;
+      let nextCol = curCol;
+
+      switch (e.key) {
+        case 'ArrowUp':
+          e.preventDefault();
+          nextRow = Math.max(0, curRow - 1);
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          nextRow = Math.min(rows - 1, curRow + 1);
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          nextCol = Math.max(0, curCol - 1);
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          nextCol = Math.min(cols - 1, curCol + 1);
+          break;
+        case ' ':
+        case 'Enter':
+          e.preventDefault();
+          if (curRow >= 0 && curCol >= 0) {
+            onCellClick(curRow, curCol);
+            const current = board[curRow][curCol];
+            let nextState: string;
+            switch (current.kind) {
+              case 'unknown':
+                nextState = 'filled';
+                break;
+              case 'filled':
+                nextState = 'marked empty';
+                break;
+              case 'empty':
+                nextState = 'unknown';
+                break;
+            }
+            onAnnounce?.(`Row ${curRow + 1}, column ${curCol + 1}: ${nextState}`);
+          }
+          return;
+        case 'Home':
+          e.preventDefault();
+          nextCol = 0;
+          if (e.ctrlKey) nextRow = 0;
+          break;
+        case 'End':
+          e.preventDefault();
+          nextCol = cols - 1;
+          if (e.ctrlKey) nextRow = rows - 1;
+          break;
+        default:
+          return;
+      }
+
+      setFocusRow(nextRow);
+      setFocusCol(nextCol);
+    },
+    [focusRow, focusCol, rows, cols, board, onCellClick, onAnnounce],
+  );
+
+  /** When the grid wrapper receives focus (via Tab), activate keyboard focus on first cell. */
+  const handleGridFocus = useCallback(() => {
+    if (focusRow < 0 || focusCol < 0) {
+      setFocusRow(0);
+      setFocusCol(0);
+    }
+  }, [focusRow, focusCol]);
+
+  /** When focus leaves the grid, deactivate keyboard focus. */
+  const handleGridBlur = useCallback((e: React.FocusEvent) => {
+    // Only reset if focus is truly leaving the grid (not moving within it)
+    if (!gridRef.current?.contains(e.relatedTarget)) {
+      setFocusRow(-1);
+      setFocusCol(-1);
+    }
+  }, []);
+
   return (
     <div
+      ref={gridRef}
       className="pap-grid-wrapper"
       onMouseUp={handleMouseUp}
       onMouseLeave={handleGridLeave}
+      onKeyDown={handleGridKeyDown}
+      onFocus={handleGridFocus}
+      onBlur={handleGridBlur}
       role="grid"
+      aria-label="Puzzle grid"
+      tabIndex={0}
     >
       {/* ── Column validation indicators (OUTSIDE, above clues) ── */}
       <div
@@ -210,6 +309,8 @@ export function Grid({
                 // Highlight cells in the hovered row or column
                 if (hoverRow === ri || hoverCol === ci) dividerClasses.push('pap-cell--crosshair');
 
+                const cellIsFocused = focusRow === ri && focusCol === ci;
+
                 return (
                   <div
                     key={ci}
@@ -226,6 +327,9 @@ export function Grid({
                       }}
                       onDragEnter={() => onCellDragEnter(ri, ci)}
                       size={DEFAULT_CELL_SIZE}
+                      ariaRowIndex={ri + 1}
+                      ariaColIndex={ci + 1}
+                      isFocused={cellIsFocused}
                     />
                   </div>
                 );

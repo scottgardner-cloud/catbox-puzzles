@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Grid, PaletteBar } from './components';
 import {
   createInitialGameState,
@@ -33,6 +33,21 @@ function App() {
   const puzzle: ValidatedPuzzle = puzzles[puzzleIndex];
   const [gameState, setGameState] = useState(() => initGameState(puzzle));
   const solved = isSolved(gameState, puzzle);
+
+  // Screen reader live region announcement
+  const liveRegionRef = useRef<HTMLDivElement>(null);
+  const announceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** Push a message to the screen reader live region. */
+  const announce = useCallback((message: string) => {
+    if (!liveRegionRef.current) return;
+    // Clear then set to ensure repeated identical messages are announced
+    liveRegionRef.current.textContent = '';
+    if (announceTimeoutRef.current) clearTimeout(announceTimeoutRef.current);
+    announceTimeoutRef.current = setTimeout(() => {
+      if (liveRegionRef.current) liveRegionRef.current.textContent = message;
+    }, 50);
+  }, []);
 
   // Drag state (not part of game state — ephemeral UI concern)
   const isDragging = useRef(false);
@@ -121,6 +136,64 @@ function App() {
     setGameState(initGameState(puzzles[index]));
   }, []);
 
+  // Announce solved state
+  const prevSolvedRef = useRef(false);
+  useEffect(() => {
+    if (solved && !prevSolvedRef.current) {
+      announce('Puzzle solved! Congratulations!');
+    }
+    prevSolvedRef.current = solved;
+  }, [solved, announce]);
+
+  // Announce validation results
+  const prevValidationRef = useRef(false);
+  useEffect(() => {
+    if (gameState.isValidationActive && !prevValidationRef.current) {
+      const wrongCount = gameState.cellValidation
+        .flat()
+        .filter((v) => v === 'wrong-filled' || v === 'wrong-empty' || v === 'wrong-color').length;
+      if (wrongCount === 0) {
+        announce('Validation: no errors found.');
+      } else {
+        announce(`Validation: ${wrongCount} error${wrongCount === 1 ? '' : 's'} found.`);
+      }
+    }
+    prevValidationRef.current = gameState.isValidationActive;
+  }, [gameState.isValidationActive, gameState.cellValidation, announce]);
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Z — undo
+      if (e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+        e.preventDefault();
+        setGameState(undo);
+        return;
+      }
+      // Ctrl+Y or Ctrl+Shift+Z — redo
+      if (
+        (e.key === 'y' && (e.ctrlKey || e.metaKey)) ||
+        (e.key === 'z' && (e.ctrlKey || e.metaKey) && e.shiftKey) ||
+        (e.key === 'Z' && (e.ctrlKey || e.metaKey) && e.shiftKey)
+      ) {
+        e.preventDefault();
+        setGameState(redo);
+        return;
+      }
+      // Number keys 1-9 — select palette color
+      if (e.key >= '1' && e.key <= '9' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const index = parseInt(e.key, 10) - 1;
+        if (index < puzzle.palette.length) {
+          const colorId = puzzle.palette[index].id;
+          setGameState((s) => ({ ...s, selectedColorId: colorId }));
+          announce(`Selected color: ${puzzle.palette[index].name}`);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [puzzle, announce]);
+
   return (
     <div className="pap-app">
       <h1>Pix-a-Pix</h1>
@@ -163,6 +236,7 @@ function App() {
         onCellDragEnter={handleCellDragEnter}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        onAnnounce={announce}
       />
 
       {/* Controls */}
@@ -193,6 +267,15 @@ function App() {
           ⟲ Reset
         </button>
       </div>
+
+      {/* Visually hidden live region for screen reader announcements */}
+      <div
+        ref={liveRegionRef}
+        className="pap-sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      />
     </div>
   );
 }

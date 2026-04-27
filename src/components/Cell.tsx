@@ -14,6 +14,12 @@ export interface CellProps {
   readonly onDragEnter: () => void;
   /** Cell size in pixels (for responsive sizing). */
   readonly size: number;
+  /** 1-based row index for ARIA. */
+  readonly ariaRowIndex?: number;
+  /** 1-based column index for ARIA. */
+  readonly ariaColIndex?: number;
+  /** Whether this cell has keyboard focus. */
+  readonly isFocused?: boolean;
 }
 
 /**
@@ -31,6 +37,9 @@ export function Cell({
   onClick,
   onDragEnter,
   size,
+  ariaRowIndex,
+  ariaColIndex,
+  isFocused,
 }: CellProps): React.JSX.Element {
   const classNames = ['pap-cell'];
 
@@ -40,6 +49,11 @@ export function Cell({
   // Validation class (skip unchecked to avoid noise)
   if (validation !== 'unchecked') {
     classNames.push(`pap-cell--${validation}`);
+  }
+
+  // Keyboard focus indicator
+  if (isFocused) {
+    classNames.push('pap-cell--focused');
   }
 
   const style: React.CSSProperties = {
@@ -59,6 +73,9 @@ export function Cell({
       onMouseEnter={onDragEnter}
       role="gridcell"
       aria-label={cellAriaLabel(state, validation)}
+      aria-rowindex={ariaRowIndex}
+      aria-colindex={ariaColIndex}
+      aria-selected={isFocused || undefined}
     >
       {state.kind === 'empty' && <span className="pap-cell__mark">×</span>}
     </div>
