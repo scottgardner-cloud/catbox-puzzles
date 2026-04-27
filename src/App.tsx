@@ -11,15 +11,27 @@ import {
   isSolved,
 } from './engine';
 import { getSamplePuzzles } from './puzzles/samples';
+import { saveGame, loadGame, restoreGameState } from './state/persistence';
 import type { ValidatedPuzzle, CellChange, PlayerCellState, ColorId } from './types';
 import './App.css';
 
 const puzzles = getSamplePuzzles();
 
+/** Try to load a saved state for a puzzle, or create a fresh one. */
+function initGameState(puzzle: ValidatedPuzzle): GameState {
+  const save = loadGame(puzzle.id);
+  if (save) {
+    return restoreGameState(save, puzzle.rows, puzzle.cols);
+  }
+  return createInitialGameState(puzzle);
+}
+
+type GameState = ReturnType<typeof createInitialGameState>;
+
 function App() {
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const puzzle: ValidatedPuzzle = puzzles[puzzleIndex];
-  const [gameState, setGameState] = useState(() => createInitialGameState(puzzle));
+  const [gameState, setGameState] = useState(() => initGameState(puzzle));
   const solved = isSolved(gameState, puzzle);
 
   // Drag state (not part of game state — ephemeral UI concern)
@@ -100,9 +112,13 @@ function App() {
     setGameState((s) => ({ ...s, selectedColorId: id }));
   }, []);
 
+  const handleSave = useCallback(() => {
+    saveGame(gameState);
+  }, [gameState]);
+
   const handlePuzzleChange = useCallback((index: number) => {
     setPuzzleIndex(index);
-    setGameState(createInitialGameState(puzzles[index]));
+    setGameState(initGameState(puzzles[index]));
   }, []);
 
   return (
@@ -169,6 +185,9 @@ function App() {
         </button>
         <button type="button" className="pap-btn" onClick={handleCheck}>
           ✓ Check
+        </button>
+        <button type="button" className="pap-btn" onClick={handleSave}>
+          💾 Save
         </button>
         <button type="button" className="pap-btn pap-btn--danger" onClick={handleReset}>
           ⟲ Reset
