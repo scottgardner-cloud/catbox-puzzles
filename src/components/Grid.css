@@ -5,9 +5,19 @@
 .pap-grid-wrapper {
   display: inline-flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: stretch;
   user-select: none;
   gap: 2px;
+}
+
+/* Wrapper row for column-aligned elements (clues, validation, run indicators) */
+.pap-col-header-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.pap-col-header-spacer {
+  flex-shrink: 0;
 }
 
 /* ── Column clues ── */

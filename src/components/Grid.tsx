@@ -252,46 +252,52 @@ export function Grid({
       tabIndex={0}
     >
       {/* ── Column validation indicators (OUTSIDE, above clues) ── */}
-      <div
-        className="pap-col-validation"
-        style={{
-          gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
-        }}
-      >
-        {colValidation.map((v, ci) => (
-          <div key={ci} className={`pap-line-indicator pap-line-indicator--${v}`}>
-            {v === 'correct' ? '✓' : v === 'incorrect' ? '✗' : ''}
-          </div>
-        ))}
+      <div className="pap-col-header-row">
+        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 44 }} />
+        <div
+          className="pap-col-validation"
+          style={{
+            gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
+          }}
+        >
+          {colValidation.map((v, ci) => (
+            <div key={ci} className={`pap-line-indicator pap-line-indicator--${v}`}>
+              {v === 'correct' ? '✓' : v === 'incorrect' ? '✗' : ''}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── Column clues (closer to grid) ── */}
-      <div
-        className="pap-col-clues"
-        style={{
-          gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
-        }}
-      >
-        {colClues.map((clue, ci) => (
-          <div
-            key={ci}
-            className={`pap-col-clue${hoverCol === ci ? ' pap-col-clue--highlight' : ''}`}
-          >
-            {clue.length === 0 ? (
-              <span className="pap-clue-num">0</span>
-            ) : (
-              clue.map((run, ri) => (
-                <span
-                  key={ri}
-                  className="pap-clue-num"
-                  style={isColorPuzzle ? { color: resolveColor(run.colorId) } : undefined}
-                >
-                  {run.length}
-                </span>
-              ))
-            )}
-          </div>
-        ))}
+      <div className="pap-col-header-row">
+        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 44 }} />
+        <div
+          className="pap-col-clues"
+          style={{
+            gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
+          }}
+        >
+          {colClues.map((clue, ci) => (
+            <div
+              key={ci}
+              className={`pap-col-clue${hoverCol === ci ? ' pap-col-clue--highlight' : ''}`}
+            >
+              {clue.length === 0 ? (
+                <span className="pap-clue-num">0</span>
+              ) : (
+                clue.map((run, ri) => (
+                  <span
+                    key={ri}
+                    className="pap-clue-num"
+                    style={isColorPuzzle ? { color: resolveColor(run.colorId) } : undefined}
+                  >
+                    {run.length}
+                  </span>
+                ))
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── Row area (validation + clues + cells) ── */}
@@ -386,27 +392,30 @@ export function Grid({
       </div>
 
       {/* Column run-length indicators (bottom edge) */}
-      <div
-        className="pap-col-run-indicators"
-        style={{ gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)` }}
-      >
-        {Array.from({ length: cols }, (_, ci) => {
-          const colCells = board.map((r) => r[ci]);
-          const show = hoverCol === ci && hoverRow !== null;
-          return (
-            <div
-              key={ci}
-              className={`pap-run-indicator${show ? '' : ' pap-run-indicator--hidden'}`}
-              style={
-                show && hoverRow !== null
-                  ? runIndicatorStyle(colCells[hoverRow], resolveColor)
-                  : undefined
-              }
-            >
-              {show && hoverRow !== null ? countRunAt(colCells, hoverRow) : ''}
-            </div>
-          );
-        })}
+      <div className="pap-col-header-row">
+        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 44 }} />
+        <div
+          className="pap-col-run-indicators"
+          style={{ gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)` }}
+        >
+          {Array.from({ length: cols }, (_, ci) => {
+            const colCells = board.map((r) => r[ci]);
+            const show = hoverCol === ci && hoverRow !== null;
+            return (
+              <div
+                key={ci}
+                className={`pap-run-indicator${show ? '' : ' pap-run-indicator--hidden'}`}
+                style={
+                  show && hoverRow !== null
+                    ? runIndicatorStyle(colCells[hoverRow], resolveColor)
+                    : undefined
+                }
+              >
+                {show && hoverRow !== null ? countRunAt(colCells, hoverRow) : ''}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
