@@ -11,4 +11,5 @@ export {
   checkErrors,
   isSolved,
   validateLine,
+  computeLineValidation,
 } from './game-logic';

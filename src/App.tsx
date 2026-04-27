@@ -20,7 +20,7 @@ import './App.css';
 function initGameState(entry: PuzzleEntry): GameState {
   const save = loadGame(entry.entryId);
   if (save) {
-    const restored = restoreGameState(save, entry.puzzle.rows, entry.puzzle.cols);
+    const restored = restoreGameState(save, entry.puzzle);
     if (restored) return restored;
   }
   return createInitialGameState(entry.puzzle);

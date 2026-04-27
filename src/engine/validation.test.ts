@@ -101,6 +101,19 @@ describe('validatePuzzleDefinition', () => {
       expect(errors.some((e) => e.message.includes('at least one color'))).toBe(true);
     });
 
+    it('rejects duplicate palette color IDs', () => {
+      const puzzle: PuzzleDefinition = {
+        ...make3x3BW(),
+        kind: 'color',
+        palette: [
+          { id: B, name: 'Black', value: '#000' },
+          { id: B, name: 'Also Black', value: '#111' },
+        ],
+      };
+      const errors = expectErrors(validatePuzzleDefinition(puzzle));
+      expect(errors.some((e) => e.message.includes('duplicate color IDs'))).toBe(true);
+    });
+
     it('rejects B&W puzzle with multiple colors', () => {
       const red = colorId('red');
       const puzzle = {

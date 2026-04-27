@@ -1,6 +1,67 @@
-import type { GameState, SavedGameState } from '../types';
+import type { GameState, SavedGameState, ValidatedPuzzle, PlayerCellState, GameAction, CellChange, ColorId } from '../types';
+import { computeLineValidation } from '../engine';
 
 const STORAGE_PREFIX = 'pap-save-';
+
+// ── Helpers ─────────────────────────────────────────────────────────
+
+/** Type-guard for a valid PlayerCellState shape. */
+function isValidCellState(cell: unknown): cell is PlayerCellState {
+  if (typeof cell !== 'object' || cell === null) return false;
+  const obj = cell as Record<string, unknown>;
+  switch (obj.kind) {
+    case 'unknown':
+    case 'empty':
+      return true;
+    case 'filled':
+      return typeof obj.colorId === 'string';
+    default:
+      return false;
+  }
+}
+
+/** Type-guard for a valid CellChange shape (structural only). */
+function isValidCellChange(change: unknown): change is CellChange {
+  if (typeof change !== 'object' || change === null) return false;
+  const obj = change as Record<string, unknown>;
+  return (
+    typeof obj.row === 'number' &&
+    typeof obj.col === 'number' &&
+    isValidCellState(obj.prev) &&
+    isValidCellState(obj.next)
+  );
+}
+
+/** Type-guard for a valid GameAction shape (structural only). */
+function isValidAction(action: unknown): action is GameAction {
+  if (typeof action !== 'object' || action === null) return false;
+  const obj = action as Record<string, unknown>;
+  switch (obj.type) {
+    case 'set-cell':
+      return isValidCellChange(obj.change);
+    case 'set-cells':
+      return Array.isArray(obj.changes) && obj.changes.every(isValidCellChange);
+    case 'reset':
+      return (
+        Array.isArray(obj.previousBoard) &&
+        obj.previousBoard.every(
+          (row: unknown) => Array.isArray(row) && row.every(isValidCellState),
+        )
+      );
+    default:
+      return false;
+  }
+}
+
+/** Check that a board contains only valid cells structurally. */
+function isValidBoard(board: unknown): board is PlayerCellState[][] {
+  return (
+    Array.isArray(board) &&
+    board.every(
+      (row: unknown) => Array.isArray(row) && row.every(isValidCellState),
+    )
+  );
+}
 
 /**
  * Saves the current game state to localStorage.
@@ -93,17 +154,65 @@ export function hasSave(entryId: string): boolean {
   return localStorage.getItem(STORAGE_PREFIX + legacyKey) !== null;
 }
 
+// ── Semantic helpers ────────────────────────────────────────────────
+
+/** Check that all filled-cell colorIds in a board exist in the palette. */
+function boardColorsValid(
+  board: readonly (readonly PlayerCellState[])[],
+  paletteIds: ReadonlySet<ColorId>,
+): boolean {
+  return board.every((row) =>
+    row.every((cell) => cell.kind !== 'filled' || paletteIds.has(cell.colorId)),
+  );
+}
+
+/** Check that all cell changes in an action reference valid coords and palette colors. */
+function actionSemanticsValid(
+  action: GameAction,
+  rows: number,
+  cols: number,
+  paletteIds: ReadonlySet<ColorId>,
+): boolean {
+  const changeValid = (c: CellChange): boolean =>
+    Number.isInteger(c.row) &&
+    Number.isInteger(c.col) &&
+    c.row >= 0 &&
+    c.row < rows &&
+    c.col >= 0 &&
+    c.col < cols &&
+    (c.prev.kind !== 'filled' || paletteIds.has(c.prev.colorId)) &&
+    (c.next.kind !== 'filled' || paletteIds.has(c.next.colorId));
+
+  switch (action.type) {
+    case 'set-cell':
+      return changeValid(action.change);
+    case 'set-cells':
+      return action.changes.every(changeValid);
+    case 'reset':
+      return (
+        action.previousBoard.length === rows &&
+        action.previousBoard.every((row) => row.length === cols) &&
+        boardColorsValid(action.previousBoard, paletteIds)
+      );
+  }
+}
+
 /**
  * Restores a GameState from a SavedGameState.
- * Validates board dimensions against the puzzle. Returns null if incompatible.
+ * Validates the save against the puzzle: dimensions, cell colors, history
+ * coordinates, and history cell colors. Returns null if incompatible.
  * Re-initializes ephemeral fields (validation inactive, line validation derived).
  */
 export function restoreGameState(
   save: SavedGameState,
-  rows: number,
-  cols: number,
+  puzzle: ValidatedPuzzle,
 ): GameState | null {
-  // Validate board dimensions match the puzzle
+  const { rows, cols } = puzzle;
+
+  // Puzzle ID must match
+  if (save.puzzleId !== puzzle.id) return null;
+
+  // Validate board dimensions
   if (
     !Array.isArray(save.board) ||
     save.board.length !== rows ||
@@ -112,37 +221,51 @@ export function restoreGameState(
     return null;
   }
 
+  const paletteIds = new Set<ColorId>(puzzle.palette.map((c) => c.id));
+
+  // Validate board cell colors against palette
+  if (!boardColorsValid(save.board, paletteIds)) return null;
+
+  // Validate history actions semantically
+  const allActions = [...save.undoStack, ...save.redoStack];
+  if (!allActions.every((a) => actionSemanticsValid(a, rows, cols, paletteIds))) {
+    return null;
+  }
+
+  // Validate or fall back selectedColorId
+  const selectedColorId = paletteIds.has(save.selectedColorId)
+    ? save.selectedColorId
+    : puzzle.palette[0].id;
+
+  const derived = computeLineValidation(save.board, puzzle);
+
   return {
     puzzleId: save.puzzleId,
     board: save.board,
     isValidationActive: false,
-    cellValidation: makeUncheckedGrid(rows, cols),
-    // Line validation will be recomputed by the caller or on first action
-    rowValidation: Array.from({ length: rows }, () => 'incomplete' as const),
-    colValidation: Array.from({ length: cols }, () => 'incomplete' as const),
-    selectedColorId: save.selectedColorId,
+    cellValidation: derived.cellValidation,
+    rowValidation: derived.rowValidation,
+    colValidation: derived.colValidation,
+    selectedColorId,
     undoStack: save.undoStack,
     redoStack: save.redoStack,
   };
 }
 
-function makeUncheckedGrid(rows: number, cols: number) {
-  return Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => 'unchecked' as const),
-  );
-}
 
-/** Basic shape check for loaded save data. */
+/** Structural shape check for loaded save data. */
 function isValidSave(data: unknown): data is SavedGameState {
   if (typeof data !== 'object' || data === null) return false;
   const obj = data as Record<string, unknown>;
   return (
     obj.version === 1 &&
     typeof obj.puzzleId === 'string' &&
-    Array.isArray(obj.board) &&
+    isValidBoard(obj.board) &&
     typeof obj.selectedColorId === 'string' &&
     Array.isArray(obj.undoStack) &&
+    obj.undoStack.every(isValidAction) &&
     Array.isArray(obj.redoStack) &&
+    obj.redoStack.every(isValidAction) &&
     typeof obj.savedAt === 'string'
   );
 }

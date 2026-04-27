@@ -23,7 +23,7 @@ function getEntryStatus(entry: PuzzleEntry): PuzzleStatus {
     if (!hasSave(entry.entryId)) return 'new';
     const save = loadGame(entry.entryId);
     if (!save) return 'new';
-    const state = restoreGameState(save, entry.puzzle.rows, entry.puzzle.cols);
+    const state = restoreGameState(save, entry.puzzle);
     if (!state) return 'new';
     return isSolved(state, entry.puzzle) ? 'solved' : 'in-progress';
   } catch {

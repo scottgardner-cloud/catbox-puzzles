@@ -52,7 +52,7 @@ export function createInitialGameState(puzzle: ValidatedPuzzle): GameState {
  * Compute per-line validation from the current board.
  * Cell validation is left unchecked (only populated by explicit error check).
  */
-function computeLineValidation(
+export function computeLineValidation(
   board: readonly (readonly PlayerCellState[])[],
   puzzle: ValidatedPuzzle,
 ): {
