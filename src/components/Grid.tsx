@@ -23,6 +23,29 @@ function countRunAt(line: readonly PlayerCellState[], pos: number): number {
   return end - start + 1;
 }
 
+/** Build inline style for a run indicator based on the hovered cell's state. */
+function runIndicatorStyle(
+  cell: PlayerCellState,
+  resolveColor: (id: ColorId) => string,
+): React.CSSProperties {
+  switch (cell.kind) {
+    case 'filled':
+      return {
+        backgroundColor: resolveColor(cell.colorId),
+        color: '#fff',
+        borderRadius: 4,
+      };
+    case 'empty':
+      return {
+        backgroundColor: '#e0e0e0',
+        color: '#616161',
+        borderRadius: 4,
+      };
+    default:
+      return {};
+  }
+}
+
 /** Props for the {@link Grid} component. */
 export interface GridProps {
   /** The player's current board state, indexed as board[row][col]. */
@@ -350,6 +373,11 @@ export function Grid({
             {/* Row run-length indicator (right edge) */}
             <div
               className={`pap-run-indicator${hoverRow === ri && hoverCol !== null ? '' : ' pap-run-indicator--hidden'}`}
+              style={
+                hoverRow === ri && hoverCol !== null
+                  ? runIndicatorStyle(row[hoverCol], resolveColor)
+                  : undefined
+              }
             >
               {hoverRow === ri && hoverCol !== null ? countRunAt(row, hoverCol) : ''}
             </div>
@@ -369,6 +397,11 @@ export function Grid({
             <div
               key={ci}
               className={`pap-run-indicator${show ? '' : ' pap-run-indicator--hidden'}`}
+              style={
+                show && hoverRow !== null
+                  ? runIndicatorStyle(colCells[hoverRow], resolveColor)
+                  : undefined
+              }
             >
               {show && hoverRow !== null ? countRunAt(colCells, hoverRow) : ''}
             </div>
