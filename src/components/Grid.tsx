@@ -185,16 +185,17 @@ export function Grid({
                   cellState.kind === 'filled' ? resolveColor(cellState.colorId) : undefined;
 
                 // Extra class for 5-cell grid dividers
-                const borderClasses: string[] = [];
+                // Extra class for 5-cell grid dividers
+                const dividerClasses: string[] = [];
                 if ((ci + 1) % 5 === 0 && ci + 1 < cols)
-                  borderClasses.push('pap-cell--border-right');
+                  dividerClasses.push('pap-cell--border-right');
                 if ((ri + 1) % 5 === 0 && ri + 1 < rows)
-                  borderClasses.push('pap-cell--border-bottom');
+                  dividerClasses.push('pap-cell--border-bottom');
 
                 return (
                   <div
                     key={ci}
-                    className={borderClasses.join(' ') || undefined}
+                    className={dividerClasses.join(' ') || undefined}
                     onMouseDown={() => handleMouseDown(ri, ci)}
                   >
                     <Cell
