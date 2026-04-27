@@ -11,10 +11,51 @@
   background: #fafafa;
 }
 
-.pap-app h1 {
-  margin: 0 0 16px;
+.pap-header {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  margin-bottom: 16px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.pap-header h1 {
+  margin: 0;
   font-size: 28px;
   color: #333;
+}
+
+.pap-header__title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.pap-header__title-link:hover {
+  text-decoration: underline;
+}
+
+.pap-nav {
+  display: flex;
+  gap: 16px;
+}
+
+.pap-nav__link {
+  color: #1976d2;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.pap-nav__link:hover {
+  text-decoration: underline;
+}
+
+.pap-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 .pap-back-row {
