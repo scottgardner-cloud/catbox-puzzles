@@ -123,8 +123,8 @@ function App() {
         ))}
       </div>
 
-      {/* Status */}
-      {solved && <div className="pap-solved">🎉 Puzzle Solved!</div>}
+      {/* Status (always rendered, invisible when not solved to avoid layout shift) */}
+      <div className={`pap-solved${solved ? '' : ' pap-solved--hidden'}`}>🎉 Puzzle Solved!</div>
 
       {/* Color palette (hidden for B&W puzzles) */}
       <PaletteBar
