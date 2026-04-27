@@ -253,7 +253,7 @@ export function Grid({
     >
       {/* ── Column validation indicators (OUTSIDE, above clues) ── */}
       <div className="pap-col-header-row">
-        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 44 }} />
+        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 24 }} />
         <div
           className="pap-col-validation"
           style={{
@@ -270,7 +270,7 @@ export function Grid({
 
       {/* ── Column clues (closer to grid) ── */}
       <div className="pap-col-header-row">
-        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 44 }} />
+        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 24 }} />
         <div
           className="pap-col-clues"
           style={{
@@ -393,7 +393,7 @@ export function Grid({
 
       {/* Column run-length indicators (bottom edge) */}
       <div className="pap-col-header-row">
-        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 44 }} />
+        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 24 }} />
         <div
           className="pap-col-run-indicators"
           style={{ gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)` }}
