@@ -95,6 +95,15 @@
   color: transparent;
 }
 
+/* Hidden state: reserve space but don't show content */
+.pap-line-indicator--hidden {
+  visibility: hidden;
+}
+
+.pap-col-validation--hidden {
+  visibility: hidden;
+}
+
 /* ── Cell ── */
 .pap-cell {
   box-sizing: border-box;

@@ -131,21 +131,19 @@ export function Grid({
         ))}
       </div>
 
-      {/* ── Column validation indicators ── */}
-      {isValidationActive && (
-        <div
-          className="pap-col-validation"
-          style={{
-            gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
-          }}
-        >
-          {colValidation.map((v, ci) => (
-            <div key={ci} className={`pap-line-indicator pap-line-indicator--${v}`}>
-              {v === 'correct' ? '✓' : v === 'incorrect' ? '✗' : ''}
-            </div>
-          ))}
-        </div>
-      )}
+      {/* ── Column validation indicators (always rendered for stable layout) ── */}
+      <div
+        className={`pap-col-validation${isValidationActive ? '' : ' pap-col-validation--hidden'}`}
+        style={{
+          gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
+        }}
+      >
+        {colValidation.map((v, ci) => (
+          <div key={ci} className={`pap-line-indicator pap-line-indicator--${v}`}>
+            {v === 'correct' ? '✓' : v === 'incorrect' ? '✗' : ''}
+          </div>
+        ))}
+      </div>
 
       {/* ── Row area (clues + validation + cells) ── */}
       <div className="pap-rows">
@@ -168,16 +166,12 @@ export function Grid({
               )}
             </div>
 
-            {/* Row validation indicator */}
-            {isValidationActive && (
-              <div className={`pap-line-indicator pap-line-indicator--${rowValidation[ri]}`}>
-                {rowValidation[ri] === 'correct'
-                  ? '✓'
-                  : rowValidation[ri] === 'incorrect'
-                    ? '✗'
-                    : ''}
-              </div>
-            )}
+            {/* Row validation indicator (always rendered for stable layout) */}
+            <div
+              className={`pap-line-indicator pap-line-indicator--${rowValidation[ri]}${isValidationActive ? '' : ' pap-line-indicator--hidden'}`}
+            >
+              {rowValidation[ri] === 'correct' ? '✓' : rowValidation[ri] === 'incorrect' ? '✗' : ''}
+            </div>
 
             {/* Cells */}
             <div
@@ -222,14 +216,8 @@ export function Grid({
       </div>
 
       {/* Hidden spacer to reserve room for clue columns */}
-      <div
-        className="pap-clue-spacer"
-        style={{ width: maxRowClueLen * 24 + (isValidationActive ? 24 : 0) }}
-      />
-      <div
-        className="pap-clue-spacer-col"
-        style={{ height: maxColClueLen * 20 + (isValidationActive ? 20 : 0) }}
-      />
+      <div className="pap-clue-spacer" style={{ width: maxRowClueLen * 24 + 24 }} />
+      <div className="pap-clue-spacer-col" style={{ height: maxColClueLen * 20 + 20 }} />
     </div>
   );
 }
