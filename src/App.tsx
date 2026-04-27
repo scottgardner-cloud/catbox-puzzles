@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Grid, PaletteBar } from './components';
+import { Grid, PaletteBar, PuzzleBrowser } from './components';
 import {
   createInitialGameState,
   cycleCell,
@@ -29,6 +29,7 @@ function initGameState(puzzle: ValidatedPuzzle): GameState {
 type GameState = ReturnType<typeof createInitialGameState>;
 
 function App() {
+  const [view, setView] = useState<'browser' | 'game'>('browser');
   const [puzzleIndex, setPuzzleIndex] = useState(0);
   const puzzle: ValidatedPuzzle = puzzles[puzzleIndex];
   const [gameState, setGameState] = useState(() => initGameState(puzzle));
@@ -134,7 +135,13 @@ function App() {
   const handlePuzzleChange = useCallback((index: number) => {
     setPuzzleIndex(index);
     setGameState(initGameState(puzzles[index]));
+    setView('game');
   }, []);
+
+  const handleBackToBrowser = useCallback(() => {
+    saveGame(gameState);
+    setView('browser');
+  }, [gameState]);
 
   // Announce solved state
   const prevSolvedRef = useRef(false);
@@ -161,8 +168,9 @@ function App() {
     prevValidationRef.current = gameState.isValidationActive;
   }, [gameState.isValidationActive, gameState.cellValidation, announce]);
 
-  // Global keyboard shortcuts
+  // Global keyboard shortcuts (only active in game view)
   useEffect(() => {
+    if (view !== 'game') return;
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ctrl+Z — undo
       if (e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
@@ -192,81 +200,82 @@ function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [puzzle, announce]);
+  }, [view, puzzle, announce]);
 
   return (
     <div className="pap-app">
       <h1>Pix-a-Pix</h1>
 
-      {/* Puzzle selector */}
-      <div className="pap-puzzle-selector">
-        {puzzles.map((p, i) => (
-          <button
-            key={p.id}
-            type="button"
-            className={i === puzzleIndex ? 'pap-btn pap-btn--active' : 'pap-btn'}
-            onClick={() => handlePuzzleChange(i)}
-          >
-            {p.name}
-          </button>
-        ))}
-      </div>
+      {view === 'browser' ? (
+        <PuzzleBrowser puzzles={puzzles} onSelectPuzzle={handlePuzzleChange} />
+      ) : (
+        <>
+          {/* Back button */}
+          <div className="pap-back-row">
+            <button type="button" className="pap-btn" onClick={handleBackToBrowser}>
+              ← Back to puzzles
+            </button>
+          </div>
 
-      {/* Status (always rendered, invisible when not solved to avoid layout shift) */}
-      <div className={`pap-solved${solved ? '' : ' pap-solved--hidden'}`}>🎉 Puzzle Solved!</div>
+          {/* Status (always rendered, invisible when not solved to avoid layout shift) */}
+          <div className={`pap-solved${solved ? '' : ' pap-solved--hidden'}`}>
+            🎉 Puzzle Solved!
+          </div>
 
-      {/* Color palette (hidden for B&W puzzles) */}
-      <PaletteBar
-        palette={puzzle.palette}
-        selectedColorId={gameState.selectedColorId}
-        onSelectColor={handleSelectColor}
-      />
+          {/* Color palette (hidden for B&W puzzles) */}
+          <PaletteBar
+            palette={puzzle.palette}
+            selectedColorId={gameState.selectedColorId}
+            onSelectColor={handleSelectColor}
+          />
 
-      {/* Grid */}
-      <Grid
-        board={gameState.board}
-        cellValidation={gameState.cellValidation}
-        rowValidation={gameState.rowValidation}
-        colValidation={gameState.colValidation}
-        rowClues={puzzle.rowClues}
-        colClues={puzzle.colClues}
-        palette={puzzle.palette}
-        isValidationActive={gameState.isValidationActive}
-        onCellClick={handleCellClick}
-        onCellDragEnter={handleCellDragEnter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onAnnounce={announce}
-      />
+          {/* Grid */}
+          <Grid
+            board={gameState.board}
+            cellValidation={gameState.cellValidation}
+            rowValidation={gameState.rowValidation}
+            colValidation={gameState.colValidation}
+            rowClues={puzzle.rowClues}
+            colClues={puzzle.colClues}
+            palette={puzzle.palette}
+            isValidationActive={gameState.isValidationActive}
+            onCellClick={handleCellClick}
+            onCellDragEnter={handleCellDragEnter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onAnnounce={announce}
+          />
 
-      {/* Controls */}
-      <div className="pap-controls">
-        <button
-          type="button"
-          className="pap-btn"
-          onClick={handleUndo}
-          disabled={gameState.undoStack.length === 0}
-        >
-          ↩ Undo
-        </button>
-        <button
-          type="button"
-          className="pap-btn"
-          onClick={handleRedo}
-          disabled={gameState.redoStack.length === 0}
-        >
-          ↪ Redo
-        </button>
-        <button type="button" className="pap-btn" onClick={handleCheck}>
-          ✓ Check
-        </button>
-        <button type="button" className="pap-btn" onClick={handleSave}>
-          💾 Save
-        </button>
-        <button type="button" className="pap-btn pap-btn--danger" onClick={handleReset}>
-          ⟲ Reset
-        </button>
-      </div>
+          {/* Controls */}
+          <div className="pap-controls">
+            <button
+              type="button"
+              className="pap-btn"
+              onClick={handleUndo}
+              disabled={gameState.undoStack.length === 0}
+            >
+              ↩ Undo
+            </button>
+            <button
+              type="button"
+              className="pap-btn"
+              onClick={handleRedo}
+              disabled={gameState.redoStack.length === 0}
+            >
+              ↪ Redo
+            </button>
+            <button type="button" className="pap-btn" onClick={handleCheck}>
+              ✓ Check
+            </button>
+            <button type="button" className="pap-btn" onClick={handleSave}>
+              💾 Save
+            </button>
+            <button type="button" className="pap-btn pap-btn--danger" onClick={handleReset}>
+              ⟲ Reset
+            </button>
+          </div>
+        </>
+      )}
 
       {/* Visually hidden live region for screen reader announcements */}
       <div

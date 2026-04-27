@@ -17,10 +17,9 @@
   color: #333;
 }
 
-.pap-puzzle-selector {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
+.pap-back-row {
+  align-self: flex-start;
+  margin-bottom: 12px;
 }
 
 .pap-btn {

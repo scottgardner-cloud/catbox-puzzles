@@ -4,3 +4,5 @@ export { Grid } from './Grid';
 export type { GridProps } from './Grid';
 export { PaletteBar } from './PaletteBar';
 export type { PaletteBarProps } from './PaletteBar';
+export { PuzzleBrowser } from './PuzzleBrowser';
+export type { PuzzleBrowserProps } from './PuzzleBrowser';
