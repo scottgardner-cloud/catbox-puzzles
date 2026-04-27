@@ -16,7 +16,8 @@ const run = (length: number, c: ColorId = B): ClueRun => ({ length, colorId: c }
  *   .X.X.
  */
 // prettier-ignore
-const crossDefinition: PuzzleDefinition = {
+/** Raw 5×5 cross puzzle definition. */
+export const crossDefinition: PuzzleDefinition = {
   id: 'sample-cross-5x5',
   name: 'Cross 5×5',
   kind: 'bw',
@@ -61,8 +62,9 @@ const crossDefinition: PuzzleDefinition = {
  *   .....X....
  *   ..........
  */
+/** Raw 10×10 heart puzzle definition. */
 // prettier-ignore
-const heartDefinition: PuzzleDefinition = {
+export const heartDefinition: PuzzleDefinition = {
   id: 'sample-heart-10x10',
   name: 'Heart 10×10',
   kind: 'bw',
@@ -120,8 +122,9 @@ const heartDefinition: PuzzleDefinition = {
 const R = colorId('red');
 const BL = colorId('blue');
 
+/** Raw 5×5 color flag puzzle definition. */
 // prettier-ignore
-const flagDefinition: PuzzleDefinition = {
+export const flagDefinition: PuzzleDefinition = {
   id: 'sample-flag-5x5',
   name: 'Flag 5×5 (Color)',
   kind: 'color',

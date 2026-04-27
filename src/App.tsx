@@ -10,30 +10,48 @@ import {
   checkErrors,
   isSolved,
 } from './engine';
-import { getSamplePuzzles } from './puzzles/samples';
+import { getAllEntries, deleteCustomPuzzle } from './puzzles/registry';
+import type { PuzzleEntry } from './puzzles/types';
 import { saveGame, loadGame, restoreGameState } from './state/persistence';
 import type { ValidatedPuzzle, CellChange, PlayerCellState, ColorId } from './types';
 import './App.css';
 
-const puzzles = getSamplePuzzles();
-
-/** Try to load a saved state for a puzzle, or create a fresh one. */
-function initGameState(puzzle: ValidatedPuzzle): GameState {
-  const save = loadGame(puzzle.id);
+/** Try to load a saved state for a puzzle entry, or create a fresh one. */
+function initGameState(entry: PuzzleEntry): GameState {
+  const save = loadGame(entry.entryId);
   if (save) {
-    return restoreGameState(save, puzzle.rows, puzzle.cols);
+    return restoreGameState(save, entry.puzzle.rows, entry.puzzle.cols);
   }
-  return createInitialGameState(puzzle);
+  return createInitialGameState(entry.puzzle);
 }
 
 type GameState = ReturnType<typeof createInitialGameState>;
 
+// Null-safe state updaters — stable function references for useCallback
+function safeUndo(s: GameState | null): GameState | null {
+  return s ? undo(s) : s;
+}
+function safeRedo(s: GameState | null): GameState | null {
+  return s ? redo(s) : s;
+}
+function safeResetBoard(s: GameState | null): GameState | null {
+  return s ? resetBoard(s) : s;
+}
+
 function App() {
   const [view, setView] = useState<'browser' | 'game'>('browser');
-  const [puzzleIndex, setPuzzleIndex] = useState(0);
-  const puzzle: ValidatedPuzzle = puzzles[puzzleIndex];
-  const [gameState, setGameState] = useState(() => initGameState(puzzle));
-  const solved = isSolved(gameState, puzzle);
+  const [entries, setEntries] = useState(() => getAllEntries());
+  const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null);
+
+  const currentEntry: PuzzleEntry | undefined = selectedEntryId
+    ? entries.find((e) => e.entryId === selectedEntryId)
+    : undefined;
+  const puzzle: ValidatedPuzzle | undefined = currentEntry?.puzzle;
+
+  const [gameState, setGameState] = useState<GameState | null>(() =>
+    currentEntry ? initGameState(currentEntry) : null,
+  );
+  const solved = gameState && puzzle ? isSolved(gameState, puzzle) : false;
 
   // Screen reader live region announcement
   const liveRegionRef = useRef<HTMLDivElement>(null);
@@ -57,17 +75,16 @@ function App() {
 
   const handleCellClick = useCallback(
     (row: number, col: number) => {
-      if (solved) return;
-      setGameState((s) => cycleCell(s, row, col, puzzle));
+      if (solved || !puzzle) return;
+      setGameState((s) => (s ? cycleCell(s, row, col, puzzle) : s));
     },
-    [puzzle, solved],
+    [puzzle, solved, setGameState],
   );
 
   const handleDragStart = useCallback(
     (row: number, col: number) => {
-      if (solved) return;
+      if (solved || !gameState) return;
       isDragging.current = true;
-      // Determine what the drag will propagate based on the first cell's transition
       const current = gameState.board[row][col];
       switch (current.kind) {
         case 'unknown':
@@ -82,12 +99,12 @@ function App() {
       }
       dragChanges.current = [];
     },
-    [gameState.board, solved],
+    [gameState, solved],
   );
 
   const handleCellDragEnter = useCallback(
     (row: number, col: number) => {
-      if (!isDragging.current || solved || !dragTarget.current) return;
+      if (!isDragging.current || solved || !dragTarget.current || !gameState) return;
 
       const current = gameState.board[row][col];
       let next: PlayerCellState;
@@ -108,9 +125,9 @@ function App() {
 
       const change: CellChange = { row, col, prev: current, next };
       dragChanges.current.push(change);
-      setGameState((s) => setCells(s, [change]));
+      setGameState((s) => (s ? setCells(s, [change]) : s));
     },
-    [gameState.board, gameState.selectedColorId, solved],
+    [gameState, solved, setGameState],
   );
 
   const handleDragEnd = useCallback(() => {
@@ -119,29 +136,58 @@ function App() {
     dragChanges.current = [];
   }, []);
 
-  const handleUndo = useCallback(() => setGameState(undo), []);
-  const handleRedo = useCallback(() => setGameState(redo), []);
-  const handleReset = useCallback(() => setGameState(resetBoard), []);
-  const handleCheck = useCallback(() => setGameState((s) => checkErrors(s, puzzle)), [puzzle]);
+  const handleUndo = useCallback(() => setGameState(safeUndo), [setGameState]);
+  const handleRedo = useCallback(() => setGameState(safeRedo), [setGameState]);
+  const handleReset = useCallback(() => setGameState(safeResetBoard), [setGameState]);
+  const handleCheck = useCallback(
+    () => setGameState((s) => (s && puzzle ? checkErrors(s, puzzle) : s)),
+    [puzzle, setGameState],
+  );
 
-  const handleSelectColor = useCallback((id: ColorId) => {
-    setGameState((s) => ({ ...s, selectedColorId: id }));
-  }, []);
+  const handleSelectColor = useCallback(
+    (id: ColorId) => {
+      setGameState((s) => (s ? { ...s, selectedColorId: id } : s));
+    },
+    [setGameState],
+  );
 
   const handleSave = useCallback(() => {
-    saveGame(gameState);
-  }, [gameState]);
+    if (gameState && selectedEntryId) {
+      saveGame(gameState, selectedEntryId);
+    }
+  }, [gameState, selectedEntryId]);
 
-  const handlePuzzleChange = useCallback((index: number) => {
-    setPuzzleIndex(index);
-    setGameState(initGameState(puzzles[index]));
-    setView('game');
-  }, []);
+  const handlePuzzleChange = useCallback(
+    (entryId: string) => {
+      const entry = entries.find((e) => e.entryId === entryId);
+      if (!entry) return;
+      setSelectedEntryId(entryId);
+      setGameState(initGameState(entry));
+      setView('game');
+    },
+    [entries, setGameState],
+  );
+
+  const handleDeletePuzzle = useCallback(
+    (entryId: string) => {
+      deleteCustomPuzzle(entryId);
+      const refreshed = getAllEntries();
+      setEntries(refreshed);
+      if (selectedEntryId === entryId) {
+        setSelectedEntryId(null);
+        setGameState(null);
+        setView('browser');
+      }
+    },
+    [selectedEntryId, setGameState],
+  );
 
   const handleBackToBrowser = useCallback(() => {
-    saveGame(gameState);
+    if (gameState && selectedEntryId) {
+      saveGame(gameState, selectedEntryId);
+    }
     setView('browser');
-  }, [gameState]);
+  }, [gameState, selectedEntryId]);
 
   // Announce solved state
   const prevSolvedRef = useRef(false);
@@ -155,6 +201,7 @@ function App() {
   // Announce validation results
   const prevValidationRef = useRef(false);
   useEffect(() => {
+    if (!gameState) return;
     if (gameState.isValidationActive && !prevValidationRef.current) {
       const wrongCount = gameState.cellValidation
         .flat()
@@ -165,17 +212,17 @@ function App() {
         announce(`Validation: ${wrongCount} error${wrongCount === 1 ? '' : 's'} found.`);
       }
     }
-    prevValidationRef.current = gameState.isValidationActive;
-  }, [gameState.isValidationActive, gameState.cellValidation, announce]);
+    prevValidationRef.current = gameState?.isValidationActive ?? false;
+  }, [gameState, announce]);
 
   // Global keyboard shortcuts (only active in game view)
   useEffect(() => {
-    if (view !== 'game') return;
+    if (view !== 'game' || !puzzle) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ctrl+Z — undo
       if (e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
         e.preventDefault();
-        setGameState(undo);
+        setGameState(safeUndo);
         return;
       }
       // Ctrl+Y or Ctrl+Shift+Z — redo
@@ -185,7 +232,7 @@ function App() {
         (e.key === 'Z' && (e.ctrlKey || e.metaKey) && e.shiftKey)
       ) {
         e.preventDefault();
-        setGameState(redo);
+        setGameState(safeRedo);
         return;
       }
       // Number keys 1-9 — select palette color
@@ -193,7 +240,7 @@ function App() {
         const index = parseInt(e.key, 10) - 1;
         if (index < puzzle.palette.length) {
           const colorId = puzzle.palette[index].id;
-          setGameState((s) => ({ ...s, selectedColorId: colorId }));
+          setGameState((s) => (s ? { ...s, selectedColorId: colorId } : s));
           announce(`Selected color: ${puzzle.palette[index].name}`);
         }
       }
@@ -207,8 +254,12 @@ function App() {
       <h1>Pix-a-Pix</h1>
 
       {view === 'browser' ? (
-        <PuzzleBrowser puzzles={puzzles} onSelectPuzzle={handlePuzzleChange} />
-      ) : (
+        <PuzzleBrowser
+          entries={entries}
+          onSelectPuzzle={handlePuzzleChange}
+          onDeletePuzzle={handleDeletePuzzle}
+        />
+      ) : puzzle && gameState ? (
         <>
           {/* Back button */}
           <div className="pap-back-row">
@@ -275,7 +326,7 @@ function App() {
             </button>
           </div>
         </>
-      )}
+      ) : null}
 
       {/* Visually hidden live region for screen reader announcements */}
       <div
