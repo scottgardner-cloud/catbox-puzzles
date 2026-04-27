@@ -48,24 +48,42 @@ export function createInitialGameState(puzzle: ValidatedPuzzle): GameState {
   };
 }
 
-/** Create a fresh unchecked validation grid. */
-function emptyValidation(
-  rows: number,
-  cols: number,
+/**
+ * Compute per-line validation from the current board.
+ * Cell validation is left unchecked (only populated by explicit error check).
+ */
+function computeLineValidation(
+  board: readonly (readonly PlayerCellState[])[],
+  puzzle: ValidatedPuzzle,
 ): {
   cellValidation: CellValidation[][];
   rowValidation: LineValidation[];
   colValidation: LineValidation[];
 } {
+  const rows = puzzle.rows;
+  const cols = puzzle.cols;
   const cellValidation: CellValidation[][] = [];
   for (let r = 0; r < rows; r++) {
     cellValidation.push(Array.from<CellValidation>({ length: cols }).fill('unchecked'));
   }
-  return {
-    cellValidation,
-    rowValidation: Array.from<LineValidation>({ length: rows }).fill('incomplete'),
-    colValidation: Array.from<LineValidation>({ length: cols }).fill('incomplete'),
-  };
+
+  const rowValidation: LineValidation[] = [];
+  for (let r = 0; r < rows; r++) {
+    rowValidation.push(validateLine(board[r], puzzle.solution[r]));
+  }
+
+  const colValidation: LineValidation[] = [];
+  for (let c = 0; c < cols; c++) {
+    const playerCol: PlayerCellState[] = [];
+    const solutionCol: (ColorId | null)[] = [];
+    for (let r = 0; r < rows; r++) {
+      playerCol.push(board[r][c]);
+      solutionCol.push(puzzle.solution[r][c]);
+    }
+    colValidation.push(validateLine(playerCol, solutionCol));
+  }
+
+  return { cellValidation, rowValidation, colValidation };
 }
 
 /** Shallow-clone a 2D board and apply cell changes. */
@@ -110,14 +128,12 @@ export function cycleCell(
   const change: CellChange = { row, col, prev: current, next };
   const action: GameAction = { type: 'set-cell', change };
   const newBoard = applyChangesToBoard(state.board, [change], 'forward');
-  const rows = puzzle.rows;
-  const cols = puzzle.cols;
 
   return {
     ...state,
     board: newBoard,
     isValidationActive: false,
-    ...emptyValidation(rows, cols),
+    ...computeLineValidation(newBoard, puzzle),
     undoStack: [...state.undoStack, action],
     redoStack: [],
   };
@@ -127,19 +143,21 @@ export function cycleCell(
  * Applies multiple cell changes at once (e.g. drag operations).
  * Recorded as a single undo action for the entire batch.
  */
-export function setCells(state: GameState, changes: CellChange[]): GameState {
+export function setCells(
+  state: GameState,
+  changes: CellChange[],
+  puzzle: ValidatedPuzzle,
+): GameState {
   if (changes.length === 0) return state;
 
   const action: GameAction = { type: 'set-cells', changes };
   const newBoard = applyChangesToBoard(state.board, changes, 'forward');
-  const rows = state.board.length;
-  const cols = state.board[0].length;
 
   return {
     ...state,
     board: newBoard,
     isValidationActive: false,
-    ...emptyValidation(rows, cols),
+    ...computeLineValidation(newBoard, puzzle),
     undoStack: [...state.undoStack, action],
     redoStack: [],
   };
@@ -187,19 +205,17 @@ function applyAction(
  * Undoes the most recent action, moving it to the redo stack.
  * Clears validation state. Returns unchanged state if nothing to undo.
  */
-export function undo(state: GameState): GameState {
+export function undo(state: GameState, puzzle: ValidatedPuzzle): GameState {
   if (state.undoStack.length === 0) return state;
 
   const action = state.undoStack[state.undoStack.length - 1];
   const newBoard = reverseAction(state.board, action);
-  const rows = state.board.length;
-  const cols = state.board[0].length;
 
   return {
     ...state,
     board: newBoard,
     isValidationActive: false,
-    ...emptyValidation(rows, cols),
+    ...computeLineValidation(newBoard, puzzle),
     undoStack: state.undoStack.slice(0, -1),
     redoStack: [...state.redoStack, action],
   };
@@ -209,19 +225,19 @@ export function undo(state: GameState): GameState {
  * Redoes the most recently undone action, moving it back to the undo stack.
  * Clears validation state. Returns unchanged state if nothing to redo.
  */
-export function redo(state: GameState): GameState {
+export function redo(state: GameState, puzzle: ValidatedPuzzle): GameState {
   if (state.redoStack.length === 0) return state;
 
   const action = state.redoStack[state.redoStack.length - 1];
-  const rows = state.board.length;
-  const cols = state.board[0].length;
+  const rows = puzzle.rows;
+  const cols = puzzle.cols;
   const newBoard = applyAction(state.board, action, rows, cols);
 
   return {
     ...state,
     board: newBoard,
     isValidationActive: false,
-    ...emptyValidation(rows, cols),
+    ...computeLineValidation(newBoard, puzzle),
     undoStack: [...state.undoStack, action],
     redoStack: state.redoStack.slice(0, -1),
   };
@@ -231,9 +247,9 @@ export function redo(state: GameState): GameState {
  * Resets all cells to unknown. Saves a snapshot of the current board
  * as a reset action for undo support. Clears validation state.
  */
-export function resetBoard(state: GameState): GameState {
-  const rows = state.board.length;
-  const cols = state.board[0].length;
+export function resetBoard(state: GameState, puzzle: ValidatedPuzzle): GameState {
+  const rows = puzzle.rows;
+  const cols = puzzle.cols;
   const unknownCell: PlayerCellState = { kind: 'unknown' };
 
   const newBoard: PlayerCellState[][] = [];
@@ -250,7 +266,7 @@ export function resetBoard(state: GameState): GameState {
     ...state,
     board: newBoard,
     isValidationActive: false,
-    ...emptyValidation(rows, cols),
+    ...computeLineValidation(newBoard, puzzle),
     undoStack: [...state.undoStack, action],
     redoStack: [],
   };

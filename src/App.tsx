@@ -27,17 +27,6 @@ function initGameState(entry: PuzzleEntry): GameState {
 
 type GameState = ReturnType<typeof createInitialGameState>;
 
-// Null-safe state updaters — stable function references for useCallback
-function safeUndo(s: GameState | null): GameState | null {
-  return s ? undo(s) : s;
-}
-function safeRedo(s: GameState | null): GameState | null {
-  return s ? redo(s) : s;
-}
-function safeResetBoard(s: GameState | null): GameState | null {
-  return s ? resetBoard(s) : s;
-}
-
 function App() {
   const [view, setView] = useState<'browser' | 'game'>('browser');
   const [entries, setEntries] = useState(() => getAllEntries());
@@ -125,9 +114,9 @@ function App() {
 
       const change: CellChange = { row, col, prev: current, next };
       dragChanges.current.push(change);
-      setGameState((s) => (s ? setCells(s, [change]) : s));
+      setGameState((s) => (s && puzzle ? setCells(s, [change], puzzle) : s));
     },
-    [gameState, solved, setGameState],
+    [gameState, puzzle, solved, setGameState],
   );
 
   const handleDragEnd = useCallback(() => {
@@ -136,9 +125,18 @@ function App() {
     dragChanges.current = [];
   }, []);
 
-  const handleUndo = useCallback(() => setGameState(safeUndo), [setGameState]);
-  const handleRedo = useCallback(() => setGameState(safeRedo), [setGameState]);
-  const handleReset = useCallback(() => setGameState(safeResetBoard), [setGameState]);
+  const handleUndo = useCallback(
+    () => setGameState((s) => (s && puzzle ? undo(s, puzzle) : s)),
+    [puzzle, setGameState],
+  );
+  const handleRedo = useCallback(
+    () => setGameState((s) => (s && puzzle ? redo(s, puzzle) : s)),
+    [puzzle, setGameState],
+  );
+  const handleReset = useCallback(
+    () => setGameState((s) => (s && puzzle ? resetBoard(s, puzzle) : s)),
+    [puzzle, setGameState],
+  );
   const handleCheck = useCallback(
     () => setGameState((s) => (s && puzzle ? checkErrors(s, puzzle) : s)),
     [puzzle, setGameState],
@@ -222,7 +220,7 @@ function App() {
       // Ctrl+Z — undo
       if (e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
         e.preventDefault();
-        setGameState(safeUndo);
+        setGameState((s) => (s ? undo(s, puzzle) : s));
         return;
       }
       // Ctrl+Y or Ctrl+Shift+Z — redo
@@ -232,7 +230,7 @@ function App() {
         (e.key === 'Z' && (e.ctrlKey || e.metaKey) && e.shiftKey)
       ) {
         e.preventDefault();
-        setGameState(safeRedo);
+        setGameState((s) => (s ? redo(s, puzzle) : s));
         return;
       }
       // Number keys 1-9 — select palette color

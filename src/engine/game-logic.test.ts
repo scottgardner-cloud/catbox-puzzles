@@ -93,7 +93,7 @@ describe('cycleCell', () => {
   it('clears the redo stack', () => {
     let state = createInitialGameState(crossPuzzle);
     state = cycleCell(state, 0, 0, crossPuzzle);
-    state = undo(state); // action moves to redo
+    state = undo(state, crossPuzzle); // action moves to redo
     expect(state.redoStack).toHaveLength(1);
     state = cycleCell(state, 1, 1, crossPuzzle);
     expect(state.redoStack).toHaveLength(0);
@@ -107,7 +107,7 @@ describe('setCells', () => {
       { row: 0, col: 0, prev: { kind: 'unknown' }, next: { kind: 'filled', colorId: B } },
       { row: 0, col: 1, prev: { kind: 'unknown' }, next: { kind: 'empty' } },
     ];
-    const next = setCells(state, changes);
+    const next = setCells(state, changes, crossPuzzle);
     expect(next.board[0][0]).toEqual({ kind: 'filled', colorId: B });
     expect(next.board[0][1]).toEqual({ kind: 'empty' });
   });
@@ -118,14 +118,14 @@ describe('setCells', () => {
       { row: 0, col: 0, prev: { kind: 'unknown' }, next: { kind: 'filled', colorId: B } },
       { row: 1, col: 0, prev: { kind: 'unknown' }, next: { kind: 'filled', colorId: B } },
     ];
-    const next = setCells(state, changes);
+    const next = setCells(state, changes, crossPuzzle);
     expect(next.undoStack).toHaveLength(1);
     expect(next.undoStack[0].type).toBe('set-cells');
   });
 
   it('returns same state for empty changes', () => {
     const state = createInitialGameState(crossPuzzle);
-    const next = setCells(state, []);
+    const next = setCells(state, [], crossPuzzle);
     expect(next).toBe(state);
   });
 });
@@ -134,21 +134,21 @@ describe('undo', () => {
   it('reverses the last action', () => {
     let state = createInitialGameState(crossPuzzle);
     state = cycleCell(state, 0, 0, crossPuzzle); // unknown → filled
-    state = undo(state);
+    state = undo(state, crossPuzzle);
     expect(state.board[0][0]).toEqual({ kind: 'unknown' });
   });
 
   it('moves action to the redo stack', () => {
     let state = createInitialGameState(crossPuzzle);
     state = cycleCell(state, 0, 0, crossPuzzle);
-    state = undo(state);
+    state = undo(state, crossPuzzle);
     expect(state.undoStack).toHaveLength(0);
     expect(state.redoStack).toHaveLength(1);
   });
 
   it('returns same state when undo stack is empty', () => {
     const state = createInitialGameState(crossPuzzle);
-    const next = undo(state);
+    const next = undo(state, crossPuzzle);
     expect(next).toBe(state);
   });
 });
@@ -157,23 +157,23 @@ describe('redo', () => {
   it('re-applies the undone action', () => {
     let state = createInitialGameState(crossPuzzle);
     state = cycleCell(state, 0, 0, crossPuzzle);
-    state = undo(state);
-    state = redo(state);
+    state = undo(state, crossPuzzle);
+    state = redo(state, crossPuzzle);
     expect(state.board[0][0]).toEqual({ kind: 'filled', colorId: B });
   });
 
   it('moves action back to undo stack', () => {
     let state = createInitialGameState(crossPuzzle);
     state = cycleCell(state, 0, 0, crossPuzzle);
-    state = undo(state);
-    state = redo(state);
+    state = undo(state, crossPuzzle);
+    state = redo(state, crossPuzzle);
     expect(state.undoStack).toHaveLength(1);
     expect(state.redoStack).toHaveLength(0);
   });
 
   it('returns same state when redo stack is empty', () => {
     const state = createInitialGameState(crossPuzzle);
-    const next = redo(state);
+    const next = redo(state, crossPuzzle);
     expect(next).toBe(state);
   });
 });
@@ -183,7 +183,7 @@ describe('resetBoard', () => {
     let state = createInitialGameState(crossPuzzle);
     state = cycleCell(state, 0, 0, crossPuzzle);
     state = cycleCell(state, 1, 1, crossPuzzle);
-    state = resetBoard(state);
+    state = resetBoard(state, crossPuzzle);
     for (const row of state.board) {
       for (const cell of row) {
         expect(cell.kind).toBe('unknown');
@@ -195,7 +195,7 @@ describe('resetBoard', () => {
     let state = createInitialGameState(crossPuzzle);
     state = cycleCell(state, 0, 0, crossPuzzle);
     const boardBefore = state.board;
-    state = resetBoard(state);
+    state = resetBoard(state, crossPuzzle);
     const action = state.undoStack[state.undoStack.length - 1];
     expect(action.type).toBe('reset');
     if (action.type === 'reset') {
@@ -207,9 +207,9 @@ describe('resetBoard', () => {
     let state = createInitialGameState(crossPuzzle);
     state = cycleCell(state, 0, 0, crossPuzzle);
     const filledCell = state.board[0][0];
-    state = resetBoard(state);
+    state = resetBoard(state, crossPuzzle);
     expect(state.board[0][0].kind).toBe('unknown');
-    state = undo(state);
+    state = undo(state, crossPuzzle);
     expect(state.board[0][0]).toEqual(filledCell);
   });
 });
@@ -232,7 +232,7 @@ describe('checkErrors', () => {
     const changes: CellChange[] = [
       { row: 0, col: 0, prev: { kind: 'unknown' }, next: { kind: 'filled', colorId: B } },
     ];
-    const modified = setCells(state, changes);
+    const modified = setCells(state, changes, crossPuzzle);
     const checked = checkErrors(modified, crossPuzzle);
     expect(checked.cellValidation[0][0]).toBe('wrong-filled');
   });
@@ -243,7 +243,7 @@ describe('checkErrors', () => {
     const changes: CellChange[] = [
       { row: 0, col: 1, prev: { kind: 'unknown' }, next: { kind: 'empty' } },
     ];
-    const modified = setCells(state, changes);
+    const modified = setCells(state, changes, crossPuzzle);
     const checked = checkErrors(modified, crossPuzzle);
     expect(checked.cellValidation[0][1]).toBe('wrong-empty');
   });

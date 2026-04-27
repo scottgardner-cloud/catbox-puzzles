@@ -217,7 +217,7 @@ export function Grid({
     >
       {/* ── Column validation indicators (OUTSIDE, above clues) ── */}
       <div
-        className={`pap-col-validation${isValidationActive ? '' : ' pap-col-validation--hidden'}`}
+        className="pap-col-validation"
         style={{
           gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
         }}
@@ -263,9 +263,7 @@ export function Grid({
         {board.map((row, ri) => (
           <div key={ri} className={`pap-row${hoverRow === ri ? ' pap-row--highlight' : ''}`}>
             {/* Row validation indicator (OUTSIDE, left of clues) */}
-            <div
-              className={`pap-line-indicator pap-line-indicator--${rowValidation[ri]}${isValidationActive ? '' : ' pap-line-indicator--hidden'}`}
-            >
+            <div className={`pap-line-indicator pap-line-indicator--${rowValidation[ri]}`}>
               {rowValidation[ri] === 'correct' ? '✓' : rowValidation[ri] === 'incorrect' ? '✗' : ''}
             </div>
 
