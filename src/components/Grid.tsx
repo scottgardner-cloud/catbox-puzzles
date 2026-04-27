@@ -10,6 +10,19 @@ import type {
 import { Cell } from './Cell';
 import './Grid.css';
 
+/**
+ * Count consecutive cells of the same state around a position in a line.
+ * Returns the total run length containing the cell at `pos`.
+ */
+function countRunAt(line: readonly PlayerCellState[], pos: number): number {
+  const state = line[pos].kind;
+  let start = pos;
+  while (start > 0 && line[start - 1].kind === state) start--;
+  let end = pos;
+  while (end < line.length - 1 && line[end + 1].kind === state) end++;
+  return end - start + 1;
+}
+
 /** Props for the {@link Grid} component. */
 export interface GridProps {
   /** The player's current board state, indexed as board[row][col]. */
@@ -333,8 +346,34 @@ export function Grid({
                 );
               })}
             </div>
+
+            {/* Row run-length indicator (right edge) */}
+            <div
+              className={`pap-run-indicator${hoverRow === ri && hoverCol !== null ? '' : ' pap-run-indicator--hidden'}`}
+            >
+              {hoverRow === ri && hoverCol !== null ? countRunAt(row, hoverCol) : ''}
+            </div>
           </div>
         ))}
+      </div>
+
+      {/* Column run-length indicators (bottom edge) */}
+      <div
+        className="pap-col-run-indicators"
+        style={{ gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)` }}
+      >
+        {Array.from({ length: cols }, (_, ci) => {
+          const colCells = board.map((r) => r[ci]);
+          const show = hoverCol === ci && hoverRow !== null;
+          return (
+            <div
+              key={ci}
+              className={`pap-run-indicator${show ? '' : ' pap-run-indicator--hidden'}`}
+            >
+              {show && hoverRow !== null ? countRunAt(colCells, hoverRow) : ''}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -179,6 +179,28 @@
   pointer-events: none;
 }
 
+/* ── Run-length indicators ── */
+.pap-run-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 30px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1976d2;
+}
+
+.pap-run-indicator--hidden {
+  visibility: hidden;
+}
+
+.pap-col-run-indicators {
+  display: grid;
+  gap: 1px;
+  justify-self: end;
+}
+
 /* ── Row/column hover highlighting ── */
 .pap-row--highlight {
   background-color: rgba(66, 165, 245, 0.06);
