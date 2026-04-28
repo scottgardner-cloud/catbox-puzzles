@@ -2,11 +2,11 @@ import type { PuzzleDefinition, ValidatedPuzzle } from '../types';
 import { colorId } from '../types';
 import { validatePuzzleDefinition } from '../engine/validation';
 
-/** B&W 15×15 puzzle: Anchor 15├ù15. */
+/** B&W 15×15 puzzle: Anchor 15×15. */
 // prettier-ignore
 const anchorDefinition: PuzzleDefinition = {
   id: 'bw-anchor-15x15',
-  name: 'Anchor 15├ù15',
+  name: 'Anchor 15×15',
   kind: 'bw',
   rows: 15,
   cols: 15,
@@ -64,11 +64,11 @@ const anchorDefinition: PuzzleDefinition = {
   ],
 };
 
-/** B&W 15×15 puzzle: Cat 15├ù15. */
+/** B&W 15×15 puzzle: Cat 15×15. */
 // prettier-ignore
 const catDefinition: PuzzleDefinition = {
   id: 'bw-cat-15x15',
-  name: 'Cat 15├ù15',
+  name: 'Cat 15×15',
   kind: 'bw',
   rows: 15,
   cols: 15,
@@ -126,11 +126,11 @@ const catDefinition: PuzzleDefinition = {
   ],
 };
 
-/** B&W 15×15 puzzle: House 15├ù15. */
+/** B&W 15×15 puzzle: House 15×15. */
 // prettier-ignore
 const houseDefinition: PuzzleDefinition = {
   id: 'bw-house-15x15',
-  name: 'House 15├ù15',
+  name: 'House 15×15',
   kind: 'bw',
   rows: 15,
   cols: 15,
@@ -188,11 +188,11 @@ const houseDefinition: PuzzleDefinition = {
   ],
 };
 
-/** B&W 15×15 puzzle: Skull 15├ù15. */
+/** B&W 15×15 puzzle: Skull 15×15. */
 // prettier-ignore
 const skullDefinition: PuzzleDefinition = {
   id: 'bw-skull-15x15',
-  name: 'Skull 15├ù15',
+  name: 'Skull 15×15',
   kind: 'bw',
   rows: 15,
   cols: 15,
@@ -250,11 +250,11 @@ const skullDefinition: PuzzleDefinition = {
   ],
 };
 
-/** B&W 15×15 puzzle: Tree 15├ù15. */
+/** B&W 15×15 puzzle: Tree 15×15. */
 // prettier-ignore
 const treeDefinition: PuzzleDefinition = {
   id: 'bw-tree-15x15',
-  name: 'Tree 15├ù15',
+  name: 'Tree 15×15',
   kind: 'bw',
   rows: 15,
   cols: 15,
@@ -312,11 +312,11 @@ const treeDefinition: PuzzleDefinition = {
   ],
 };
 
-/** Color 15×15 puzzle: Sailboat 15├ù15. */
+/** Color 15×15 puzzle: Sailboat 15×15. */
 // prettier-ignore
 const boatDefinition: PuzzleDefinition = {
   id: 'color-boat-15x15',
-  name: 'Sailboat 15├ù15',
+  name: 'Sailboat 15×15',
   kind: 'color',
   rows: 15,
   cols: 15,
@@ -374,11 +374,11 @@ const boatDefinition: PuzzleDefinition = {
   ],
 };
 
-/** Color 15×15 puzzle: Cherry 15├ù15. */
+/** Color 15×15 puzzle: Cherry 15×15. */
 // prettier-ignore
 const cherryDefinition: PuzzleDefinition = {
   id: 'color-cherry-15x15',
-  name: 'Cherry 15├ù15',
+  name: 'Cherry 15×15',
   kind: 'color',
   rows: 15,
   cols: 15,
@@ -436,11 +436,11 @@ const cherryDefinition: PuzzleDefinition = {
   ],
 };
 
-/** Color 15×15 puzzle: Flower 15├ù15. */
+/** Color 15×15 puzzle: Flower 15×15. */
 // prettier-ignore
 const flowerDefinition: PuzzleDefinition = {
   id: 'color-flower-15x15',
-  name: 'Flower 15├ù15',
+  name: 'Flower 15×15',
   kind: 'color',
   rows: 15,
   cols: 15,
@@ -498,11 +498,11 @@ const flowerDefinition: PuzzleDefinition = {
   ],
 };
 
-/** Color 15×15 puzzle: Mushroom 15├ù15. */
+/** Color 15×15 puzzle: Mushroom 15×15. */
 // prettier-ignore
 const mushroomDefinition: PuzzleDefinition = {
   id: 'color-mushroom-15x15',
-  name: 'Mushroom 15├ù15',
+  name: 'Mushroom 15×15',
   kind: 'color',
   rows: 15,
   cols: 15,
@@ -560,11 +560,11 @@ const mushroomDefinition: PuzzleDefinition = {
   ],
 };
 
-/** Color 15×15 puzzle: Sunset 15├ù15. */
+/** Color 15×15 puzzle: Sunset 15×15. */
 // prettier-ignore
 const sunsetDefinition: PuzzleDefinition = {
   id: 'color-sunset-15x15',
-  name: 'Sunset 15├ù15',
+  name: 'Sunset 15×15',
   kind: 'color',
   rows: 15,
   cols: 15,
@@ -632,34 +632,34 @@ function assertValid(def: PuzzleDefinition): ValidatedPuzzle {
   return result;
 }
 
-/** Validated Anchor 15├ù15. */
+/** Validated Anchor 15×15. */
 export const anchorPuzzle: ValidatedPuzzle = assertValid(anchorDefinition);
 
-/** Validated Cat 15├ù15. */
+/** Validated Cat 15×15. */
 export const catPuzzle: ValidatedPuzzle = assertValid(catDefinition);
 
-/** Validated House 15├ù15. */
+/** Validated House 15×15. */
 export const housePuzzle: ValidatedPuzzle = assertValid(houseDefinition);
 
-/** Validated Skull 15├ù15. */
+/** Validated Skull 15×15. */
 export const skullPuzzle: ValidatedPuzzle = assertValid(skullDefinition);
 
-/** Validated Tree 15├ù15. */
+/** Validated Tree 15×15. */
 export const treePuzzle: ValidatedPuzzle = assertValid(treeDefinition);
 
-/** Validated Sailboat 15├ù15. */
+/** Validated Sailboat 15×15. */
 export const boatPuzzle: ValidatedPuzzle = assertValid(boatDefinition);
 
-/** Validated Cherry 15├ù15. */
+/** Validated Cherry 15×15. */
 export const cherryPuzzle: ValidatedPuzzle = assertValid(cherryDefinition);
 
-/** Validated Flower 15├ù15. */
+/** Validated Flower 15×15. */
 export const flowerPuzzle: ValidatedPuzzle = assertValid(flowerDefinition);
 
-/** Validated Mushroom 15├ù15. */
+/** Validated Mushroom 15×15. */
 export const mushroomPuzzle: ValidatedPuzzle = assertValid(mushroomDefinition);
 
-/** Validated Sunset 15├ù15. */
+/** Validated Sunset 15×15. */
 export const sunsetPuzzle: ValidatedPuzzle = assertValid(sunsetDefinition);
 
 /** Returns all 15x15 sample puzzles. */

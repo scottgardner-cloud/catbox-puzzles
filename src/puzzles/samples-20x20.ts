@@ -2,11 +2,11 @@ import type { PuzzleDefinition, ValidatedPuzzle } from '../types';
 import { colorId } from '../types';
 import { validatePuzzleDefinition } from '../engine/validation';
 
-/** B&W 20×20 puzzle: Castle 20├ù20. */
+/** B&W 20×20 puzzle: Castle 20×20. */
 // prettier-ignore
 const castleDefinition: PuzzleDefinition = {
   id: 'bw-castle-20x20',
-  name: 'Castle 20├ù20',
+  name: 'Castle 20×20',
   kind: 'bw',
   rows: 20,
   cols: 20,
@@ -79,11 +79,11 @@ const castleDefinition: PuzzleDefinition = {
   ],
 };
 
-/** B&W 20×20 puzzle: Dog 20├ù20. */
+/** B&W 20×20 puzzle: Dog 20×20. */
 // prettier-ignore
 const dogDefinition: PuzzleDefinition = {
   id: 'bw-dog-20x20',
-  name: 'Dog 20├ù20',
+  name: 'Dog 20×20',
   kind: 'bw',
   rows: 20,
   cols: 20,
@@ -156,11 +156,11 @@ const dogDefinition: PuzzleDefinition = {
   ],
 };
 
-/** B&W 20×20 puzzle: Guitar 20├ù20. */
+/** B&W 20×20 puzzle: Guitar 20×20. */
 // prettier-ignore
 const guitarDefinition: PuzzleDefinition = {
   id: 'bw-guitar-20x20',
-  name: 'Guitar 20├ù20',
+  name: 'Guitar 20×20',
   kind: 'bw',
   rows: 20,
   cols: 20,
@@ -233,11 +233,11 @@ const guitarDefinition: PuzzleDefinition = {
   ],
 };
 
-/** B&W 20×20 puzzle: Lighthouse 20├ù20. */
+/** B&W 20×20 puzzle: Lighthouse 20×20. */
 // prettier-ignore
 const lighthouseDefinition: PuzzleDefinition = {
   id: 'bw-lighthouse-20x20',
-  name: 'Lighthouse 20├ù20',
+  name: 'Lighthouse 20×20',
   kind: 'bw',
   rows: 20,
   cols: 20,
@@ -310,11 +310,11 @@ const lighthouseDefinition: PuzzleDefinition = {
   ],
 };
 
-/** B&W 20×20 puzzle: Rocket 20├ù20. */
+/** B&W 20×20 puzzle: Rocket 20×20. */
 // prettier-ignore
 const rocketDefinition: PuzzleDefinition = {
   id: 'bw-rocket-20x20',
-  name: 'Rocket 20├ù20',
+  name: 'Rocket 20×20',
   kind: 'bw',
   rows: 20,
   cols: 20,
@@ -387,11 +387,11 @@ const rocketDefinition: PuzzleDefinition = {
   ],
 };
 
-/** Color 20×20 puzzle: Cactus 20├ù20. */
+/** Color 20×20 puzzle: Cactus 20×20. */
 // prettier-ignore
 const cactusDefinition: PuzzleDefinition = {
   id: 'color-cactus-20x20',
-  name: 'Cactus 20├ù20',
+  name: 'Cactus 20×20',
   kind: 'color',
   rows: 20,
   cols: 20,
@@ -464,11 +464,11 @@ const cactusDefinition: PuzzleDefinition = {
   ],
 };
 
-/** Color 20×20 puzzle: Cupcake 20├ù20. */
+/** Color 20×20 puzzle: Cupcake 20×20. */
 // prettier-ignore
 const cupcakeDefinition: PuzzleDefinition = {
   id: 'color-cupcake-20x20',
-  name: 'Cupcake 20├ù20',
+  name: 'Cupcake 20×20',
   kind: 'color',
   rows: 20,
   cols: 20,
@@ -541,11 +541,11 @@ const cupcakeDefinition: PuzzleDefinition = {
   ],
 };
 
-/** Color 20×20 puzzle: Parrot 20├ù20. */
+/** Color 20×20 puzzle: Parrot 20×20. */
 // prettier-ignore
 const parrotDefinition: PuzzleDefinition = {
   id: 'color-parrot-20x20',
-  name: 'Parrot 20├ù20',
+  name: 'Parrot 20×20',
   kind: 'color',
   rows: 20,
   cols: 20,
@@ -618,11 +618,11 @@ const parrotDefinition: PuzzleDefinition = {
   ],
 };
 
-/** Color 20×20 puzzle: Rainbow 20├ù20. */
+/** Color 20×20 puzzle: Rainbow 20×20. */
 // prettier-ignore
 const rainbowDefinition: PuzzleDefinition = {
   id: 'color-rainbow-20x20',
-  name: 'Rainbow 20├ù20',
+  name: 'Rainbow 20×20',
   kind: 'color',
   rows: 20,
   cols: 20,
@@ -695,11 +695,11 @@ const rainbowDefinition: PuzzleDefinition = {
   ],
 };
 
-/** Color 20×20 puzzle: Robot 20├ù20. */
+/** Color 20×20 puzzle: Robot 20×20. */
 // prettier-ignore
 const robotDefinition: PuzzleDefinition = {
   id: 'color-robot-20x20',
-  name: 'Robot 20├ù20',
+  name: 'Robot 20×20',
   kind: 'color',
   rows: 20,
   cols: 20,
@@ -782,34 +782,34 @@ function assertValid(def: PuzzleDefinition): ValidatedPuzzle {
   return result;
 }
 
-/** Validated Castle 20├ù20. */
+/** Validated Castle 20×20. */
 export const castlePuzzle: ValidatedPuzzle = assertValid(castleDefinition);
 
-/** Validated Dog 20├ù20. */
+/** Validated Dog 20×20. */
 export const dogPuzzle: ValidatedPuzzle = assertValid(dogDefinition);
 
-/** Validated Guitar 20├ù20. */
+/** Validated Guitar 20×20. */
 export const guitarPuzzle: ValidatedPuzzle = assertValid(guitarDefinition);
 
-/** Validated Lighthouse 20├ù20. */
+/** Validated Lighthouse 20×20. */
 export const lighthousePuzzle: ValidatedPuzzle = assertValid(lighthouseDefinition);
 
-/** Validated Rocket 20├ù20. */
+/** Validated Rocket 20×20. */
 export const rocketPuzzle: ValidatedPuzzle = assertValid(rocketDefinition);
 
-/** Validated Cactus 20├ù20. */
+/** Validated Cactus 20×20. */
 export const cactusPuzzle: ValidatedPuzzle = assertValid(cactusDefinition);
 
-/** Validated Cupcake 20├ù20. */
+/** Validated Cupcake 20×20. */
 export const cupcakePuzzle: ValidatedPuzzle = assertValid(cupcakeDefinition);
 
-/** Validated Parrot 20├ù20. */
+/** Validated Parrot 20×20. */
 export const parrotPuzzle: ValidatedPuzzle = assertValid(parrotDefinition);
 
-/** Validated Rainbow 20├ù20. */
+/** Validated Rainbow 20×20. */
 export const rainbowPuzzle: ValidatedPuzzle = assertValid(rainbowDefinition);
 
-/** Validated Robot 20├ù20. */
+/** Validated Robot 20×20. */
 export const robotPuzzle: ValidatedPuzzle = assertValid(robotDefinition);
 
 /** Returns all 20x20 sample puzzles. */
