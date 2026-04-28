@@ -147,7 +147,7 @@ export function usePuzzleGenerator(): GeneratorHookState & GeneratorHookActions 
       setGeneratedFromSettings(null);
       setStatus('ready');
       return true;
-    } catch (err) {
+    } catch {
       if (reqId !== requestIdRef.current) return false;
       setError({
         message: 'Failed to load image. Please try a different file.',
@@ -213,7 +213,7 @@ export function usePuzzleGenerator(): GeneratorHookState & GeneratorHookActions 
         setStatus('ready');
         return buildResult;
       }
-    } catch (err) {
+    } catch {
       if (reqId !== requestIdRef.current) return null;
       setError({
         message: 'Generation failed unexpectedly.',

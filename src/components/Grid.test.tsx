@@ -79,8 +79,6 @@ describe('Grid', () => {
   it('supports keyboard navigation with arrow keys', async () => {
     const onClick = vi.fn();
     render(<Grid {...make3x3Props({ onCellClick: onClick })} />);
-    const grid = screen.getByRole('grid');
-
     // Tab into the grid
     await userEvent.tab();
     // Press Space to click the focused cell (should be 0,0)

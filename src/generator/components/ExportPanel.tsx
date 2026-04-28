@@ -35,6 +35,8 @@ export function ExportPanel({
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }, [puzzle]);
 
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
+
   const handleCopy = useCallback(async () => {
     if (!puzzle) return;
     const json = JSON.stringify(puzzle, null, 2);
@@ -47,8 +49,6 @@ export function ExportPanel({
       setTimeout(() => setCopyStatus('idle'), 3000);
     }
   }, [puzzle]);
-
-  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
 
   return (
     <section className="pap-gen-export" aria-label="Export options">
