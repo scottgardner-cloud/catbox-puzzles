@@ -32,7 +32,7 @@ export function ExportPanel({
     a.href = url;
     a.download = `${puzzle.name.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`;
     a.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }, [puzzle]);
 
   const handleCopy = useCallback(async () => {

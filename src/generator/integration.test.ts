@@ -98,6 +98,30 @@ describe('Generator pipeline integration', () => {
     expect(puzzle.solution[1][3]).toBeNull();
   });
 
+  it('solid-color image in color mode with auto background produces valid puzzle', () => {
+    // 10×10 solid red — should NOT fail with "all background"
+    const data = new Uint8ClampedArray(10 * 10 * 4);
+    for (let i = 0; i < 100; i++) {
+      data[i * 4] = 255;
+      data[i * 4 + 3] = 255;
+    }
+    const grid = createPixelGrid(10, 10, data);
+
+    const settings: GeneratorSettings = {
+      name: 'Solid Red',
+      kind: 'color',
+      targetRows: 10,
+      targetCols: 10,
+      maxColors: 4,
+      backgroundMode: { kind: 'auto' },
+    };
+
+    const result = buildPuzzle(grid, settings);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.puzzle.palette.length).toBe(1);
+  });
+
   it('handles resize + generate for a larger image downscaled to 5×5', () => {
     // 100×100 solid blue image → downscale to 5×5 B&W
     const data = new Uint8ClampedArray(100 * 100 * 4);

@@ -84,7 +84,20 @@ function resolveAutoBackground(grid: PixelGrid): BackgroundMode {
   // Only use edge-based background if it covers a meaningful portion of edges
   const totalEdgePixels = 2 * grid.width + 2 * (grid.height - 2);
   if (bestCount > totalEdgePixels * 0.3) {
-    return { kind: 'color', color: bestColor, tolerance: 30 };
+    // Verify removing this color leaves enough foreground content
+    const candidateMode: BackgroundMode = { kind: 'color', color: bestColor, tolerance: 30 };
+    const totalPixels = grid.width * grid.height;
+    let fgCount = 0;
+    for (let i = 0; i < totalPixels; i++) {
+      const pi = i * 4;
+      if (!isBackground(grid.data[pi], grid.data[pi + 1], grid.data[pi + 2], grid.data[pi + 3], candidateMode)) {
+        fgCount++;
+      }
+    }
+    // If removing the edge color leaves <10% foreground, it's not really a background
+    if (fgCount >= totalPixels * 0.1) {
+      return candidateMode;
+    }
   }
 
   // No clear background detected

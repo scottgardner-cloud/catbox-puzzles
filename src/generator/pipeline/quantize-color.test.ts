@@ -153,6 +153,22 @@ describe('quantizeColor', () => {
     expect(result.palette.length).toBe(1);
   });
 
+  it('auto mode does not strip solid-color images', () => {
+    // 10×10 solid red — auto mode should detect red as edge color but
+    // realize removing it leaves no foreground, and fall back to 'none'
+    const data = new Uint8ClampedArray(10 * 10 * 4);
+    for (let i = 0; i < 100; i++) {
+      data[i * 4] = 255;
+      data[i * 4 + 3] = 255;
+    }
+    const grid = createPixelGrid(10, 10, data);
+    const result = quantizeColor(grid, 4, { kind: 'auto' });
+
+    // All pixels should be filled (not stripped as background)
+    expect(result.palette.length).toBe(1);
+    expect(result.cells.every((c) => c !== null)).toBe(true);
+  });
+
   it('auto mode detects transparency', () => {
     const data = new Uint8ClampedArray([
       255, 0, 0, 255, // opaque red

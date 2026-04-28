@@ -48,6 +48,8 @@ export function UploadPanel({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) handleFile(file);
+      // Reset so selecting the same file again triggers onChange
+      e.target.value = '';
     },
     [handleFile],
   );

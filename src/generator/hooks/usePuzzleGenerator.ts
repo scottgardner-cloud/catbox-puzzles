@@ -82,6 +82,7 @@ async function decodeImageFile(file: File): Promise<{ imageData: ImageData; prev
   if (!ctx) throw new Error('Failed to get canvas 2D context');
   ctx.drawImage(bitmap, 0, 0);
   const imageData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+  bitmap.close(); // Release GPU memory
   const previewUrl = URL.createObjectURL(file);
   return { imageData, previewUrl };
 }
@@ -161,6 +162,7 @@ export function usePuzzleGenerator(): GeneratorHookState & GeneratorHookActions 
     const reqId = ++requestIdRef.current;
     setStatus('generating');
     setError(null);
+    setResult(null); // Clear stale result while generating
 
     // Build pipeline settings from form
     const pipelineSettings: GeneratorSettings = {
