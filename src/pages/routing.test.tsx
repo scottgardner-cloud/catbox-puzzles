@@ -66,8 +66,7 @@ describe('Route rendering', () => {
 
   it('renders GeneratorPage at /generator', () => {
     renderApp('/generator');
-    expect(screen.getByText('Puzzle Generator')).toBeInTheDocument();
-    expect(screen.getByText(/coming soon/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Puzzle Generator' })).toBeInTheDocument();
   });
 
   it('renders GameRoute at /play/:entryId with a valid entry', () => {
