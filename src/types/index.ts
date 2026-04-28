@@ -149,6 +149,14 @@ export type GameAction =
     };
 
 /**
+ * Timer lifecycle status.
+ * - `'idle'` — timer not yet started (no cell interaction yet)
+ * - `'running'` — actively counting solve time
+ * - `'stopped'` — puzzle solved, timer frozen
+ */
+export type TimerStatus = 'idle' | 'running' | 'stopped';
+
+/**
  * The game session state — the player's progress on a puzzle.
  *
  * Note: `isSolved` is NOT stored here. It is derived from `board` + puzzle solution
@@ -185,6 +193,10 @@ export interface GameState {
   readonly undoStack: readonly GameAction[];
   /** Redo history stack. Cleared when a new action is performed. */
   readonly redoStack: readonly GameAction[];
+  /** Accumulated solve time in milliseconds (excludes paused/away time). */
+  readonly elapsedMs: number;
+  /** Timer lifecycle status. */
+  readonly timerStatus: TimerStatus;
 }
 
 /**
@@ -210,4 +222,8 @@ export interface SavedGameState {
   readonly redoStack: readonly GameAction[];
   /** ISO 8601 timestamp of when the save was created. */
   readonly savedAt: string;
+  /** Accumulated solve time in milliseconds. */
+  readonly elapsedMs: number;
+  /** Timer lifecycle status at time of save. */
+  readonly timerStatus: TimerStatus;
 }

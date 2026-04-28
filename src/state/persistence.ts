@@ -6,6 +6,7 @@ import type {
   GameAction,
   CellChange,
   ColorId,
+  TimerStatus,
 } from '../types';
 import { computeLineValidation } from '../engine';
 
@@ -67,14 +68,24 @@ function isValidBoard(board: unknown): board is PlayerCellState[][] {
   );
 }
 
+/** Valid timer status values. */
+const VALID_TIMER_STATUSES: ReadonlySet<string> = new Set(['idle', 'running', 'stopped']);
+
 /**
  * Saves the current game state to localStorage.
  * Strips ephemeral validation state and adds a timestamp.
  *
+ * @param state - Current game state.
  * @param entryId - Namespaced entry key (e.g. 'builtin:sample-cross-5x5').
  *                  Falls back to `state.puzzleId` for backward compatibility.
+ * @param timerOverride - Flushed timer values from the live timer. If provided,
+ *                        these take precedence over `state.elapsedMs`/`state.timerStatus`.
  */
-export function saveGame(state: GameState, entryId?: string): void {
+export function saveGame(
+  state: GameState,
+  entryId?: string,
+  timerOverride?: { elapsedMs: number; timerStatus: TimerStatus },
+): void {
   const save: SavedGameState = {
     version: 1,
     puzzleId: state.puzzleId,
@@ -83,6 +94,8 @@ export function saveGame(state: GameState, entryId?: string): void {
     undoStack: state.undoStack,
     redoStack: state.redoStack,
     savedAt: new Date().toISOString(),
+    elapsedMs: timerOverride?.elapsedMs ?? state.elapsedMs,
+    timerStatus: timerOverride?.timerStatus ?? state.timerStatus,
   };
   const key = entryId ?? state.puzzleId;
   localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(save));
@@ -126,12 +139,19 @@ export function loadGame(entryId: string): SavedGameState | null {
   return save;
 }
 
-/** Parse and validate raw save JSON. */
+/** Parse and validate raw save JSON. Normalizes missing timer fields for legacy saves. */
 function parseSave(raw: string): SavedGameState | null {
   try {
     const parsed: unknown = JSON.parse(raw);
     if (!isValidSave(parsed)) return null;
-    return parsed;
+    // Normalize legacy saves missing timer fields
+    return {
+      ...parsed,
+      elapsedMs: typeof parsed.elapsedMs === 'number' ? parsed.elapsedMs : 0,
+      timerStatus: VALID_TIMER_STATUSES.has(parsed.timerStatus as string)
+        ? (parsed.timerStatus as TimerStatus)
+        : 'idle',
+    };
   } catch {
     return null;
   }
@@ -240,6 +260,13 @@ export function restoreGameState(save: SavedGameState, puzzle: ValidatedPuzzle):
 
   const derived = computeLineValidation(save.board, puzzle);
 
+  // Timer fields default to idle/0 for legacy saves
+  const elapsedMs = typeof save.elapsedMs === 'number' ? save.elapsedMs : 0;
+  const timerStatus: TimerStatus =
+    typeof save.timerStatus === 'string' && VALID_TIMER_STATUSES.has(save.timerStatus)
+      ? save.timerStatus
+      : 'idle';
+
   return {
     puzzleId: save.puzzleId,
     board: save.board,
@@ -250,6 +277,8 @@ export function restoreGameState(save: SavedGameState, puzzle: ValidatedPuzzle):
     selectedColorId,
     undoStack: save.undoStack,
     redoStack: save.redoStack,
+    elapsedMs,
+    timerStatus,
   };
 }
 
@@ -257,6 +286,12 @@ export function restoreGameState(save: SavedGameState, puzzle: ValidatedPuzzle):
 function isValidSave(data: unknown): data is SavedGameState {
   if (typeof data !== 'object' || data === null) return false;
   const obj = data as Record<string, unknown>;
+
+  // Timer fields are optional for backward compatibility with legacy saves
+  if (obj.elapsedMs !== undefined && typeof obj.elapsedMs !== 'number') return false;
+  if (obj.timerStatus !== undefined && !VALID_TIMER_STATUSES.has(obj.timerStatus as string))
+    return false;
+
   return (
     obj.version === 1 &&
     typeof obj.puzzleId === 'string' &&

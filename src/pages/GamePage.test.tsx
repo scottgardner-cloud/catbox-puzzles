@@ -10,11 +10,11 @@ import type { PuzzleEntry } from '../puzzles/types';
 // ── Mocks ───────────────────────────────────────────────────────────
 
 const mockSaveGame = vi.fn();
-const mockLoadGame = vi.fn(() => null);
+const mockLoadGame = vi.fn((_entryId?: string) => null);
 
 vi.mock('../state/persistence', () => ({
   saveGame: (...args: unknown[]) => mockSaveGame(...args),
-  loadGame: (...args: unknown[]) => mockLoadGame(...args),
+  loadGame: (entryId: string) => mockLoadGame(entryId),
   restoreGameState: vi.fn(() => null),
   hasSave: vi.fn(() => false),
   deleteSave: vi.fn(),

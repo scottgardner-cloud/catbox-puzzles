@@ -45,6 +45,8 @@ export function createInitialGameState(puzzle: ValidatedPuzzle): GameState {
     selectedColorId: puzzle.palette[0].id,
     undoStack: [],
     redoStack: [],
+    elapsedMs: 0,
+    timerStatus: 'idle',
   };
 }
 
@@ -269,6 +271,8 @@ export function resetBoard(state: GameState, puzzle: ValidatedPuzzle): GameState
     ...computeLineValidation(newBoard, puzzle),
     undoStack: [...state.undoStack, action],
     redoStack: [],
+    elapsedMs: 0,
+    timerStatus: 'idle',
   };
 }
 

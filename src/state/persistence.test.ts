@@ -19,6 +19,8 @@ function makeValidSave(overrides?: Partial<SavedGameState>): SavedGameState {
     undoStack: [],
     redoStack: [],
     savedAt: new Date().toISOString(),
+    elapsedMs: 0,
+    timerStatus: 'idle',
     ...overrides,
   };
 }
@@ -50,14 +52,14 @@ describe('saveGame / loadGame round-trip', () => {
 describe('isValidSave (structural validation via loadGame)', () => {
   it('rejects save with invalid board cell shapes', () => {
     const bad = makeValidSave();
-    (bad as Record<string, unknown>).board = [[{ kind: 'bogus' }]];
+    (bad as unknown as Record<string, unknown>).board = [[{ kind: 'bogus' }]];
     localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
     expect(loadGame(entryId)).toBeNull();
   });
 
   it('rejects save with non-object board cells', () => {
     const bad = makeValidSave();
-    (bad as Record<string, unknown>).board = [[42, 'string', null]];
+    (bad as unknown as Record<string, unknown>).board = [[42, 'string', null]];
     localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
     expect(loadGame(entryId)).toBeNull();
   });
@@ -69,7 +71,7 @@ describe('isValidSave (structural validation via loadGame)', () => {
 
   it('rejects save with wrong version', () => {
     const bad = makeValidSave();
-    (bad as Record<string, unknown>).version = 99;
+    (bad as unknown as Record<string, unknown>).version = 99;
     localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
     expect(loadGame(entryId)).toBeNull();
   });
