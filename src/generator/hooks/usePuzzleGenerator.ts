@@ -55,8 +55,8 @@ export interface GeneratorHookState {
 /** Actions exposed by the hook. */
 export interface GeneratorHookActions {
   updateSettings: (partial: Partial<GeneratorFormSettings>) => void;
-  loadImage: (file: File) => Promise<void>;
-  generate: () => Promise<void>;
+  loadImage: (file: File) => Promise<boolean>;
+  generate: () => Promise<BuildPuzzleResult | null>;
   saveToLibrary: () => Promise<ValidatedPuzzle | null>;
   reset: () => void;
 }
@@ -117,7 +117,7 @@ export function usePuzzleGenerator(): GeneratorHookState & GeneratorHookActions 
     setSettings((prev) => ({ ...prev, ...partial }));
   }, []);
 
-  const loadImage = useCallback(async (file: File) => {
+  const loadImage = useCallback(async (file: File): Promise<boolean> => {
     const reqId = ++requestIdRef.current;
     setStatus('loading-image');
     setError(null);
@@ -128,7 +128,7 @@ export function usePuzzleGenerator(): GeneratorHookState & GeneratorHookActions 
       // Stale request check
       if (reqId !== requestIdRef.current) {
         URL.revokeObjectURL(previewUrl);
-        return;
+        return false;
       }
 
       // Revoke old preview URL
@@ -143,18 +143,20 @@ export function usePuzzleGenerator(): GeneratorHookState & GeneratorHookActions 
       setResult(null);
       setGeneratedFromSettings(null);
       setStatus('ready');
+      return true;
     } catch (err) {
-      if (reqId !== requestIdRef.current) return;
+      if (reqId !== requestIdRef.current) return false;
       setError({
         message: 'Failed to load image. Please try a different file.',
         recoveryHint: 'Supported formats: PNG, JPEG, GIF, WebP',
       });
       setStatus('error');
+      return false;
     }
   }, []);
 
-  const generate = useCallback(async () => {
-    if (!sourceImage) return;
+  const generate = useCallback(async (): Promise<BuildPuzzleResult | null> => {
+    if (!sourceImage) return null;
 
     const reqId = ++requestIdRef.current;
     setStatus('generating');
@@ -186,7 +188,7 @@ export function usePuzzleGenerator(): GeneratorHookState & GeneratorHookActions 
       // Build puzzle
       const buildResult = buildPuzzle(pixelGrid, pipelineSettings);
 
-      if (reqId !== requestIdRef.current) return;
+      if (reqId !== requestIdRef.current) return null;
 
       setResult(buildResult);
       setGeneratedFromSettings(pipelineSettings);
@@ -202,16 +204,19 @@ export function usePuzzleGenerator(): GeneratorHookState & GeneratorHookActions 
         }
         setError({ message: firstError, recoveryHint: hint });
         setStatus('ready');
+        return buildResult;
       } else {
         setStatus('ready');
+        return buildResult;
       }
     } catch (err) {
-      if (reqId !== requestIdRef.current) return;
+      if (reqId !== requestIdRef.current) return null;
       setError({
         message: 'Generation failed unexpectedly.',
         recoveryHint: 'Try different settings or a different image.',
       });
       setStatus('ready');
+      return null;
     }
   }, [sourceImage, settings]);
 
@@ -259,7 +264,8 @@ export function usePuzzleGenerator(): GeneratorHookState & GeneratorHookActions 
       settings.targetCols !== generatedFromSettings.targetCols ||
       settings.bwThreshold !== (generatedFromSettings.bwThreshold ?? 128) ||
       settings.maxColors !== (generatedFromSettings.maxColors ?? 4) ||
-      settings.name !== generatedFromSettings.name);
+      settings.name !== generatedFromSettings.name ||
+      settings.backgroundMode.kind !== (generatedFromSettings.backgroundMode?.kind ?? 'auto'));
 
   return {
     status,

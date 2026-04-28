@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import type { ValidatedPuzzle } from '../../types';
 import type { GeneratorError } from '../hooks/usePuzzleGenerator';
 
@@ -38,8 +38,17 @@ export function ExportPanel({
   const handleCopy = useCallback(async () => {
     if (!puzzle) return;
     const json = JSON.stringify(puzzle, null, 2);
-    await navigator.clipboard.writeText(json);
+    try {
+      await navigator.clipboard.writeText(json);
+      setCopyStatus('copied');
+      setTimeout(() => setCopyStatus('idle'), 2000);
+    } catch {
+      setCopyStatus('failed');
+      setTimeout(() => setCopyStatus('idle'), 3000);
+    }
   }, [puzzle]);
+
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle');
 
   return (
     <section className="pap-gen-export" aria-label="Export options">
@@ -87,7 +96,7 @@ export function ExportPanel({
             className="pap-btn"
             onClick={handleCopy}
           >
-            📋 Copy JSON
+            {copyStatus === 'copied' ? '✓ Copied!' : copyStatus === 'failed' ? '✗ Copy failed' : '📋 Copy JSON'}
           </button>
         </div>
       )}

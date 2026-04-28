@@ -19,18 +19,20 @@ export function GeneratorPage(): React.JSX.Element {
 
   const handleLoadImage = useCallback(
     async (file: File) => {
-      await gen.loadImage(file);
-      announce(`Image loaded: ${file.name}`);
+      const success = await gen.loadImage(file);
+      announce(success ? `Image loaded: ${file.name}` : 'Failed to load image.');
     },
     [gen, announce],
   );
 
   const handleGenerate = useCallback(async () => {
-    await gen.generate();
-    if (gen.result?.ok) {
+    const result = await gen.generate();
+    if (result?.ok) {
       announce('Puzzle generated successfully.');
+    } else if (result) {
+      announce('Generation produced errors. Check the details below.');
     } else {
-      announce('Generation failed. Check the error message below.');
+      announce('Generation failed.');
     }
   }, [gen, announce]);
 

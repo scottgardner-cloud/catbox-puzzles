@@ -114,23 +114,57 @@ export function SettingsPanel({
 
       {/* Color options */}
       {settings.kind === 'color' && (
-        <div className="pap-gen-settings__field" aria-label="Color settings">
-          <label htmlFor="gen-colors">
-            Max colors: {settings.maxColors}
-          </label>
-          <input
-            id="gen-colors"
-            type="range"
-            min={2}
-            max={8}
-            value={settings.maxColors}
-            onChange={(e) => onUpdate({ maxColors: e.target.valueAsNumber })}
-            disabled={disabled}
-            aria-valuemin={2}
-            aria-valuemax={8}
-            aria-valuenow={settings.maxColors}
-          />
-        </div>
+        <>
+          <div className="pap-gen-settings__field" aria-label="Color settings">
+            <label htmlFor="gen-colors">
+              Max colors: {settings.maxColors}
+            </label>
+            <input
+              id="gen-colors"
+              type="range"
+              min={2}
+              max={8}
+              value={settings.maxColors}
+              onChange={(e) => onUpdate({ maxColors: e.target.valueAsNumber })}
+              disabled={disabled}
+              aria-valuemin={2}
+              aria-valuemax={8}
+              aria-valuenow={settings.maxColors}
+            />
+          </div>
+
+          <div className="pap-gen-settings__field">
+            <label htmlFor="gen-bg-mode">Background detection</label>
+            <select
+              id="gen-bg-mode"
+              value={settings.backgroundMode.kind}
+              onChange={(e) => {
+                const kind = e.target.value as 'auto' | 'alpha' | 'none';
+                switch (kind) {
+                  case 'auto':
+                    onUpdate({ backgroundMode: { kind: 'auto' } });
+                    break;
+                  case 'alpha':
+                    onUpdate({ backgroundMode: { kind: 'alpha' } });
+                    break;
+                  case 'none':
+                    onUpdate({ backgroundMode: { kind: 'none' } });
+                    break;
+                }
+              }}
+              disabled={disabled}
+            >
+              <option value="auto">Auto-detect</option>
+              <option value="alpha">Transparency (PNG)</option>
+              <option value="none">No background</option>
+            </select>
+            <span className="pap-gen-settings__field-hint">
+              {settings.backgroundMode.kind === 'auto' && 'Detects transparent or edge-color backgrounds automatically.'}
+              {settings.backgroundMode.kind === 'alpha' && 'Treats transparent pixels as empty cells.'}
+              {settings.backgroundMode.kind === 'none' && 'All pixels become filled cells.'}
+            </span>
+          </div>
+        </>
       )}
 
       {/* Generate button */}
