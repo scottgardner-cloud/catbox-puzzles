@@ -23,7 +23,12 @@ function getCellSize(rows: number, cols: number): number {
  * DOM-based paint grid for the puzzle editor.
  * Supports click-to-paint, drag-paint, keyboard navigation, and erase.
  */
-export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridProps): React.JSX.Element {
+export function EditorGrid({
+  state,
+  dispatch,
+  rowClues,
+  colClues,
+}: EditorGridProps): React.JSX.Element {
   const isDragging = useRef(false);
   const dragAction = useRef<'paint' | 'erase'>('paint');
 
@@ -144,15 +149,17 @@ export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridPr
       className="pap-editor-grid-wrapper"
       onPointerUp={handlePointerUp}
       onContextMenu={handleContextMenu}
-      style={{
-        '--cell-size': `${cellSize}px`,
-        '--grid-cols': state.cols,
-        '--grid-rows': state.rows,
-        '--grid-width': `${gridWidth}px`,
-        '--grid-height': `${gridHeight}px`,
-        '--clue-col-height': `${Math.ceil(state.rows / 2) * 16}px`,
-        '--clue-row-width': `${Math.ceil(state.cols / 2) * 16}px`,
-      } as React.CSSProperties}
+      style={
+        {
+          '--cell-size': `${cellSize}px`,
+          '--grid-cols': state.cols,
+          '--grid-rows': state.rows,
+          '--grid-width': `${gridWidth}px`,
+          '--grid-height': `${gridHeight}px`,
+          '--clue-col-height': `${Math.ceil(state.rows / 2) * 16}px`,
+          '--clue-row-width': `${Math.ceil(state.cols / 2) * 16}px`,
+        } as React.CSSProperties
+      }
     >
       {/* CSS Grid layout: [col-clues] above [row-clues | pixel-grid] */}
       <div className="pap-editor-grid-layout">
@@ -169,13 +176,19 @@ export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridPr
                   <span
                     key={i}
                     className="pap-editor-grid__clue-num"
-                    style={state.kind === 'color' ? { color: getCellColor(run.colorId) ?? undefined } : undefined}
+                    style={
+                      state.kind === 'color'
+                        ? { color: getCellColor(run.colorId) ?? undefined }
+                        : undefined
+                    }
                   >
                     {run.length}
                   </span>
                 ))}
                 {clue.length === 0 && (
-                  <span className="pap-editor-grid__clue-num pap-editor-grid__clue-num--empty">0</span>
+                  <span className="pap-editor-grid__clue-num pap-editor-grid__clue-num--empty">
+                    0
+                  </span>
                 )}
               </div>
             );
@@ -192,13 +205,19 @@ export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridPr
                   <span
                     key={i}
                     className="pap-editor-grid__clue-num"
-                    style={state.kind === 'color' ? { color: getCellColor(run.colorId) ?? undefined } : undefined}
+                    style={
+                      state.kind === 'color'
+                        ? { color: getCellColor(run.colorId) ?? undefined }
+                        : undefined
+                    }
                   >
                     {run.length}
                   </span>
                 ))}
                 {clue.length === 0 && (
-                  <span className="pap-editor-grid__clue-num pap-editor-grid__clue-num--empty">0</span>
+                  <span className="pap-editor-grid__clue-num pap-editor-grid__clue-num--empty">
+                    0
+                  </span>
                 )}
               </div>
             );
@@ -217,8 +236,7 @@ export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridPr
         >
           {state.grid.map((row, r) =>
             row.map((cell, c) => {
-              const isFocused =
-                state.focusedCell?.row === r && state.focusedCell?.col === c;
+              const isFocused = state.focusedCell?.row === r && state.focusedCell?.col === c;
               const colorValue = getCellColor(cell);
               const showDividerRight = (c + 1) % 5 === 0 && c < state.cols - 1;
               const showDividerBottom = (r + 1) % 5 === 0 && r < state.rows - 1;

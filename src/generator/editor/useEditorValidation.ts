@@ -32,10 +32,7 @@ export function useEditorValidation(
   const checkingRef = useRef(false);
 
   // Memoize clues — deriveClues is pure and cheap
-  const { rowClues, colClues } = useMemo(
-    () => deriveClues(state.grid),
-    [state.grid],
-  );
+  const { rowClues, colClues } = useMemo(() => deriveClues(state.grid), [state.grid]);
 
   const checkSolvability = useCallback(async () => {
     if (checkingRef.current) return;

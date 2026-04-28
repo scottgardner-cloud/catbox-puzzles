@@ -14,8 +14,8 @@
   grid-template-columns: var(--clue-row-width) var(--grid-width);
   grid-template-rows: var(--clue-col-height) var(--grid-height);
   grid-template-areas:
-    "spacer col-clues"
-    "row-clues cells";
+    'spacer col-clues'
+    'row-clues cells';
 }
 
 .pap-editor-grid__spacer {

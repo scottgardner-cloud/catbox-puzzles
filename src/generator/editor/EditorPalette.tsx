@@ -14,9 +14,7 @@ interface EditorPaletteProps {
 export function EditorPalette({ state, dispatch }: EditorPaletteProps): React.JSX.Element | null {
   if (state.kind === 'bw') return null;
 
-  const availableToAdd = PRESET_COLORS.filter(
-    (pc) => !state.palette.some((p) => p.id === pc.id),
-  );
+  const availableToAdd = PRESET_COLORS.filter((pc) => !state.palette.some((p) => p.id === pc.id));
 
   return (
     <div className="pap-editor-palette">

@@ -44,7 +44,7 @@ export function EditorToolbar({
     [dispatch, state.rows],
   );
 
-  const canExport= state.validationStatus === 'valid' && state.name.trim().length > 0;
+  const canExport = state.validationStatus === 'valid' && state.name.trim().length > 0;
 
   return (
     <div className="pap-editor-toolbar">
@@ -88,18 +88,10 @@ export function EditorToolbar({
 
       {/* Grid actions */}
       <div className="pap-editor-toolbar__actions">
-        <button
-          type="button"
-          className="pap-btn"
-          onClick={() => dispatch({ type: 'CLEAR_GRID' })}
-        >
+        <button type="button" className="pap-btn" onClick={() => dispatch({ type: 'CLEAR_GRID' })}>
           Clear All
         </button>
-        <button
-          type="button"
-          className="pap-btn"
-          onClick={() => dispatch({ type: 'FILL_GRID' })}
-        >
+        <button type="button" className="pap-btn" onClick={() => dispatch({ type: 'FILL_GRID' })}>
           Fill All
         </button>
       </div>

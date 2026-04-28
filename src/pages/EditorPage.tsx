@@ -25,11 +25,7 @@ export function EditorPage(): React.JSX.Element {
   const { announce } = useLayoutContext();
   const { entryId } = useParams<{ entryId?: string }>();
 
-  const [state, dispatch] = useReducer(
-    editorReducer,
-    null,
-    () => createInitialState('bw', 10, 10),
-  );
+  const [state, dispatch] = useReducer(editorReducer, null, () => createInitialState('bw', 10, 10));
 
   // Load existing puzzle for editing, or reset to new state
   useEffect(() => {

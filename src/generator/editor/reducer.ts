@@ -7,15 +7,13 @@ import { BW_PALETTE, PRESET_COLORS } from './types';
 
 /** Create an empty grid of the given dimensions. */
 export function createEmptyGrid(rows: number, cols: number): (ColorId | null)[][] {
-  return Array.from({ length: rows }, () => Array.from<ColorId | null>({ length: cols }).fill(null));
+  return Array.from({ length: rows }, () =>
+    Array.from<ColorId | null>({ length: cols }).fill(null),
+  );
 }
 
 /** Create initial editor state for a new puzzle. */
-export function createInitialState(
-  kind: 'bw' | 'color',
-  rows: number,
-  cols: number,
-): EditorState {
+export function createInitialState(kind: 'bw' | 'color', rows: number, cols: number): EditorState {
   const palette = kind === 'bw' ? [...BW_PALETTE] : [PRESET_COLORS[0]];
   return {
     mode: 'new',
@@ -81,9 +79,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return markDirty({ ...state, grid: createEmptyGrid(state.rows, state.cols) });
 
     case 'FILL_GRID': {
-      const newGrid = state.grid.map((r) =>
-        r.map(() => state.selectedColor),
-      );
+      const newGrid = state.grid.map((r) => r.map(() => state.selectedColor));
       return markDirty({ ...state, grid: newGrid });
     }
 
@@ -191,7 +187,15 @@ export function buildPuzzleFields(state: EditorState): {
  */
 export function stateFromPuzzle(
   entryId: string,
-  puzzle: { id: string; name: string; kind: 'bw' | 'color'; rows: number; cols: number; palette: readonly PaletteColor[]; solution: readonly (readonly (ColorId | null)[])[] },
+  puzzle: {
+    id: string;
+    name: string;
+    kind: 'bw' | 'color';
+    rows: number;
+    cols: number;
+    palette: readonly PaletteColor[];
+    solution: readonly (readonly (ColorId | null)[])[];
+  },
 ): EditorState {
   return {
     mode: 'edit',
