@@ -10,11 +10,7 @@ import { createPixelGrid } from './types';
  * @param targetRows - Target grid rows (10–30)
  * @returns A PixelGrid where each pixel represents one grid cell's averaged color
  */
-export function resizeToGrid(
-  source: PixelGrid,
-  targetCols: number,
-  targetRows: number,
-): PixelGrid {
+export function resizeToGrid(source: PixelGrid, targetCols: number, targetRows: number): PixelGrid {
   if (targetCols < 1 || targetRows < 1) {
     throw new Error(`Target dimensions must be >= 1, got ${targetCols}×${targetRows}`);
   }

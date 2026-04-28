@@ -8,9 +8,15 @@ function make3x3CrossPixels(): ReturnType<typeof createPixelGrid> {
   const W = [255, 255, 255, 255]; // white
   const B = [0, 0, 0, 255]; // black
   const data = new Uint8ClampedArray([
-    ...W, ...B, ...W, // row 0
-    ...B, ...B, ...B, // row 1
-    ...W, ...B, ...W, // row 2
+    ...W,
+    ...B,
+    ...W, // row 0
+    ...B,
+    ...B,
+    ...B, // row 1
+    ...W,
+    ...B,
+    ...W, // row 2
   ]);
   return createPixelGrid(3, 3, data);
 }
@@ -46,10 +52,7 @@ describe('buildPuzzle', () => {
   it('builds a valid color puzzle', () => {
     // 2×2: red, green, blue, yellow
     const data = new Uint8ClampedArray([
-      255, 0, 0, 255,
-      0, 255, 0, 255,
-      0, 0, 255, 255,
-      255, 255, 0, 255,
+      255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 255, 0, 255,
     ]);
     const grid = createPixelGrid(2, 2, data);
     const settings: GeneratorSettings = {

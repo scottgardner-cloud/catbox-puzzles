@@ -13,9 +13,10 @@ import type { ColorId, ClueRun, LineClue } from '../../types';
  *
  * @param solution - Grid of ColorId | null, indexed as solution[row][col]
  */
-export function deriveClues(
-  solution: readonly (readonly (ColorId | null)[])[],
-): { rowClues: readonly LineClue[]; colClues: readonly LineClue[] } {
+export function deriveClues(solution: readonly (readonly (ColorId | null)[])[]): {
+  rowClues: readonly LineClue[];
+  colClues: readonly LineClue[];
+} {
   const rows = solution.length;
   const cols = rows > 0 ? solution[0].length : 0;
 

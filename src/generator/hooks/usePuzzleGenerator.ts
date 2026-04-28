@@ -98,7 +98,9 @@ export function usePuzzleGenerator(): GeneratorHookState & GeneratorHookActions 
   const [sourceImage, setSourceImage] = useState<SourceImage | null>(null);
   const [settings, setSettings] = useState<GeneratorFormSettings>(DEFAULT_SETTINGS);
   const [result, setResult] = useState<BuildPuzzleResult | null>(null);
-  const [generatedFromSettings, setGeneratedFromSettings] = useState<GeneratorSettings | null>(null);
+  const [generatedFromSettings, setGeneratedFromSettings] = useState<GeneratorSettings | null>(
+    null,
+  );
   const [error, setError] = useState<GeneratorError | null>(null);
 
   // Request token for stale-request protection

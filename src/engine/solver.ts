@@ -30,7 +30,11 @@ export type SolverBoard = SolverCell[][];
 /** Result of solving a complete puzzle. */
 export type SolverResult =
   | { readonly solved: true; readonly board: SolverBoard }
-  | { readonly solved: false; readonly board: SolverBoard; readonly reason: 'stuck' | 'contradiction' | 'budget-exceeded' };
+  | {
+      readonly solved: false;
+      readonly board: SolverBoard;
+      readonly reason: 'stuck' | 'contradiction' | 'budget-exceeded';
+    };
 
 /** Options for the full solver (with search/backtracking). */
 export interface SolverOptions {
@@ -165,7 +169,7 @@ export function solveLine(
 
   // Forward DP: fdp[r][p] = can runs[0..r] be placed with run r starting at p?
   // Meaning: runs 0..r-1 are placed before position p with proper gaps, and run r at p is compatible.
-  
+
   // We'll compute two DPs:
   // fdp[r][p] = true if we can place runs[0..r] such that run r starts at position p
   // bdp[r][p] = true if we can place runs[r..numRuns-1] such that run r starts at position p
@@ -196,7 +200,7 @@ export function solveLine(
   for (let r = 1; r < numRuns; r++) {
     const needGap = isBW || runs[r].colorId === runs[r - 1].colorId;
     const minGap = needGap ? 1 : 0;
-    
+
     for (let p = 0; p <= n - runs[r].length; p++) {
       if (!canFill(p, runs[r].length, runs[r].colorId)) continue;
 
@@ -205,7 +209,7 @@ export function solveLine(
       // Run r-1 must end before p - minGap, so q + prevRunLen - 1 <= p - minGap - 1
       // i.e., q <= p - minGap - prevRunLen
       const maxQ = p - minGap - prevRunLen;
-      
+
       for (let q = 0; q <= maxQ && q < n; q++) {
         if (!fdp[r - 1][q]) continue;
         // Check cells between end of run r-1 and start of run r are empty
@@ -223,8 +227,10 @@ export function solveLine(
   //   - cells[p+len..n-1] can all be empty
   const lastRun = numRuns - 1;
   for (let p = 0; p <= n - runs[lastRun].length; p++) {
-    if (canFill(p, runs[lastRun].length, runs[lastRun].colorId) &&
-        canEmptyRange(p + runs[lastRun].length, n)) {
+    if (
+      canFill(p, runs[lastRun].length, runs[lastRun].colorId) &&
+      canEmptyRange(p + runs[lastRun].length, n)
+    ) {
       bdp[lastRun][p] = true;
     }
   }
@@ -238,12 +244,12 @@ export function solveLine(
     const needGap = isBW || runs[r].colorId === runs[r + 1].colorId;
     const minGap = needGap ? 1 : 0;
     const runLen = runs[r].length;
-    
+
     for (let p = 0; p <= n - runLen; p++) {
       if (!canFill(p, runLen, runs[r].colorId)) continue;
 
       const nextMinStart = p + runLen + minGap;
-      
+
       for (let q = nextMinStart; q < n; q++) {
         if (!bdp[r + 1][q]) continue;
         // Check cells between end of run r and start of run r+1 are empty
@@ -292,7 +298,7 @@ export function solveLine(
   // A cell can be empty if:
   //   - It can be in a gap before run 0: exists valid fdp[0][p] with p > i, and bdp[0][p]
   //   - It can be in a gap after run numRuns-1: exists valid fdp[lastRun][p] with p+runLen <= i, and bdp[lastRun][p]
-  //   - It can be in a gap between run r and run r+1: 
+  //   - It can be in a gap between run r and run r+1:
   //     exists p where fdp[r][p] && (p + runs[r].length <= i)
   //     AND exists q where bdp[r+1][q] && (q > i)
   //     AND the gap cells between p+runs[r].length and q can be empty
@@ -307,7 +313,7 @@ export function solveLine(
   // entries, we need to check if there's also a valid placement where it's empty.
 
   // Let me use a different approach: compute canBeEmpty via the "gap" positions.
-  
+
   // Gap before first run: cells 0..p-1 where fdp[0][p] && bdp[0][p]
   for (let p = 0; p < n; p++) {
     if (fdp[0][p] && bdp[0][p]) {
@@ -333,7 +339,7 @@ export function solveLine(
     const minGap = needGap ? 1 : 0;
     const runLen = runs[r].length;
     const nextRunLen = runs[r + 1].length;
-    
+
     // For each valid placement of run r at p, and run r+1 at q:
     // cells between p+runLen and q-1 are empty in that placement.
     // We need fdp[r][p] AND bdp[r+1][q] AND the gap is valid AND
@@ -341,15 +347,15 @@ export function solveLine(
     // Actually fdp[r][p] means runs 0..r can be placed with r at p.
     // bdp[r+1][q] means runs r+1..end can be placed with r+1 at q.
     // We need: the gap between p+runLen and q is all emptiable, and q >= p+runLen+minGap.
-    
+
     for (let p = 0; p < n; p++) {
       if (!fdp[r][p]) continue;
       const gapStart = p + runLen;
-      
+
       for (let q = gapStart + minGap; q <= n - nextRunLen; q++) {
         if (!bdp[r + 1][q]) continue;
         if (!canEmptyRange(gapStart, q)) continue;
-        
+
         // Cells gapStart..q-1 are empty in this placement
         for (let i = gapStart; i < q; i++) {
           canBeEmpty[i] = true;
@@ -571,7 +577,16 @@ function solveWithSearch(
 
         const trial = cloneBoard(board);
         trial[r][c] = value;
-        const result = solveWithSearch(trial, rows, cols, rowClues, colClues, isBW, palette, budget);
+        const result = solveWithSearch(
+          trial,
+          rows,
+          cols,
+          rowClues,
+          colClues,
+          isBW,
+          palette,
+          budget,
+        );
 
         if (result.solved) {
           solutionCount++;
@@ -618,10 +633,7 @@ function solveWithSearch(
  * @param board - The current solver board state.
  * @returns The first line with deducible progress, or a no-progress/contradiction indicator.
  */
-export function solveStep(
-  puzzle: ValidatedPuzzle,
-  board: SolverBoard,
-): SolveStepResult {
+export function solveStep(puzzle: ValidatedPuzzle, board: SolverBoard): SolveStepResult {
   const { rows, cols, rowClues, colClues, kind } = puzzle;
   const isBW = kind === 'bw';
 

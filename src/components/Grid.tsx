@@ -29,7 +29,9 @@ function countRunAt(line: readonly PlayerCellState[], pos: number): number {
  */
 function contrastText(cssColor: string): '#fff' | '#000' {
   // Parse hex colors (#RGB or #RRGGBB)
-  let r = 0, g = 0, b = 0;
+  let r = 0,
+    g = 0,
+    b = 0;
   if (cssColor.startsWith('#')) {
     const hex = cssColor.slice(1);
     if (hex.length === 3) {

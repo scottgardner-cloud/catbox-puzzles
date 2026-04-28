@@ -119,7 +119,17 @@ describe('registry', () => {
         'pap-custom-bad-id',
         JSON.stringify({
           version: 1,
-          puzzle: { id: 'x', name: 'Bad', kind: 'bw', rows: -1, cols: 5, palette: [], rowClues: [], colClues: [], solution: [] },
+          puzzle: {
+            id: 'x',
+            name: 'Bad',
+            kind: 'bw',
+            rows: -1,
+            cols: 5,
+            palette: [],
+            rowClues: [],
+            colClues: [],
+            solution: [],
+          },
           internalId: 'bad-id',
           createdAt: new Date().toISOString(),
         }),

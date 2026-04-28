@@ -78,11 +78,7 @@ export function getPixel(
 }
 
 /** Create a PixelGrid from dimensions and a flat RGBA buffer. */
-export function createPixelGrid(
-  width: number,
-  height: number,
-  data: Uint8ClampedArray,
-): PixelGrid {
+export function createPixelGrid(width: number, height: number, data: Uint8ClampedArray): PixelGrid {
   if (data.length !== width * height * 4) {
     throw new Error(`PixelGrid data length ${data.length} !== expected ${width * height * 4}`);
   }

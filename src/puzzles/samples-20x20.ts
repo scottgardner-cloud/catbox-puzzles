@@ -776,7 +776,7 @@ function assertValid(def: PuzzleDefinition): ValidatedPuzzle {
   const result = validatePuzzleDefinition(def);
   if (Array.isArray(result)) {
     throw new Error(
-    `Sample puzzle "${def.id}" failed validation:\n${result.map((e) => `  - ${e.message}`).join('\n')}`,
+      `Sample puzzle "${def.id}" failed validation:\n${result.map((e) => `  - ${e.message}`).join('\n')}`,
     );
   }
   return result;

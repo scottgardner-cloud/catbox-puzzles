@@ -11,11 +11,7 @@ import {
 } from './solver';
 import type { ClueRun, ColorId, ValidatedPuzzle, PlayerCellState } from '../types';
 import { colorId } from '../types';
-import {
-  crossPuzzle,
-  heartPuzzle,
-  flagPuzzle,
-} from '../puzzles/samples';
+import { crossPuzzle, heartPuzzle, flagPuzzle } from '../puzzles/samples';
 import {
   anchorPuzzle,
   catPuzzle,
@@ -177,11 +173,7 @@ describe('solveLine', () => {
 
     it('different-color runs can be adjacent', () => {
       // [R:2, G:2] in line of 4: no gap needed between different colors
-      const result = solveLine(
-        [colorRun(2, R), colorRun(2, G)],
-        cells('????'),
-        false,
-      );
+      const result = solveLine([colorRun(2, R), colorRun(2, G)], cells('????'), false);
       // Only valid placement: RR GG
       expect(result).not.toBeNull();
       expect(result![0]).toBe(R);
@@ -192,11 +184,7 @@ describe('solveLine', () => {
 
     it('same-color runs need gap in color mode', () => {
       // [R:1, R:1] in line of 3: need gap between same color
-      const result = solveLine(
-        [colorRun(1, R), colorRun(1, R)],
-        cells('???'),
-        false,
-      );
+      const result = solveLine([colorRun(1, R), colorRun(1, R)], cells('???'), false);
       expect(result).not.toBeNull();
       expect(result![0]).toBe(R);
       expect(result![1]).toBe(null);
@@ -636,7 +624,10 @@ describe('getHint', () => {
       rows: 2,
       cols: 2,
       palette: [{ id: B, name: 'Black', value: '#000' }],
-      solution: [[B, null], [null, B]],
+      solution: [
+        [B, null],
+        [null, B],
+      ],
       rowClues: [[run(1)], [run(1)]],
       colClues: [[run(1)], [run(1)]],
       __validated: true,

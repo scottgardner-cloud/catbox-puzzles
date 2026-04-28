@@ -38,10 +38,13 @@ export function KeyboardShortcutHelp({
   const closeRef = useRef<HTMLButtonElement>(null);
   const hasBeenOpened = useRef(false);
 
-  const setOpen = useCallback((value: boolean) => {
-    setIsOpen(value);
-    onOpenChange?.(value);
-  }, [onOpenChange]);
+  const setOpen = useCallback(
+    (value: boolean) => {
+      setIsOpen(value);
+      onOpenChange?.(value);
+    },
+    [onOpenChange],
+  );
 
   const toggle = useCallback(() => setOpen(!isOpen), [setOpen, isOpen]);
   const close = useCallback(() => setOpen(false), [setOpen]);
@@ -83,11 +86,7 @@ export function KeyboardShortcutHelp({
       </button>
 
       {isOpen && (
-        <div
-          className="pap-shortcut-help__backdrop"
-          onClick={close}
-          role="presentation"
-        >
+        <div className="pap-shortcut-help__backdrop" onClick={close} role="presentation">
           <div
             className="pap-shortcut-help__modal"
             role="dialog"

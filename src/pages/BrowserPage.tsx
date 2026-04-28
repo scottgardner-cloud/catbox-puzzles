@@ -19,13 +19,10 @@ export function BrowserPage(): React.JSX.Element {
     [navigate],
   );
 
-  const handleDeletePuzzle = useCallback(
-    (entryId: string) => {
-      deleteCustomPuzzle(entryId);
-      setEntries(getAllEntries());
-    },
-    [],
-  );
+  const handleDeletePuzzle = useCallback((entryId: string) => {
+    deleteCustomPuzzle(entryId);
+    setEntries(getAllEntries());
+  }, []);
 
   const handleImport = useCallback(() => {
     setShowImport(false);
@@ -40,12 +37,7 @@ export function BrowserPage(): React.JSX.Element {
         onDeletePuzzle={handleDeletePuzzle}
         onImportPuzzle={() => setShowImport(true)}
       />
-      {showImport && (
-        <ImportPuzzle
-          onImport={handleImport}
-          onClose={() => setShowImport(false)}
-        />
-      )}
+      {showImport && <ImportPuzzle onImport={handleImport} onClose={() => setShowImport(false)} />}
     </>
   );
 }

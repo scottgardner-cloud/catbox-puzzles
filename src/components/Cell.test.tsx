@@ -49,7 +49,13 @@ describe('Cell', () => {
   it('fires onClick when clicked', async () => {
     const onClick = vi.fn();
     render(
-      <Cell state={{ kind: 'unknown' }} validation="unchecked" onClick={onClick} onDragEnter={noop} size={30} />,
+      <Cell
+        state={{ kind: 'unknown' }}
+        validation="unchecked"
+        onClick={onClick}
+        onDragEnter={noop}
+        size={30}
+      />,
     );
     await userEvent.click(screen.getByRole('gridcell'));
     expect(onClick).toHaveBeenCalledOnce();

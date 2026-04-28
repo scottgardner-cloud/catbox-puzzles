@@ -39,8 +39,22 @@ describe('resizeToGrid', () => {
   it('averages 2×2 blocks into 1×1', () => {
     // 2×2 grid: TL=black, TR=white, BL=white, BR=black → average = gray
     const data = new Uint8ClampedArray([
-      0, 0, 0, 255, 255, 255, 255, 255, // row 0
-      255, 255, 255, 255, 0, 0, 0, 255, // row 1
+      0,
+      0,
+      0,
+      255,
+      255,
+      255,
+      255,
+      255, // row 0
+      255,
+      255,
+      255,
+      255,
+      0,
+      0,
+      0,
+      255, // row 1
     ]);
     const src = createPixelGrid(2, 2, data);
     const result = resizeToGrid(src, 1, 1);
@@ -61,13 +75,25 @@ describe('resizeToGrid', () => {
         const isTop = r < 2;
         const isLeft = c < 2;
         if (isTop && isLeft) {
-          data[i] = 255; data[i + 1] = 0; data[i + 2] = 0; data[i + 3] = 255; // red
+          data[i] = 255;
+          data[i + 1] = 0;
+          data[i + 2] = 0;
+          data[i + 3] = 255; // red
         } else if (isTop && !isLeft) {
-          data[i] = 0; data[i + 1] = 255; data[i + 2] = 0; data[i + 3] = 255; // green
+          data[i] = 0;
+          data[i + 1] = 255;
+          data[i + 2] = 0;
+          data[i + 3] = 255; // green
         } else if (!isTop && isLeft) {
-          data[i] = 0; data[i + 1] = 0; data[i + 2] = 255; data[i + 3] = 255; // blue
+          data[i] = 0;
+          data[i + 1] = 0;
+          data[i + 2] = 255;
+          data[i + 3] = 255; // blue
         } else {
-          data[i] = 255; data[i + 1] = 255; data[i + 2] = 0; data[i + 3] = 255; // yellow
+          data[i] = 255;
+          data[i + 1] = 255;
+          data[i + 2] = 0;
+          data[i + 3] = 255; // yellow
         }
       }
     }
@@ -87,8 +113,22 @@ describe('resizeToGrid', () => {
 
   it('preserves alpha in averaging', () => {
     const data = new Uint8ClampedArray([
-      100, 100, 100, 0, 100, 100, 100, 255, // row 0: transparent + opaque
-      100, 100, 100, 0, 100, 100, 100, 255, // row 1
+      100,
+      100,
+      100,
+      0,
+      100,
+      100,
+      100,
+      255, // row 0: transparent + opaque
+      100,
+      100,
+      100,
+      0,
+      100,
+      100,
+      100,
+      255, // row 1
     ]);
     const src = createPixelGrid(2, 2, data);
     const result = resizeToGrid(src, 1, 1);
@@ -125,11 +165,7 @@ describe('resizeToGrid', () => {
 
   it('handles non-integer downscale ratio (3×1 to 2×1)', () => {
     // 3 pixels: red, green, blue
-    const data = new Uint8ClampedArray([
-      255, 0, 0, 255,
-      0, 255, 0, 255,
-      0, 0, 255, 255,
-    ]);
+    const data = new Uint8ClampedArray([255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255]);
     const src = createPixelGrid(3, 1, data);
     const result = resizeToGrid(src, 2, 1);
     expect(result.width).toBe(2);

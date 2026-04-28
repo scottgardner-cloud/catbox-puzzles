@@ -18,8 +18,16 @@ function make3x3Props(overrides: Partial<GridProps> = {}): GridProps {
   );
   const rowVal: LineValidation[] = ['incomplete', 'incomplete', 'incomplete'];
   const colVal: LineValidation[] = ['incomplete', 'incomplete', 'incomplete'];
-  const rowClues = [[{ length: 1, colorId: B }], [{ length: 3, colorId: B }], [{ length: 1, colorId: B }]];
-  const colClues = [[{ length: 1, colorId: B }], [{ length: 3, colorId: B }], [{ length: 1, colorId: B }]];
+  const rowClues = [
+    [{ length: 1, colorId: B }],
+    [{ length: 3, colorId: B }],
+    [{ length: 1, colorId: B }],
+  ];
+  const colClues = [
+    [{ length: 1, colorId: B }],
+    [{ length: 3, colorId: B }],
+    [{ length: 1, colorId: B }],
+  ];
   const palette = [{ id: B, name: 'Black', value: '#000000' }];
 
   return {

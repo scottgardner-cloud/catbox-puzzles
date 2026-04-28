@@ -55,7 +55,9 @@ export function ExportPanel({
       {/* Generation/system errors */}
       {error && (
         <div className="pap-gen-export__error" role="alert">
-          <p><strong>Error:</strong> {error.message}</p>
+          <p>
+            <strong>Error:</strong> {error.message}
+          </p>
           {error.recoveryHint && <p className="pap-gen-export__hint">{error.recoveryHint}</p>}
         </div>
       )}
@@ -63,7 +65,9 @@ export function ExportPanel({
       {/* Validation errors from pipeline */}
       {errors && errors.length > 0 && (
         <div className="pap-gen-export__errors" role="alert">
-          <p><strong>Puzzle validation failed:</strong></p>
+          <p>
+            <strong>Puzzle validation failed:</strong>
+          </p>
           <ul>
             {errors.map((e, i) => (
               <li key={i}>{e.message}</li>
@@ -84,19 +88,15 @@ export function ExportPanel({
           >
             {isSaving ? 'Saving…' : '💾 Save to Library'}
           </button>
-          <button
-            type="button"
-            className="pap-btn"
-            onClick={handleDownload}
-          >
+          <button type="button" className="pap-btn" onClick={handleDownload}>
             ⬇ Download JSON
           </button>
-          <button
-            type="button"
-            className="pap-btn"
-            onClick={handleCopy}
-          >
-            {copyStatus === 'copied' ? '✓ Copied!' : copyStatus === 'failed' ? '✗ Copy failed' : '📋 Copy JSON'}
+          <button type="button" className="pap-btn" onClick={handleCopy}>
+            {copyStatus === 'copied'
+              ? '✓ Copied!'
+              : copyStatus === 'failed'
+                ? '✗ Copy failed'
+                : '📋 Copy JSON'}
           </button>
         </div>
       )}

@@ -31,7 +31,7 @@ export function PreviewGrid({ puzzle }: PreviewGridProps): React.JSX.Element {
       >
         {puzzle.solution.flatMap((row, r) =>
           row.map((cell, c) => {
-            const color = cell ? paletteMap.get(cell) ?? '#000' : '#fff';
+            const color = cell ? (paletteMap.get(cell) ?? '#000') : '#fff';
             return (
               <div
                 key={`${r}-${c}`}
@@ -47,7 +47,8 @@ export function PreviewGrid({ puzzle }: PreviewGridProps): React.JSX.Element {
       </div>
       <div className="pap-gen-preview__info">
         <p>
-          {puzzle.rows}×{puzzle.cols} • {puzzle.kind === 'bw' ? 'B&W' : `${puzzle.palette.length} colors`}
+          {puzzle.rows}×{puzzle.cols} •{' '}
+          {puzzle.kind === 'bw' ? 'B&W' : `${puzzle.palette.length} colors`}
         </p>
         {puzzle.kind === 'color' && (
           <div className="pap-gen-preview__palette" aria-label="Color palette">

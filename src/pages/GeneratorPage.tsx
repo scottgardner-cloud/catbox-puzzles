@@ -53,7 +53,8 @@ export function GeneratorPage(): React.JSX.Element {
   const hasResult = gen.result !== null && gen.result.ok;
   const validationErrors = gen.result && !gen.result.ok ? gen.result.errors : null;
   const puzzle = gen.result?.ok ? gen.result.puzzle : null;
-  const isBusy = gen.status === 'generating' || gen.status === 'saving' || gen.status === 'loading-image';
+  const isBusy =
+    gen.status === 'generating' || gen.status === 'saving' || gen.status === 'loading-image';
 
   return (
     <div className="pap-gen">
@@ -93,9 +94,13 @@ export function GeneratorPage(): React.JSX.Element {
       )}
       {gen.result?.ok && !gen.result.solvability.solvable && (
         <div className="pap-gen-solvability-warning" role="alert">
-          <p><strong>⚠ Solvability warning:</strong> {gen.result.solvability.reason}</p>
+          <p>
+            <strong>⚠ Solvability warning:</strong> {gen.result.solvability.reason}
+          </p>
           <p className="pap-gen-solvability-warning__hint">{gen.result.solvability.hint}</p>
-          <p className="pap-gen-solvability-warning__note">You can still save this puzzle, but it may require guessing to solve.</p>
+          <p className="pap-gen-solvability-warning__note">
+            You can still save this puzzle, but it may require guessing to solve.
+          </p>
         </div>
       )}
 

@@ -48,17 +48,19 @@ describe('quantizeBW', () => {
     const W = [255, 255, 255, 255]; // white
     const B = [0, 0, 0, 255]; // black
     const data = new Uint8ClampedArray([
-      ...W, ...B, ...W, // row 0
-      ...B, ...B, ...B, // row 1
-      ...W, ...B, ...W, // row 2
+      ...W,
+      ...B,
+      ...W, // row 0
+      ...B,
+      ...B,
+      ...B, // row 1
+      ...W,
+      ...B,
+      ...W, // row 2
     ]);
     const grid = createPixelGrid(3, 3, data);
     const result = quantizeBW(grid);
-    expect(result.cells).toEqual([
-      false, true, false,
-      true, true, true,
-      false, true, false,
-    ]);
+    expect(result.cells).toEqual([false, true, false, true, true, true, false, true, false]);
   });
 
   it('returns correct dimensions', () => {

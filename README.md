@@ -28,15 +28,15 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start dev server with hot reload |
-| `npm run build` | Type-check and build for production |
-| `npm run test` | Run tests (Vitest) |
-| `npm run test:watch` | Run tests in watch mode |
-| `npm run lint` | Lint with ESLint |
-| `npm run format` | Format with Prettier |
-| `npm run format:check` | Check formatting without writing |
+| Command                | Description                         |
+| ---------------------- | ----------------------------------- |
+| `npm run dev`          | Start dev server with hot reload    |
+| `npm run build`        | Type-check and build for production |
+| `npm run test`         | Run tests (Vitest)                  |
+| `npm run test:watch`   | Run tests in watch mode             |
+| `npm run lint`         | Lint with ESLint                    |
+| `npm run format`       | Format with Prettier                |
+| `npm run format:check` | Check formatting without writing    |
 
 ## Architecture
 
@@ -56,6 +56,7 @@ src/
 ```
 
 **Key design decisions:**
+
 - `ValidatedPuzzle` branded type — only validated puzzles enter the system
 - `isSolved` is derived, never stored
 - Validation state is ephemeral (cleared on undo/redo/reset)

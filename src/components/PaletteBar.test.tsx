@@ -25,8 +25,14 @@ describe('PaletteBar', () => {
 
   it('marks the selected color as pressed', () => {
     render(<PaletteBar palette={colorPalette} selectedColorId={R} onSelectColor={vi.fn()} />);
-    expect(screen.getByRole('button', { name: /select red/i })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: /select green/i })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: /select red/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: /select green/i })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
   });
 
   it('fires onSelectColor when a swatch is clicked', async () => {

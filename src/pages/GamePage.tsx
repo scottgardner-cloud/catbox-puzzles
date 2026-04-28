@@ -97,8 +97,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         saveGame(gameStateRef.current, entry.entryId);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entry.entryId]);
+  }, [entry.entryId]); // isDirtyRef/gameStateRef/saveGame are stable refs/functions
 
   // ── Drag state (ephemeral UI concern) ───────────────────────────
   const isDragging = useRef(false);
@@ -216,14 +215,14 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
   const [hintShake, setHintShake] = useState(false);
   const [checkPulse, setCheckPulse] = useState(false);
 
-  /** Clear hints whenever the board changes. */
-  useEffect(() => {
+  // Clear hints whenever the board changes (render-time adjustment pattern).
+  const [prevBoard, setPrevBoard] = useState(gameState.board);
+  if (prevBoard !== gameState.board) {
+    setPrevBoard(gameState.board);
     if (hintCells.size > 0) {
       setHintCells(new Set());
     }
-    // Only clear on board changes, not when hintCells itself changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState.board]);
+  }
 
   const handleHint = useCallback(() => {
     if (solved) return;
@@ -232,8 +231,11 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
       case 'hint': {
         const keys = new Set(result.cells.map((c) => `${c.row},${c.col}`));
         setHintCells(keys);
-        const lineLabel = result.line === 'row' ? `row ${result.index + 1}` : `column ${result.index + 1}`;
-        announce(`Hint: look at ${lineLabel} — ${result.cells.length} cell${result.cells.length === 1 ? '' : 's'} can be determined.`);
+        const lineLabel =
+          result.line === 'row' ? `row ${result.index + 1}` : `column ${result.index + 1}`;
+        announce(
+          `Hint: look at ${lineLabel} — ${result.cells.length} cell${result.cells.length === 1 ? '' : 's'} can be determined.`,
+        );
         break;
       }
       case 'error':
@@ -302,7 +304,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [puzzle, announce]);
+  }, [puzzle, announce, updateGameState]);
 
   return (
     <>
@@ -312,9 +314,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         </button>
       </div>
 
-      <div className={`pap-solved${solved ? '' : ' pap-solved--hidden'}`}>
-        🎉 Puzzle Solved!
-      </div>
+      <div className={`pap-solved${solved ? '' : ' pap-solved--hidden'}`}>🎉 Puzzle Solved!</div>
 
       <PaletteBar
         palette={puzzle.palette}
@@ -380,7 +380,11 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         <button type="button" className="pap-btn pap-btn--danger" onClick={handleReset}>
           ⟲ Reset
         </button>
-        <KeyboardShortcutHelp onOpenChange={(open) => { isHelpOpenRef.current = open; }} />
+        <KeyboardShortcutHelp
+          onOpenChange={(open) => {
+            isHelpOpenRef.current = open;
+          }}
+        />
       </div>
     </>
   );

@@ -136,7 +136,10 @@ function createBWPalette(): PaletteColor {
 }
 
 /** Convert a BWGrid to a solution grid. */
-function bwGridToSolution(bwGrid: { width: number; height: number; cells: readonly boolean[] }, fillId: ColorId): (ColorId | null)[][] {
+function bwGridToSolution(
+  bwGrid: { width: number; height: number; cells: readonly boolean[] },
+  fillId: ColorId,
+): (ColorId | null)[][] {
   const solution: (ColorId | null)[][] = [];
   for (let r = 0; r < bwGrid.height; r++) {
     const row: (ColorId | null)[] = [];

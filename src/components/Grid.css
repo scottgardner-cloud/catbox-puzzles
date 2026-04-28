@@ -256,8 +256,13 @@
 }
 
 @keyframes hint-pulse {
-  0%, 100% { outline-color: #e65100; }
-  50% { outline-color: #ffcc80; }
+  0%,
+  100% {
+    outline-color: #e65100;
+  }
+  50% {
+    outline-color: #ffcc80;
+  }
 }
 
 /* Don't show the browser's default focus ring on the grid wrapper */
@@ -325,8 +330,12 @@
 }
 
 @keyframes pap-cell-fill {
-  from { transform: scale(0.85); }
-  to { transform: scale(1); }
+  from {
+    transform: scale(0.85);
+  }
+  to {
+    transform: scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

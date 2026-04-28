@@ -181,5 +181,11 @@ import { getSamplePuzzles20x20 } from './samples-20x20';
 
 /** Returns all sample puzzles. */
 export function getSamplePuzzles(): ValidatedPuzzle[] {
-  return [crossPuzzle, heartPuzzle, flagPuzzle, ...getSamplePuzzles15x15(), ...getSamplePuzzles20x20()];
+  return [
+    crossPuzzle,
+    heartPuzzle,
+    flagPuzzle,
+    ...getSamplePuzzles15x15(),
+    ...getSamplePuzzles20x20(),
+  ];
 }

@@ -1,4 +1,12 @@
-import type { GameState, SavedGameState, ValidatedPuzzle, PlayerCellState, GameAction, CellChange, ColorId } from '../types';
+import type {
+  GameState,
+  SavedGameState,
+  ValidatedPuzzle,
+  PlayerCellState,
+  GameAction,
+  CellChange,
+  ColorId,
+} from '../types';
 import { computeLineValidation } from '../engine';
 
 const STORAGE_PREFIX = 'pap-save-';
@@ -44,9 +52,7 @@ function isValidAction(action: unknown): action is GameAction {
     case 'reset':
       return (
         Array.isArray(obj.previousBoard) &&
-        obj.previousBoard.every(
-          (row: unknown) => Array.isArray(row) && row.every(isValidCellState),
-        )
+        obj.previousBoard.every((row: unknown) => Array.isArray(row) && row.every(isValidCellState))
       );
     default:
       return false;
@@ -57,9 +63,7 @@ function isValidAction(action: unknown): action is GameAction {
 function isValidBoard(board: unknown): board is PlayerCellState[][] {
   return (
     Array.isArray(board) &&
-    board.every(
-      (row: unknown) => Array.isArray(row) && row.every(isValidCellState),
-    )
+    board.every((row: unknown) => Array.isArray(row) && row.every(isValidCellState))
   );
 }
 
@@ -203,10 +207,7 @@ function actionSemanticsValid(
  * coordinates, and history cell colors. Returns null if incompatible.
  * Re-initializes ephemeral fields (validation inactive, line validation derived).
  */
-export function restoreGameState(
-  save: SavedGameState,
-  puzzle: ValidatedPuzzle,
-): GameState | null {
+export function restoreGameState(save: SavedGameState, puzzle: ValidatedPuzzle): GameState | null {
   const { rows, cols } = puzzle;
 
   // Puzzle ID must match
@@ -251,7 +252,6 @@ export function restoreGameState(
     redoStack: save.redoStack,
   };
 }
-
 
 /** Structural shape check for loaded save data. */
 function isValidSave(data: unknown): data is SavedGameState {

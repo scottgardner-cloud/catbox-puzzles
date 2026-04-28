@@ -23,25 +23,19 @@ function getEntries(): PuzzleEntry[] {
 describe('PuzzleBrowser', () => {
   it('renders builtin puzzles section', () => {
     const entries = getEntries();
-    render(
-      <PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />,
-    );
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
     expect(screen.getByRole('heading', { name: 'Puzzles' })).toBeInTheDocument();
   });
 
   it('shows My Puzzles section', () => {
     const entries = getEntries();
-    render(
-      <PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />,
-    );
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
     expect(screen.getByRole('heading', { name: 'My Puzzles' })).toBeInTheDocument();
   });
 
   it('displays puzzle names as buttons', () => {
     const entries = getEntries();
-    render(
-      <PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />,
-    );
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
     const firstBuiltin = entries.find((e) => e.source === 'builtin');
     if (firstBuiltin) {
       expect(screen.getByText(firstBuiltin.puzzle.name)).toBeInTheDocument();
@@ -51,9 +45,7 @@ describe('PuzzleBrowser', () => {
   it('calls onSelectPuzzle when a puzzle card is clicked', async () => {
     const entries = getEntries();
     const onSelect = vi.fn();
-    render(
-      <PuzzleBrowser entries={entries} onSelectPuzzle={onSelect} />,
-    );
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={onSelect} />);
     const firstBuiltin = entries.find((e) => e.source === 'builtin')!;
     const card = screen.getByText(firstBuiltin.puzzle.name).closest('button');
     await userEvent.click(card!);
@@ -62,9 +54,7 @@ describe('PuzzleBrowser', () => {
 
   it('shows puzzle dimensions', () => {
     const entries = getEntries();
-    render(
-      <PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />,
-    );
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
     const firstBuiltin = entries.find((e) => e.source === 'builtin')!;
     // Look for dimension badge containing rows and cols
     const dimRegex = new RegExp(`${firstBuiltin.puzzle.rows}.*${firstBuiltin.puzzle.cols}`);
@@ -74,9 +64,7 @@ describe('PuzzleBrowser', () => {
 
   it('shows "New" status for puzzles without saves', () => {
     const entries = getEntries();
-    render(
-      <PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />,
-    );
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
     const newBadges = screen.getAllByText('New');
     expect(newBadges.length).toBeGreaterThan(0);
   });

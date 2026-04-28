@@ -86,7 +86,9 @@ export function ImportPuzzle({ onImport, onClose }: ImportPuzzleProps): React.JS
         return;
       }
       if (!entry) {
-        setError('Puzzle validation failed. Ensure the puzzle has valid dimensions, clues, solution, and palette.');
+        setError(
+          'Puzzle validation failed. Ensure the puzzle has valid dimensions, clues, solution, and palette.',
+        );
         return;
       }
 
@@ -126,12 +128,7 @@ export function ImportPuzzle({ onImport, onClose }: ImportPuzzleProps): React.JS
       >
         <div className="pap-import__header">
           <h3>Import Puzzle</h3>
-          <button
-            type="button"
-            className="pap-import__close"
-            onClick={onClose}
-            aria-label="Close"
-          >
+          <button type="button" className="pap-import__close" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>

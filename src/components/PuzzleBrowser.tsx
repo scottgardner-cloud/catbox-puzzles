@@ -123,7 +123,11 @@ export function PuzzleBrowser({
       <div className="pap-browser__section-row">
         <h2 className="pap-browser__section-header">My Puzzles</h2>
         {onImportPuzzle && (
-          <button type="button" className="pap-btn pap-browser__import-btn" onClick={onImportPuzzle}>
+          <button
+            type="button"
+            className="pap-btn pap-browser__import-btn"
+            onClick={onImportPuzzle}
+          >
             + Import
           </button>
         )}

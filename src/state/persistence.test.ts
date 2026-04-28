@@ -5,11 +5,9 @@ import { crossPuzzle } from '../puzzles/samples';
 import { colorId } from '../types';
 import type {
   SavedGameState,
-  ValidatedPuzzle,
   PlayerCellState,
   GameAction,
   CellChange,
-  ColorId,
 } from '../types';
 
 const B = colorId('black');
@@ -94,7 +92,12 @@ describe('isValidSave (structural validation via loadGame)', () => {
       undoStack: [
         {
           type: 'set-cell',
-          change: { row: 'not-a-number', col: 0, prev: { kind: 'unknown' }, next: { kind: 'empty' } },
+          change: {
+            row: 'not-a-number',
+            col: 0,
+            prev: { kind: 'unknown' },
+            next: { kind: 'empty' },
+          },
         } as unknown as GameAction,
       ],
     });

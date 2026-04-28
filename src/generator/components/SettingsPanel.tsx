@@ -51,7 +51,9 @@ export function SettingsPanel({
             onChange={(e) => onUpdate({ targetRows: Number(e.target.value) })}
           >
             {GRID_SIZES.map((n) => (
-              <option key={n} value={n}>{n}</option>
+              <option key={n} value={n}>
+                {n}
+              </option>
             ))}
           </select>
           <span aria-hidden="true">×</span>
@@ -62,7 +64,9 @@ export function SettingsPanel({
             onChange={(e) => onUpdate({ targetCols: Number(e.target.value) })}
           >
             {GRID_SIZES.map((n) => (
-              <option key={n} value={n}>{n}</option>
+              <option key={n} value={n}>
+                {n}
+              </option>
             ))}
           </select>
         </div>
@@ -98,9 +102,7 @@ export function SettingsPanel({
       {/* B&W threshold */}
       {settings.kind === 'bw' && (
         <div className="pap-gen-settings__field" aria-label="Threshold settings">
-          <label htmlFor="gen-threshold">
-            Threshold: {settings.bwThreshold}
-          </label>
+          <label htmlFor="gen-threshold">Threshold: {settings.bwThreshold}</label>
           <input
             id="gen-threshold"
             type="range"
@@ -123,9 +125,7 @@ export function SettingsPanel({
       {settings.kind === 'color' && (
         <>
           <div className="pap-gen-settings__field" aria-label="Color settings">
-            <label htmlFor="gen-colors">
-              Max colors: {settings.maxColors}
-            </label>
+            <label htmlFor="gen-colors">Max colors: {settings.maxColors}</label>
             <input
               id="gen-colors"
               type="range"
@@ -166,8 +166,10 @@ export function SettingsPanel({
               <option value="none">No background</option>
             </select>
             <span className="pap-gen-settings__field-hint">
-              {settings.backgroundMode.kind === 'auto' && 'Detects transparent or edge-color backgrounds automatically.'}
-              {settings.backgroundMode.kind === 'alpha' && 'Treats transparent pixels as empty cells.'}
+              {settings.backgroundMode.kind === 'auto' &&
+                'Detects transparent or edge-color backgrounds automatically.'}
+              {settings.backgroundMode.kind === 'alpha' &&
+                'Treats transparent pixels as empty cells.'}
               {settings.backgroundMode.kind === 'none' && 'All pixels become filled cells.'}
             </span>
           </div>

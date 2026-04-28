@@ -3,13 +3,7 @@ import type { PixelGrid, ColorGrid, RGBColor, BackgroundMode } from './types';
 // ── Background detection ────────────────────────────────────────────
 
 /** Check if a pixel (r, g, b, a) should be treated as background/empty. */
-function isBackground(
-  r: number,
-  g: number,
-  b: number,
-  a: number,
-  mode: BackgroundMode,
-): boolean {
+function isBackground(r: number, g: number, b: number, a: number, mode: BackgroundMode): boolean {
   switch (mode.kind) {
     case 'alpha':
       return a < (mode.threshold ?? 128);
@@ -90,7 +84,15 @@ function resolveAutoBackground(grid: PixelGrid): BackgroundMode {
     let fgCount = 0;
     for (let i = 0; i < totalPixels; i++) {
       const pi = i * 4;
-      if (!isBackground(grid.data[pi], grid.data[pi + 1], grid.data[pi + 2], grid.data[pi + 3], candidateMode)) {
+      if (
+        !isBackground(
+          grid.data[pi],
+          grid.data[pi + 1],
+          grid.data[pi + 2],
+          grid.data[pi + 3],
+          candidateMode,
+        )
+      ) {
         fgCount++;
       }
     }
@@ -153,10 +155,7 @@ function bucketAverage(bucket: ColorBucket): RGBColor {
 }
 
 /** Median-cut: split buckets until we have maxColors buckets. */
-function medianCut(
-  pixels: { r: number; g: number; b: number }[],
-  maxColors: number,
-): RGBColor[] {
+function medianCut(pixels: { r: number; g: number; b: number }[], maxColors: number): RGBColor[] {
   if (pixels.length === 0) return [];
   if (maxColors <= 1) return [bucketAverage({ pixels })];
 

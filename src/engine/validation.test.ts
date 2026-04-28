@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { validatePuzzleDefinition, validatePuzzleUniqueness, type ValidationError } from './validation';
+import {
+  validatePuzzleDefinition,
+  validatePuzzleUniqueness,
+  type ValidationError,
+} from './validation';
 import type { PuzzleDefinition, ClueRun, ValidatedPuzzle } from '../types';
 import { colorId } from '../types';
 import { crossPuzzle, heartPuzzle } from '../puzzles/samples';
@@ -224,7 +228,10 @@ describe('validatePuzzleUniqueness', () => {
       rows: 2,
       cols: 2,
       palette: [{ id: B, name: 'Black', value: '#000' }],
-      solution: [[B, null], [null, B]],
+      solution: [
+        [B, null],
+        [null, B],
+      ],
       rowClues: [[run(1)], [run(1)]],
       colClues: [[run(1)], [run(1)]],
     });
