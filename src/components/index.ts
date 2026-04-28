@@ -2,6 +2,7 @@ export { Cell } from './Cell';
 export type { CellProps } from './Cell';
 export { Grid } from './Grid';
 export type { GridProps } from './Grid';
+export { KeyboardShortcutHelp } from './KeyboardShortcutHelp';
 export { PaletteBar } from './PaletteBar';
 export type { PaletteBarProps } from './PaletteBar';
 export { PuzzleBrowser } from './PuzzleBrowser';

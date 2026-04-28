@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { Grid, PaletteBar } from '../components';
+import { Grid, PaletteBar, KeyboardShortcutHelp } from '../components';
 import {
   createInitialGameState,
   cycleCell,
@@ -359,6 +359,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         <button type="button" className="pap-btn pap-btn--danger" onClick={handleReset}>
           ⟲ Reset
         </button>
+        <KeyboardShortcutHelp />
       </div>
     </>
   );

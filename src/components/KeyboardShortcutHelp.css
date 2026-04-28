@@ -1,0 +1,118 @@
+.pap-shortcut-help__trigger {
+  font-weight: 700;
+  font-size: 16px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.pap-shortcut-help__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: pap-fade-in 0.15s ease-out;
+}
+
+.pap-shortcut-help__modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 420px;
+  width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  animation: pap-scale-in 0.15s ease-out;
+}
+
+.pap-shortcut-help__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.pap-shortcut-help__header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.pap-shortcut-help__close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.pap-shortcut-help__close:hover {
+  color: #333;
+}
+
+.pap-shortcut-help__section {
+  margin: 16px 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pap-shortcut-help__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pap-shortcut-help__table tr + tr {
+  border-top: 1px solid #f0f0f0;
+}
+
+.pap-shortcut-help__keys {
+  padding: 6px 12px 6px 0;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.pap-shortcut-help__keys kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 12px;
+  color: #333;
+  box-shadow: 0 1px 0 #ccc;
+}
+
+.pap-shortcut-help__sep {
+  color: #999;
+  font-size: 12px;
+}
+
+.pap-shortcut-help__desc {
+  padding: 6px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+@keyframes pap-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pap-scale-in {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
