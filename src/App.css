@@ -51,6 +51,12 @@
   text-decoration: underline;
 }
 
+.pap-nav__link:focus-visible {
+  outline: 2px solid #7c4dff;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .pap-main {
   display: flex;
   flex-direction: column;
@@ -76,6 +82,11 @@
 .pap-btn:hover:not(:disabled) {
   background: #f0f0f0;
   border-color: #999;
+}
+
+.pap-btn:focus-visible {
+  outline: 2px solid #7c4dff;
+  outline-offset: 2px;
 }
 
 .pap-btn:disabled {
@@ -111,6 +122,8 @@
   display: flex;
   gap: 8px;
   margin-top: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .pap-solved {
