@@ -214,6 +214,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
   // ── Hint state ──────────────────────────────────────────────────
   const [hintCells, setHintCells] = useState<ReadonlySet<string>>(new Set());
   const [hintShake, setHintShake] = useState(false);
+  const [checkPulse, setCheckPulse] = useState(false);
 
   /** Clear hints whenever the board changes. */
   useEffect(() => {
@@ -238,6 +239,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
       case 'error':
         announce('Your board has an error. Use Check to find mistakes.');
         setHintShake(true);
+        setCheckPulse(true);
         break;
       case 'no-hint':
         announce('No hints available right now.');
@@ -355,7 +357,12 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         >
           ↪ Redo
         </button>
-        <button type="button" className="pap-btn" onClick={handleCheck}>
+        <button
+          type="button"
+          className={`pap-btn${checkPulse ? ' pap-btn--pulse' : ''}`}
+          onClick={handleCheck}
+          onAnimationEnd={() => setCheckPulse(false)}
+        >
           ✓ Check
         </button>
         <button

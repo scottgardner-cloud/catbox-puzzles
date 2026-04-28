@@ -116,8 +116,13 @@ export interface GridProps {
   readonly selectedColorId?: ColorId;
 }
 
-/** Default cell size in pixels. */
-const DEFAULT_CELL_SIZE = 30;
+/** Compute cell size based on puzzle dimensions. */
+function adaptiveCellSize(rows: number, cols: number): number {
+  const maxDim = Math.max(rows, cols);
+  if (maxDim <= 10) return 30;
+  if (maxDim <= 15) return 24;
+  return 20;
+}
 
 /**
  * Renders the full Pix-a-Pix puzzle grid including clues, validation
@@ -149,6 +154,7 @@ export function Grid({
 }: GridProps): React.JSX.Element {
   const rows = board.length;
   const cols = rows > 0 ? board[0].length : 0;
+  const cellSize = adaptiveCellSize(rows, cols);
 
   // Hover tracking for row/column highlighting
   const [hoverRow, setHoverRow] = useState<number | null>(null);
@@ -310,7 +316,7 @@ export function Grid({
         <div
           className="pap-col-validation"
           style={{
-            gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
+            gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
           }}
         >
           {colValidation.map((v, ci) => (
@@ -327,7 +333,7 @@ export function Grid({
         <div
           className="pap-col-clues"
           style={{
-            gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
+            gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
           }}
         >
           {colClues.map((clue, ci) => (
@@ -386,7 +392,7 @@ export function Grid({
             <div
               className="pap-cells-row"
               style={{
-                gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)`,
+                gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
               }}
             >
               {row.map((cellState, ci) => {
@@ -419,7 +425,7 @@ export function Grid({
                         /* click handled by mouseDown on wrapper */
                       }}
                       onDragEnter={() => onCellDragEnter(ri, ci)}
-                      size={DEFAULT_CELL_SIZE}
+                      size={cellSize}
                       ariaRowIndex={ri + 1}
                       ariaColIndex={ci + 1}
                       isFocused={cellIsFocused}
@@ -450,7 +456,7 @@ export function Grid({
         <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 24 }} />
         <div
           className="pap-col-run-indicators"
-          style={{ gridTemplateColumns: `repeat(${cols}, ${DEFAULT_CELL_SIZE}px)` }}
+          style={{ gridTemplateColumns: `repeat(${cols}, ${cellSize}px)` }}
         >
           {Array.from({ length: cols }, (_, ci) => {
             const colCells = board.map((r) => r[ci]);
