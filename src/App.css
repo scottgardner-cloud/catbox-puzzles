@@ -197,6 +197,18 @@
   }
 }
 
+.pap-timer {
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  color: #333;
+  margin-bottom: 8px;
+  min-height: 28px;
+}
+
+.pap-timer--idle {
+  opacity: 0.4;
+}
+
 /* Visually hidden but accessible to screen readers */
 .pap-sr-only {
   position: absolute;
