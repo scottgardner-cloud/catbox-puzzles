@@ -121,8 +121,12 @@ function assessSolvability(puzzle: ValidatedPuzzle): SolvabilityInfo {
         };
     }
   } catch {
-    // Solver failure shouldn't block puzzle creation
-    return { solvable: true };
+    // Solver failure shouldn't block puzzle creation, but shouldn't claim solvability
+    return {
+      solvable: false,
+      reason: 'Solver verification failed unexpectedly.',
+      hint: 'The puzzle may still be valid — try saving and testing it.',
+    };
   }
 }
 
