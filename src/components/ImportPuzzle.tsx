@@ -78,7 +78,13 @@ export function ImportPuzzle({ onImport, onClose }: ImportPuzzleProps): React.JS
         return;
       }
 
-      const entry = saveCustomPuzzle(definition);
+      let entry;
+      try {
+        entry = saveCustomPuzzle(definition);
+      } catch {
+        setError('Puzzle validation failed. The puzzle data may be incomplete or malformed.');
+        return;
+      }
       if (!entry) {
         setError('Puzzle validation failed. Ensure the puzzle has valid dimensions, clues, solution, and palette.');
         return;

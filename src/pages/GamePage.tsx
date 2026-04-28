@@ -64,6 +64,9 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
   // Track whether the board has been modified since init/load
   const [isDirty, setIsDirty] = useState(false);
 
+  // Track whether help modal is open (suppress global shortcuts)
+  const isHelpOpenRef = useRef(false);
+
   // Keep a ref to latest game state for save-on-unmount (synced via effect, not render)
   const gameStateRef = useRef(gameState);
   const isDirtyRef = useRef(isDirty);
@@ -268,6 +271,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
   // ── Global keyboard shortcuts ───────────────────────────────────
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (isHelpOpenRef.current) return;
       if (e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
         e.preventDefault();
         updateGameState((s) => undo(s, puzzle));
@@ -360,7 +364,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         <button type="button" className="pap-btn pap-btn--danger" onClick={handleReset}>
           ⟲ Reset
         </button>
-        <KeyboardShortcutHelp />
+        <KeyboardShortcutHelp onOpenChange={(open) => { isHelpOpenRef.current = open; }} />
       </div>
     </>
   );

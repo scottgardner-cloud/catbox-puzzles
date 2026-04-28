@@ -27,19 +27,31 @@ const GLOBAL_SHORTCUTS: Shortcut[] = [
  * Pressing Escape or clicking outside the modal closes it.
  * Focus is trapped inside the modal while open and restored on close.
  */
-export function KeyboardShortcutHelp(): React.JSX.Element {
+export function KeyboardShortcutHelp({
+  onOpenChange,
+}: {
+  /** Called when the modal opens or closes. */
+  readonly onOpenChange?: (isOpen: boolean) => void;
+} = {}): React.JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const hasBeenOpened = useRef(false);
 
-  const toggle = useCallback(() => setIsOpen((v) => !v), []);
-  const close = useCallback(() => setIsOpen(false), []);
+  const setOpen = useCallback((value: boolean) => {
+    setIsOpen(value);
+    onOpenChange?.(value);
+  }, [onOpenChange]);
+
+  const toggle = useCallback(() => setOpen(!isOpen), [setOpen, isOpen]);
+  const close = useCallback(() => setOpen(false), [setOpen]);
 
   // Focus management: move focus into modal on open, restore on close
   useEffect(() => {
     if (isOpen) {
+      hasBeenOpened.current = true;
       closeRef.current?.focus();
-    } else {
+    } else if (hasBeenOpened.current) {
       triggerRef.current?.focus();
     }
   }, [isOpen]);
