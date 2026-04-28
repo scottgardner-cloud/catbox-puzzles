@@ -101,6 +101,58 @@ describe('quantizeColor', () => {
     expect(result.cells[0]).toBe(0);
   });
 
+  it('deduplicates palette for uniform-color image', () => {
+    // 4 identical red pixels with maxColors=4 — should not produce duplicates
+    const data = new Uint8ClampedArray([
+      255, 0, 0, 255,
+      255, 0, 0, 255,
+      255, 0, 0, 255,
+      255, 0, 0, 255,
+    ]);
+    const grid = createPixelGrid(4, 1, data);
+    const result = quantizeColor(grid, 4, { kind: 'none' });
+
+    expect(result.palette.length).toBe(1); // deduplicated to 1
+    expect(result.cells.every((c) => c === 0)).toBe(true);
+  });
+
+  it('deduplicates palette when maxColors exceeds unique colors', () => {
+    // 2 colors but maxColors=8
+    const data = new Uint8ClampedArray([
+      255, 0, 0, 255,
+      255, 0, 0, 255,
+      0, 0, 255, 255,
+      0, 0, 255, 255,
+    ]);
+    const grid = createPixelGrid(4, 1, data);
+    const result = quantizeColor(grid, 8, { kind: 'none' });
+
+    expect(result.palette.length).toBe(2);
+  });
+
+  it('auto mode ignores single stray transparent pixel and uses edge-color detection', () => {
+    // 10 pixels: 8 opaque white (edge bg), 1 transparent, 1 red (content)
+    // Auto mode should NOT use alpha (only 1/10 = 10%, not > 10%)
+    // Should detect white as edge background instead
+    const data = new Uint8ClampedArray(10 * 1 * 4);
+    for (let i = 0; i < 10; i++) {
+      const pi = i * 4;
+      data[pi] = 255; data[pi + 1] = 255; data[pi + 2] = 255; data[pi + 3] = 255;
+    }
+    data[4 * 4 + 3] = 0; // pixel 4 transparent
+    // Make pixel 5 red (the content)
+    data[5 * 4] = 255; data[5 * 4 + 1] = 0; data[5 * 4 + 2] = 0;
+
+    const grid = createPixelGrid(10, 1, data);
+    const result = quantizeColor(grid, 4, { kind: 'auto' });
+
+    // Should have detected white as edge background → only the red pixel is filled
+    // The transparent pixel's RGB is (255,255,255) so it's also background in color mode
+    const filledCount = result.cells.filter((c) => c !== null).length;
+    expect(filledCount).toBe(1); // only the red pixel
+    expect(result.palette.length).toBe(1);
+  });
+
   it('auto mode detects transparency', () => {
     const data = new Uint8ClampedArray([
       255, 0, 0, 255, // opaque red

@@ -48,8 +48,18 @@ export function resizeToGrid(
         }
       }
 
-      // Avoid division by zero for degenerate cases (source smaller than target)
-      if (count === 0) count = 1;
+      // Fallback for upscale: if no source pixels fall in this cell, sample the nearest
+      if (count === 0) {
+        const nearestX = Math.min(Math.round(col * cellWidth), source.width - 1);
+        const nearestY = Math.min(Math.round(row * cellHeight), source.height - 1);
+        const si = (nearestY * source.width + nearestX) * 4;
+        const di = (row * targetCols + col) * 4;
+        data[di] = source.data[si];
+        data[di + 1] = source.data[si + 1];
+        data[di + 2] = source.data[si + 2];
+        data[di + 3] = source.data[si + 3];
+        continue;
+      }
 
       const di = (row * targetCols + col) * 4;
       data[di] = Math.round(rSum / count);

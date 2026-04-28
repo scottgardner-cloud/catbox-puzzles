@@ -149,4 +149,26 @@ describe('buildPuzzle', () => {
     const result = buildPuzzle(grid, settings);
     expect(result.ok).toBe(true);
   });
+
+  it('handles uniform-color image in color mode without duplicate palette errors', () => {
+    // All red pixels — should produce 1 palette color, not fail with duplicates
+    const data = new Uint8ClampedArray(3 * 3 * 4);
+    for (let i = 0; i < 9; i++) {
+      data[i * 4] = 255;
+      data[i * 4 + 3] = 255;
+    }
+    const grid = createPixelGrid(3, 3, data);
+    const settings: GeneratorSettings = {
+      name: 'Uniform Red',
+      kind: 'color',
+      targetRows: 3,
+      targetCols: 3,
+      maxColors: 4,
+      backgroundMode: { kind: 'none' },
+    };
+    const result = buildPuzzle(grid, settings);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.puzzle.palette.length).toBe(1);
+  });
 });

@@ -109,4 +109,33 @@ describe('resizeToGrid', () => {
     expect(() => resizeToGrid(src, 0, 5)).toThrow();
     expect(() => resizeToGrid(src, 5, 0)).toThrow();
   });
+
+  it('upscales 1×1 to 2×2 by replicating the source pixel', () => {
+    const src = solidGrid(1, 1, 42, 84, 126);
+    const result = resizeToGrid(src, 2, 2);
+    expect(result.width).toBe(2);
+    expect(result.height).toBe(2);
+    for (let i = 0; i < 4; i++) {
+      expect(result.data[i * 4]).toBe(42);
+      expect(result.data[i * 4 + 1]).toBe(84);
+      expect(result.data[i * 4 + 2]).toBe(126);
+      expect(result.data[i * 4 + 3]).toBe(255);
+    }
+  });
+
+  it('handles non-integer downscale ratio (3×1 to 2×1)', () => {
+    // 3 pixels: red, green, blue
+    const data = new Uint8ClampedArray([
+      255, 0, 0, 255,
+      0, 255, 0, 255,
+      0, 0, 255, 255,
+    ]);
+    const src = createPixelGrid(3, 1, data);
+    const result = resizeToGrid(src, 2, 1);
+    expect(result.width).toBe(2);
+    expect(result.height).toBe(1);
+    // Should produce two valid colors (not black/transparent)
+    expect(result.data[3]).toBe(255); // alpha
+    expect(result.data[7]).toBe(255);
+  });
 });

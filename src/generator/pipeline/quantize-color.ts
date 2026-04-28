@@ -31,16 +31,16 @@ function isBackground(
 
 /** Resolve 'auto' background mode by inspecting image content. */
 function resolveAutoBackground(grid: PixelGrid): BackgroundMode {
-  // Check if image has meaningful alpha variation
-  let hasTransparency = false;
+  // Check if image has meaningful transparency (>10% of pixels)
+  let transparentCount = 0;
+  const totalPixels = grid.width * grid.height;
   for (let i = 3; i < grid.data.length; i += 4) {
     if (grid.data[i] < 128) {
-      hasTransparency = true;
-      break;
+      transparentCount++;
     }
   }
 
-  if (hasTransparency) {
+  if (transparentCount > totalPixels * 0.1) {
     return { kind: 'alpha', threshold: 128 };
   }
 
@@ -177,12 +177,23 @@ function medianCut(
   }
 
   // Sort palette deterministically by luminance for stable ColorId assignment
-  const palette = buckets.map(bucketAverage);
-  palette.sort((a, b) => {
+  const rawPalette = buckets.map(bucketAverage);
+  rawPalette.sort((a, b) => {
     const lumA = 0.299 * a.r + 0.587 * a.g + 0.114 * a.b;
     const lumB = 0.299 * b.r + 0.587 * b.g + 0.114 * b.b;
     return lumA - lumB;
   });
+
+  // Deduplicate colors that averaged to the same RGB value
+  const seen = new Set<string>();
+  const palette: RGBColor[] = [];
+  for (const c of rawPalette) {
+    const key = `${c.r},${c.g},${c.b}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      palette.push(c);
+    }
+  }
   return palette;
 }
 
