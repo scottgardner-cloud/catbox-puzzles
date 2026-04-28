@@ -1,0 +1,272 @@
+/* Generator page styles */
+
+.pap-gen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.pap-gen h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.pap-gen__subtitle {
+  color: #666;
+  margin: -16px 0 0;
+  font-size: 14px;
+}
+
+.pap-gen__secondary {
+  margin-top: 8px;
+}
+
+/* ── Upload panel ─────────────────────────────────── */
+
+.pap-gen-upload {
+  width: 100%;
+}
+
+.pap-gen-upload__dropzone {
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: #fff;
+}
+
+.pap-gen-upload__dropzone:hover,
+.pap-gen-upload__dropzone:focus-visible {
+  border-color: #1976d2;
+  background: #f5f9ff;
+}
+
+.pap-gen-upload__dropzone:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+.pap-gen-upload__dropzone--loading {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.pap-gen-upload__dropzone[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pap-gen-upload__preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.pap-gen-upload__thumbnail {
+  max-width: 200px;
+  max-height: 150px;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+.pap-gen-upload__filename {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.pap-gen-upload__hint {
+  font-size: 12px;
+  color: #999;
+}
+
+.pap-gen-upload__placeholder p {
+  margin: 0;
+  color: #666;
+}
+
+/* ── Settings panel ───────────────────────────────── */
+
+.pap-gen-settings {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.pap-gen-settings__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pap-gen-settings__field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+.pap-gen-settings__field input[type='text'],
+.pap-gen-settings__field input[type='number'] {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.pap-gen-settings__fieldset {
+  border: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pap-gen-settings__fieldset legend {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.pap-gen-settings__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pap-gen-settings__row input[type='number'] {
+  width: 64px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.pap-gen-settings__row label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pap-gen-settings__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.pap-gen-settings__hint {
+  font-size: 12px;
+  color: #e65100;
+  margin: 0;
+}
+
+.pap-btn--primary {
+  background: #1976d2;
+  color: #fff;
+  border-color: #1976d2;
+  font-weight: 600;
+}
+
+.pap-btn--primary:hover:not(:disabled) {
+  background: #1565c0;
+}
+
+/* ── Preview grid ─────────────────────────────────── */
+
+.pap-gen-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.pap-gen-preview h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.pap-gen-preview__info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #666;
+}
+
+.pap-gen-preview__info p {
+  margin: 0;
+}
+
+.pap-gen-preview__palette {
+  display: flex;
+  gap: 4px;
+}
+
+.pap-gen-preview__swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* ── Export panel ──────────────────────────────────── */
+
+.pap-gen-export {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pap-gen-export__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pap-gen-export__secondary {
+  margin-top: 8px;
+}
+
+.pap-gen-export__error,
+.pap-gen-export__errors {
+  background: #fff3e0;
+  border: 1px solid #ff9800;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+.pap-gen-export__error p,
+.pap-gen-export__errors p {
+  margin: 0;
+}
+
+.pap-gen-export__errors ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+}
+
+.pap-gen-export__hint {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
