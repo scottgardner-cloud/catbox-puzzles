@@ -328,6 +328,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         onDragEnd={handleDragEnd}
         onAnnounce={announce}
         hintCells={hintCells}
+        selectedColorId={gameState.selectedColorId}
       />
 
       <div className="pap-controls">

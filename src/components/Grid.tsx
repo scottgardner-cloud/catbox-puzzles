@@ -110,6 +110,8 @@ export interface GridProps {
   readonly onAnnounce?: (message: string) => void;
   /** Set of cell keys ("row,col") that are currently highlighted as hints. */
   readonly hintCells?: ReadonlySet<string>;
+  /** Currently selected color, used for cursor indicator on color puzzles. */
+  readonly selectedColorId?: ColorId;
 }
 
 /** Default cell size in pixels. */
@@ -141,6 +143,7 @@ export function Grid({
   onDragEnd,
   onAnnounce,
   hintCells,
+  selectedColorId,
 }: GridProps): React.JSX.Element {
   const rows = board.length;
   const cols = rows > 0 ? board[0].length : 0;
@@ -166,6 +169,16 @@ export function Grid({
 
   const isColorPuzzle = palette.length > 1;
   const maxRowClueLen = Math.max(1, ...rowClues.map((c) => c.length));
+
+  // Custom cursor showing selected color for color puzzles
+  const cursorStyle = useMemo((): React.CSSProperties | undefined => {
+    if (!isColorPuzzle || !selectedColorId) return undefined;
+    const color = colorMap.get(selectedColorId);
+    if (!color) return undefined;
+    // SVG circle cursor: 24×24 with a colored ring, hotspot at center
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><circle cx='12' cy='12' r='8' fill='none' stroke='${encodeURIComponent(color)}' stroke-width='3'/><circle cx='12' cy='12' r='2' fill='${encodeURIComponent(color)}'/></svg>`;
+    return { cursor: `url("data:image/svg+xml,${svg}") 12 12, crosshair` };
+  }, [isColorPuzzle, selectedColorId, colorMap]);
 
   const handleMouseDown = useCallback(
     (row: number, col: number) => {
@@ -279,6 +292,7 @@ export function Grid({
     <div
       ref={gridRef}
       className="pap-grid-wrapper"
+      style={cursorStyle}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleGridLeave}
       onKeyDown={handleGridKeyDown}
