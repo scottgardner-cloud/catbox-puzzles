@@ -6,8 +6,8 @@ import { createPixelGrid } from './types';
  * Pure function — operates on raw RGBA data, no Canvas dependency.
  *
  * @param source - Source image pixel data
- * @param targetCols - Target grid columns (5–25)
- * @param targetRows - Target grid rows (5–25)
+ * @param targetCols - Target grid columns (10–30)
+ * @param targetRows - Target grid rows (10–30)
  * @returns A PixelGrid where each pixel represents one grid cell's averaged color
  */
 export function resizeToGrid(
