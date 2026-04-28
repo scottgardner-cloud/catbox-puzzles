@@ -2,14 +2,21 @@ import type { PuzzleDefinition, ValidatedPuzzle, ColorId, PaletteColor } from '.
 import { colorId } from '../../types';
 import type { ValidationError } from '../../engine/validation';
 import { validatePuzzleDefinition } from '../../engine/validation';
+import type { SolverResult } from '../../engine/solver';
+import { solvePuzzle } from '../../engine/solver';
 import type { PixelGrid, GeneratorSettings, RGBColor } from './types';
 import { quantizeBW } from './quantize-bw';
 import { quantizeColor } from './quantize-color';
 import { deriveClues } from './clue-derivation';
 
+/** Solvability assessment from the constraint solver. */
+export type SolvabilityInfo =
+  | { readonly solvable: true }
+  | { readonly solvable: false; readonly reason: string; readonly hint: string };
+
 /** Result of puzzle building — either a validated puzzle or structured errors. */
 export type BuildPuzzleResult =
-  | { readonly ok: true; readonly puzzle: ValidatedPuzzle }
+  | { readonly ok: true; readonly puzzle: ValidatedPuzzle; readonly solvability: SolvabilityInfo }
   | { readonly ok: false; readonly errors: readonly ValidationError[] };
 
 /**
@@ -78,10 +85,46 @@ export function buildPuzzle(grid: PixelGrid, settings: GeneratorSettings): Build
     return { ok: false, errors: result };
   }
 
-  return { ok: true, puzzle: result };
+  // Run solver to verify unique solvability
+  const solvability = assessSolvability(result);
+
+  return { ok: true, puzzle: result, solvability };
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
+
+/** Run the constraint solver and return a solvability assessment. */
+function assessSolvability(puzzle: ValidatedPuzzle): SolvabilityInfo {
+  try {
+    const solverResult: SolverResult = solvePuzzle(puzzle, { maxNodes: 10_000 });
+    if (solverResult.solved) {
+      return { solvable: true };
+    }
+    switch (solverResult.reason) {
+      case 'stuck':
+        return {
+          solvable: false,
+          reason: 'Puzzle may have multiple solutions or require guessing.',
+          hint: 'Try a smaller grid size or adjust the threshold/colors for more contrast.',
+        };
+      case 'contradiction':
+        return {
+          solvable: false,
+          reason: 'Puzzle has contradictory clues.',
+          hint: 'This is unexpected for a generated puzzle — try regenerating.',
+        };
+      case 'budget-exceeded':
+        return {
+          solvable: false,
+          reason: 'Puzzle is too complex for the solver to verify.',
+          hint: 'Try a smaller grid size. Large puzzles with many colors are harder to verify.',
+        };
+    }
+  } catch {
+    // Solver failure shouldn't block puzzle creation
+    return { solvable: true };
+  }
+}
 
 /** Create the single palette color for B&W puzzles. */
 function createBWPalette(): PaletteColor {

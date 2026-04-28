@@ -28,7 +28,10 @@ export function GeneratorPage(): React.JSX.Element {
   const handleGenerate = useCallback(async () => {
     const result = await gen.generate();
     if (result?.ok) {
-      announce('Puzzle generated successfully.');
+      const solMsg = result.solvability.solvable
+        ? 'Puzzle is uniquely solvable.'
+        : 'Warning: puzzle may not be uniquely solvable.';
+      announce(`Puzzle generated successfully. ${solMsg}`);
     } else if (result) {
       announce('Generation produced errors. Check the details below.');
     } else {
@@ -81,6 +84,15 @@ export function GeneratorPage(): React.JSX.Element {
 
       {/* Step 3: Preview (shown after successful generation) */}
       {puzzle && <PreviewGrid puzzle={puzzle} />}
+
+      {/* Solvability warning */}
+      {gen.result?.ok && !gen.result.solvability.solvable && (
+        <div className="pap-gen-solvability-warning" role="alert">
+          <p><strong>⚠ Solvability warning:</strong> {gen.result.solvability.reason}</p>
+          <p className="pap-gen-solvability-warning__hint">{gen.result.solvability.hint}</p>
+          <p className="pap-gen-solvability-warning__note">You can still save this puzzle, but it may require guessing to solve.</p>
+        </div>
+      )}
 
       {/* Step 4: Export (shown after any generation attempt) */}
       {(gen.result || gen.error) && (
