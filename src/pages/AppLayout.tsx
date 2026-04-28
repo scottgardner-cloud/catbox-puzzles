@@ -48,6 +48,9 @@ export function AppLayout(): React.JSX.Element {
           <Link to="/generator" className="pap-nav__link">
             Generator
           </Link>
+          <Link to="/editor" className="pap-nav__link">
+            Editor
+          </Link>
         </nav>
       </header>
 

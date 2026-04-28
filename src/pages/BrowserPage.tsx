@@ -19,6 +19,13 @@ export function BrowserPage(): React.JSX.Element {
     [navigate],
   );
 
+  const handleEditPuzzle = useCallback(
+    (entryId: string) => {
+      navigate(`/editor/${encodeURIComponent(entryId)}`);
+    },
+    [navigate],
+  );
+
   const handleDeletePuzzle = useCallback((entryId: string) => {
     deleteCustomPuzzle(entryId);
     setEntries(getAllEntries());
@@ -31,6 +38,15 @@ export function BrowserPage(): React.JSX.Element {
 
   return (
     <>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+        <button
+          type="button"
+          className="pap-btn pap-btn--primary"
+          onClick={() => navigate('/editor')}
+        >
+          ✏️ Create New Puzzle
+        </button>
+      </div>
       <PuzzleBrowser
         entries={entries}
         onSelectPuzzle={handleSelectPuzzle}
