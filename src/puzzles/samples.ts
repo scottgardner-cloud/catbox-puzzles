@@ -176,7 +176,10 @@ export const heartPuzzle: ValidatedPuzzle = assertValid(heartDefinition);
 /** Validated 5×5 color flag puzzle. */
 export const flagPuzzle: ValidatedPuzzle = assertValid(flagDefinition);
 
+import { getSamplePuzzles15x15 } from './samples-15x15';
+import { getSamplePuzzles20x20 } from './samples-20x20';
+
 /** Returns all sample puzzles. */
 export function getSamplePuzzles(): ValidatedPuzzle[] {
-  return [crossPuzzle, heartPuzzle, flagPuzzle];
+  return [crossPuzzle, heartPuzzle, flagPuzzle, ...getSamplePuzzles15x15(), ...getSamplePuzzles20x20()];
 }
