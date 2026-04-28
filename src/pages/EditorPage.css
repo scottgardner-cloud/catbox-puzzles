@@ -28,6 +28,8 @@
   gap: 24px;
   width: 100%;
   align-items: flex-start;
+  /* Prevent the grid from pushing the layout wider than the viewport */
+  min-height: 0;
 }
 
 .pap-editor__sidebar {
@@ -36,13 +38,25 @@
   gap: 16px;
   min-width: 220px;
   max-width: 260px;
+  /* Sidebar stays in view while grid scrolls */
+  position: sticky;
+  top: 16px;
+  align-self: flex-start;
 }
 
 .pap-editor__canvas {
   flex: 1;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   overflow: auto;
+  /* Stable dimensions — grid scrolls inside, sidebar stays put */
+  min-height: 400px;
+  max-height: calc(100vh - 160px);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #fafafa;
+  padding: 16px;
 }
 
 /* ── Toolbar ─────────────────────────────────────── */
@@ -111,6 +125,12 @@
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+}
+
+.pap-editor-toolbar__hint {
+  font-size: 12px;
+  color: #e65100;
+  margin: 0;
 }
 
 .pap-editor-toolbar__status {

@@ -44,14 +44,15 @@ export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridPr
     (row: number, col: number, e: React.PointerEvent) => {
       e.preventDefault();
       isDragging.current = true;
-      // Right-click always erases; left-click uses current tool
-      const action = e.button === 2 ? 'erase' : state.tool;
+      // Toggle: if cell is filled, erase; if empty, paint. Right-click always erases.
+      const cellValue = state.grid[row]?.[col];
+      const action = e.button === 2 ? 'erase' : cellValue !== null ? 'erase' : 'paint';
       dragAction.current = action;
       handleCellAction(row, col, action);
       dispatch({ type: 'SET_FOCUSED_CELL', cell: { row, col } });
       (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
     },
-    [state.tool, handleCellAction, dispatch],
+    [state.grid, handleCellAction, dispatch],
   );
 
   const handlePointerEnter = useCallback(
@@ -86,10 +87,12 @@ export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridPr
           if (fc.col < state.cols - 1) newCell = { row: fc.row, col: fc.col + 1 };
           break;
         case ' ':
-        case 'Enter':
+        case 'Enter': {
           e.preventDefault();
-          handleCellAction(fc.row, fc.col, state.tool);
+          const cellVal = state.grid[fc.row]?.[fc.col];
+          handleCellAction(fc.row, fc.col, cellVal !== null ? 'erase' : 'paint');
           return;
+        }
         case 'Delete':
         case 'Backspace':
           e.preventDefault();
@@ -110,7 +113,7 @@ export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridPr
         dispatch({ type: 'SET_FOCUSED_CELL', cell: newCell });
       }
     },
-    [state.focusedCell, state.rows, state.cols, state.tool, handleCellAction, dispatch],
+    [state.focusedCell, state.rows, state.cols, state.grid, handleCellAction, dispatch],
   );
 
   const handleGridFocus = useCallback(() => {
@@ -129,103 +132,116 @@ export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridPr
     return state.palette.find((c) => c.id === cell)?.value ?? null;
   };
 
-  // Max clue length for sizing the clue headers
-  const maxRowClueLen = Math.max(1, ...rowClues.map((c) => c.length));
-  const maxColClueLen = Math.max(1, ...colClues.map((c) => c.length));
+  const gridWidth = state.cols * cellSize;
+  const gridHeight = state.rows * cellSize;
 
   return (
     <div
       className="pap-editor-grid-wrapper"
       onPointerUp={handlePointerUp}
       onContextMenu={handleContextMenu}
+      style={{
+        '--cell-size': `${cellSize}px`,
+        '--grid-cols': state.cols,
+        '--grid-rows': state.rows,
+        '--grid-width': `${gridWidth}px`,
+        '--grid-height': `${gridHeight}px`,
+        '--clue-col-height': `${Math.ceil(state.rows / 2) * 16}px`,
+        '--clue-row-width': `${Math.ceil(state.cols / 2) * 16}px`,
+      } as React.CSSProperties}
     >
-      <table
-        className="pap-editor-grid"
-        role="grid"
-        aria-label="Puzzle editor grid"
-        tabIndex={0}
-        onKeyDown={handleKeyDown}
-        onFocus={handleGridFocus}
-        style={{ '--cell-size': `${cellSize}px` } as React.CSSProperties}
-      >
-        {/* Column clues header */}
-        <thead>
-          {Array.from({ length: maxColClueLen }, (_, clueRow) => (
-            <tr key={`cclue-${clueRow}`} className="pap-editor-grid__clue-row">
-              {/* Spacer for row clue columns */}
-              <td
-                className="pap-editor-grid__spacer"
-                colSpan={maxRowClueLen}
-              />
-              {colClues.map((clue, col) => {
-                const offset = maxColClueLen - clue.length;
-                const idx = clueRow - offset;
-                const run = idx >= 0 ? clue[idx] : null;
-                return (
-                  <td
-                    key={col}
-                    className="pap-editor-grid__clue-cell pap-editor-grid__clue-cell--col"
-                    style={run ? { color: state.kind === 'color' ? getCellColor(run.colorId) ?? undefined : undefined } : undefined}
+      {/* CSS Grid layout: [col-clues] above [row-clues | pixel-grid] */}
+      <div className="pap-editor-grid-layout">
+        {/* Top-left spacer */}
+        <div className="pap-editor-grid__spacer" />
+
+        {/* Column clues — aligned to bottom, grow upward */}
+        <div className="pap-editor-grid__col-clues">
+          {Array.from({ length: state.cols }, (_, col) => {
+            const clue = colClues[col] ?? [];
+            return (
+              <div key={col} className="pap-editor-grid__col-clue-stack">
+                {clue.map((run, i) => (
+                  <span
+                    key={i}
+                    className="pap-editor-grid__clue-num"
+                    style={state.kind === 'color' ? { color: getCellColor(run.colorId) ?? undefined } : undefined}
                   >
-                    {run ? run.length : ''}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {state.grid.map((row, r) => (
-            <tr key={r} role="row">
-              {/* Row clues */}
-              {Array.from({ length: maxRowClueLen }, (_, clueIdx) => {
-                const clue = rowClues[r];
-                const offset = maxRowClueLen - clue.length;
-                const idx = clueIdx - offset;
-                const run = idx >= 0 ? clue[idx] : null;
-                return (
-                  <td
-                    key={`rclue-${clueIdx}`}
-                    className="pap-editor-grid__clue-cell pap-editor-grid__clue-cell--row"
-                    style={run ? { color: state.kind === 'color' ? getCellColor(run.colorId) ?? undefined : undefined } : undefined}
+                    {run.length}
+                  </span>
+                ))}
+                {clue.length === 0 && (
+                  <span className="pap-editor-grid__clue-num pap-editor-grid__clue-num--empty">0</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Row clues — aligned to right, grow leftward */}
+        <div className="pap-editor-grid__row-clues">
+          {Array.from({ length: state.rows }, (_, row) => {
+            const clue = rowClues[row] ?? [];
+            return (
+              <div key={row} className="pap-editor-grid__row-clue-stack">
+                {clue.map((run, i) => (
+                  <span
+                    key={i}
+                    className="pap-editor-grid__clue-num"
+                    style={state.kind === 'color' ? { color: getCellColor(run.colorId) ?? undefined } : undefined}
                   >
-                    {run ? run.length : ''}
-                  </td>
-                );
-              })}
-              {/* Grid cells */}
-              {row.map((cell, c) => {
-                const isFocused =
-                  state.focusedCell?.row === r && state.focusedCell?.col === c;
-                const colorValue = getCellColor(cell);
-                const showDividerRight = (c + 1) % 5 === 0 && c < state.cols - 1;
-                const showDividerBottom = (r + 1) % 5 === 0 && r < state.rows - 1;
-                return (
-                  <td
-                    key={c}
-                    role="gridcell"
-                    aria-label={`Row ${r + 1}, Column ${c + 1}${cell ? `, filled ${state.palette.find((p) => p.id === cell)?.name ?? ''}` : ', empty'}`}
-                    className={[
-                      'pap-editor-grid__cell',
-                      cell ? 'pap-editor-grid__cell--filled' : '',
-                      isFocused ? 'pap-editor-grid__cell--focused' : '',
-                      showDividerRight ? 'pap-editor-grid__cell--divider-right' : '',
-                      showDividerBottom ? 'pap-editor-grid__cell--divider-bottom' : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                    style={colorValue ? { backgroundColor: colorValue } : undefined}
-                    onPointerDown={(e) => handlePointerDown(r, c, e)}
-                    onPointerEnter={() => handlePointerEnter(r, c)}
-                    data-row={r}
-                    data-col={c}
-                  />
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                    {run.length}
+                  </span>
+                ))}
+                {clue.length === 0 && (
+                  <span className="pap-editor-grid__clue-num pap-editor-grid__clue-num--empty">0</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Pixel grid — fixed size, never moves */}
+        <div
+          className="pap-editor-grid__cells"
+          role="grid"
+          aria-label="Puzzle editor grid"
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          onFocus={handleGridFocus}
+        >
+          {state.grid.map((row, r) =>
+            row.map((cell, c) => {
+              const isFocused =
+                state.focusedCell?.row === r && state.focusedCell?.col === c;
+              const colorValue = getCellColor(cell);
+              const showDividerRight = (c + 1) % 5 === 0 && c < state.cols - 1;
+              const showDividerBottom = (r + 1) % 5 === 0 && r < state.rows - 1;
+              return (
+                <div
+                  key={`${r}-${c}`}
+                  role="gridcell"
+                  aria-label={`Row ${r + 1}, Column ${c + 1}${cell ? `, filled ${state.palette.find((p) => p.id === cell)?.name ?? ''}` : ', empty'}`}
+                  className={[
+                    'pap-editor-grid__cell',
+                    cell ? 'pap-editor-grid__cell--filled' : '',
+                    isFocused ? 'pap-editor-grid__cell--focused' : '',
+                    showDividerRight ? 'pap-editor-grid__cell--divider-right' : '',
+                    showDividerBottom ? 'pap-editor-grid__cell--divider-bottom' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  style={colorValue ? { backgroundColor: colorValue } : undefined}
+                  onPointerDown={(e) => handlePointerDown(r, c, e)}
+                  onPointerEnter={() => handlePointerEnter(r, c)}
+                  data-row={r}
+                  data-col={c}
+                />
+              );
+            }),
+          )}
+        </div>
+      </div>
     </div>
   );
 }

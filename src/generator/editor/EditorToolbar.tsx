@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { EditorAction, EditorState, EditorTool } from './types';
+import type { EditorAction, EditorState } from './types';
 import { GRID_SIZE_PRESETS } from './types';
 
 interface EditorToolbarProps {
@@ -44,14 +44,7 @@ export function EditorToolbar({
     [dispatch, state.rows],
   );
 
-  const handleToolChange = useCallback(
-    (tool: EditorTool) => {
-      dispatch({ type: 'SET_TOOL', tool });
-    },
-    [dispatch],
-  );
-
-  const canExport = state.validationStatus === 'valid' && state.name.trim().length > 0;
+  const canExport= state.validationStatus === 'valid' && state.name.trim().length > 0;
 
   return (
     <div className="pap-editor-toolbar">
@@ -93,29 +86,6 @@ export function EditorToolbar({
         </div>
       </div>
 
-      {/* Tool selection */}
-      <fieldset className="pap-editor-toolbar__tools">
-        <legend>Tool</legend>
-        <div className="pap-editor-toolbar__tool-btns">
-          <button
-            type="button"
-            className={`pap-btn${state.tool === 'paint' ? ' pap-btn--active' : ''}`}
-            onClick={() => handleToolChange('paint')}
-            aria-pressed={state.tool === 'paint'}
-          >
-            🖌 Paint
-          </button>
-          <button
-            type="button"
-            className={`pap-btn${state.tool === 'erase' ? ' pap-btn--active' : ''}`}
-            onClick={() => handleToolChange('erase')}
-            aria-pressed={state.tool === 'erase'}
-          >
-            ⌫ Erase
-          </button>
-        </div>
-      </fieldset>
-
       {/* Grid actions */}
       <div className="pap-editor-toolbar__actions">
         <button
@@ -149,11 +119,21 @@ export function EditorToolbar({
           className="pap-btn pap-btn--primary"
           onClick={onExport}
           disabled={!canExport}
-          title={!canExport ? 'Check solvability and add a name before exporting' : undefined}
         >
           💾 Save to Library
         </button>
       </div>
+
+      {/* Save requirements hint */}
+      {!canExport && (
+        <p className="pap-editor-toolbar__hint">
+          {state.name.trim().length === 0 && state.validationStatus !== 'valid'
+            ? 'Enter a name and check solvability to save.'
+            : state.name.trim().length === 0
+              ? 'Enter a puzzle name to save.'
+              : 'Check solvability before saving.'}
+        </p>
+      )}
 
       {/* Validation status */}
       {state.validationStatus === 'valid' && (

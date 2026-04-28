@@ -107,13 +107,13 @@ describe('EditorPage', () => {
   });
 
   describe('toolbar', () => {
-    it('has name input, row/col selectors, and tool buttons', () => {
+    it('has name input, row/col selectors, and action buttons', () => {
       renderEditor();
       expect(screen.getByLabelText('Puzzle name')).toBeInTheDocument();
       expect(screen.getByLabelText('Rows')).toBeInTheDocument();
       expect(screen.getByLabelText('Cols')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /paint/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /erase/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /clear all/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /fill all/i })).toBeInTheDocument();
     });
 
     it('can set puzzle name', async () => {

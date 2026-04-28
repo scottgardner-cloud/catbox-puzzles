@@ -1,46 +1,92 @@
-/* Editor grid styles */
+/* Editor grid styles — CSS Grid layout */
 
 .pap-editor-grid-wrapper {
   user-select: none;
   touch-action: none;
 }
 
-.pap-editor-grid {
-  border-collapse: collapse;
-  cursor: crosshair;
-}
+/* ── 2×2 CSS Grid: spacer | col-clues / row-clues | pixel-grid ── */
 
-.pap-editor-grid:focus {
-  outline: 2px solid #1976d2;
-  outline-offset: 2px;
-  border-radius: 2px;
+.pap-editor-grid-layout {
+  display: grid;
+  /* Row clue column has fixed width; col clue row has fixed height.
+     This prevents the pixel grid from shifting as clues appear/disappear. */
+  grid-template-columns: var(--clue-row-width) var(--grid-width);
+  grid-template-rows: var(--clue-col-height) var(--grid-height);
+  grid-template-areas:
+    "spacer col-clues"
+    "row-clues cells";
 }
-
-/* ── Clue cells ──────────────────────────────────── */
 
 .pap-editor-grid__spacer {
-  background: transparent;
+  grid-area: spacer;
 }
 
-.pap-editor-grid__clue-cell {
-  width: var(--cell-size);
-  height: var(--cell-size);
-  text-align: center;
-  vertical-align: middle;
+/* ── Column clues (top, grow upward) ─────────────── */
+
+.pap-editor-grid__col-clues {
+  grid-area: col-clues;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), var(--cell-size));
+  align-content: end; /* clues stick to bottom, grow upward */
+  overflow: hidden;
+}
+
+.pap-editor-grid__col-clue-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 2px;
+  gap: 1px;
+}
+
+/* ── Row clues (left, grow leftward) ─────────────── */
+
+.pap-editor-grid__row-clues {
+  grid-area: row-clues;
+  display: grid;
+  grid-template-rows: repeat(var(--grid-rows), var(--cell-size));
+  justify-content: end; /* clues stick to right, grow leftward */
+  overflow: hidden;
+}
+
+.pap-editor-grid__row-clue-stack {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+  gap: 3px;
+}
+
+/* ── Clue numbers ────────────────────────────────── */
+
+.pap-editor-grid__clue-num {
   font-size: 12px;
   font-weight: 600;
   color: #555;
-  padding: 0;
+  line-height: 1;
 }
 
-.pap-editor-grid__clue-cell--row {
-  text-align: right;
-  padding-right: 4px;
+.pap-editor-grid__clue-num--empty {
+  color: #ccc;
 }
 
-.pap-editor-grid__clue-cell--col {
-  vertical-align: bottom;
-  padding-bottom: 2px;
+/* ── Pixel grid (fixed size, never moves) ────────── */
+
+.pap-editor-grid__cells {
+  grid-area: cells;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), var(--cell-size));
+  grid-template-rows: repeat(var(--grid-rows), var(--cell-size));
+  cursor: crosshair;
+}
+
+.pap-editor-grid__cells:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* ── Grid cells ──────────────────────────────────── */
@@ -48,12 +94,11 @@
 .pap-editor-grid__cell {
   width: var(--cell-size);
   height: var(--cell-size);
-  min-width: var(--cell-size);
-  min-height: var(--cell-size);
   border: 1px solid #ccc;
   background: #fff;
   padding: 0;
   transition: background-color 0.05s;
+  box-sizing: border-box;
 }
 
 .pap-editor-grid__cell:hover {
