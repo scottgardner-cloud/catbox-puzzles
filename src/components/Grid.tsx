@@ -63,12 +63,14 @@ function runIndicatorStyle(
   resolveColor: (id: ColorId) => string,
 ): React.CSSProperties {
   switch (cell.kind) {
-    case 'filled':
+    case 'filled': {
+      const bg = resolveColor(cell.colorId);
       return {
-        backgroundColor: resolveColor(cell.colorId),
-        color: '#fff',
+        backgroundColor: bg,
+        color: contrastText(bg),
         borderRadius: 4,
       };
+    }
     case 'empty':
       return {
         backgroundColor: '#e0e0e0',
