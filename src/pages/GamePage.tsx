@@ -213,6 +213,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
 
   // ── Hint state ──────────────────────────────────────────────────
   const [hintCells, setHintCells] = useState<ReadonlySet<string>>(new Set());
+  const [hintShake, setHintShake] = useState(false);
 
   /** Clear hints whenever the board changes. */
   useEffect(() => {
@@ -236,9 +237,11 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
       }
       case 'error':
         announce('Your board has an error. Use Check to find mistakes.');
+        setHintShake(true);
         break;
       case 'no-hint':
         announce('No hints available right now.');
+        setHintShake(true);
         break;
     }
   }, [puzzle, gameState.board, solved, announce]);
@@ -355,7 +358,13 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         <button type="button" className="pap-btn" onClick={handleCheck}>
           ✓ Check
         </button>
-        <button type="button" className="pap-btn pap-btn--hint" onClick={handleHint} disabled={solved}>
+        <button
+          type="button"
+          className={`pap-btn pap-btn--hint${hintShake ? ' pap-btn--shake' : ''}`}
+          onClick={handleHint}
+          onAnimationEnd={() => setHintShake(false)}
+          disabled={solved}
+        >
           💡 Hint
         </button>
         <button type="button" className="pap-btn" onClick={handleSave}>
