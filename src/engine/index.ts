@@ -1,4 +1,4 @@
-export { validatePuzzleDefinition } from './validation';
+export { validatePuzzleDefinition, validatePuzzleUniqueness } from './validation';
 export type { ValidationError } from './validation';
 
 export {

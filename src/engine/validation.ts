@@ -1,4 +1,6 @@
 import type { PuzzleDefinition, ValidatedPuzzle, ColorId, LineClue, ClueRun } from '../types';
+import { solvePuzzle } from './solver';
+import type { SolverOptions } from './solver';
 
 /** A single validation error with a human-readable message. */
 export interface ValidationError {
@@ -194,4 +196,56 @@ export function validatePuzzleDefinition(
   if (errors.length > 0) return errors;
 
   return puzzle as ValidatedPuzzle;
+}
+
+/**
+ * Verify that a validated puzzle's clues produce a unique solution.
+ *
+ * Runs the solver on the puzzle's clues (ignoring the stored solution)
+ * to check that exactly one valid solution exists. This catches puzzles
+ * where the clues are ambiguous — structurally valid but not uniquely
+ * solvable.
+ *
+ * This is more expensive than structural validation (~10-200ms depending
+ * on puzzle size), so it's kept separate for use where needed:
+ * - Generator pipeline (verify before saving)
+ * - Puzzle import validation
+ * - Batch quality checks on sample puzzles
+ *
+ * @param puzzle - A structurally validated puzzle.
+ * @param options - Optional solver options (e.g., maxNodes budget).
+ * @returns The same `ValidatedPuzzle` if unique, or a `ValidationError[]`.
+ */
+export function validatePuzzleUniqueness(
+  puzzle: ValidatedPuzzle,
+  options?: SolverOptions,
+): ValidatedPuzzle | ValidationError[] {
+  const result = solvePuzzle(puzzle, options);
+
+  if (result.solved) {
+    // Verify the solver's solution matches the stored one
+    for (let r = 0; r < puzzle.rows; r++) {
+      for (let c = 0; c < puzzle.cols; c++) {
+        if (result.board[r][c] !== puzzle.solution[r][c]) {
+          return [
+            {
+              message:
+                `Solver found a different solution than stored: ` +
+                `cell [${r}][${c}] is "${result.board[r][c]}" but stored solution has "${puzzle.solution[r][c]}"`,
+            },
+          ];
+        }
+      }
+    }
+    return puzzle;
+  }
+
+  switch (result.reason) {
+    case 'stuck':
+      return [{ message: 'Puzzle clues are ambiguous — multiple valid solutions exist' }];
+    case 'contradiction':
+      return [{ message: 'Puzzle clues are contradictory — no valid solution exists' }];
+    case 'budget-exceeded':
+      return [{ message: 'Uniqueness check exceeded search budget — puzzle may be too complex' }];
+  }
 }

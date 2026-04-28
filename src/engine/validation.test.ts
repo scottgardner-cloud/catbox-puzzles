@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { validatePuzzleDefinition, type ValidationError } from './validation';
+import { validatePuzzleDefinition, validatePuzzleUniqueness, type ValidationError } from './validation';
 import type { PuzzleDefinition, ClueRun, ValidatedPuzzle } from '../types';
 import { colorId } from '../types';
 import { crossPuzzle, heartPuzzle } from '../puzzles/samples';
+import { cherryPuzzle } from '../puzzles/samples-15x15';
 
 const B = colorId('black');
 const run = (length: number, c = B): ClueRun => ({ length, colorId: c });
@@ -193,5 +194,50 @@ describe('validatePuzzleDefinition', () => {
       const errors = expectErrors(validatePuzzleDefinition(puzzle));
       expect(errors.some((e) => e.message.includes('exceed'))).toBe(true);
     });
+  });
+});
+
+describe('validatePuzzleUniqueness', () => {
+  it('accepts a uniquely solvable puzzle', () => {
+    const result = validatePuzzleUniqueness(crossPuzzle);
+    expect(Array.isArray(result)).toBe(false);
+  });
+
+  it('accepts the heart puzzle as unique', () => {
+    const result = validatePuzzleUniqueness(heartPuzzle);
+    expect(Array.isArray(result)).toBe(false);
+  });
+
+  it('rejects an ambiguous puzzle (cherry 15×15)', () => {
+    const result = validatePuzzleUniqueness(cherryPuzzle);
+    expect(Array.isArray(result)).toBe(true);
+    const errors = result as ValidationError[];
+    expect(errors[0].message).toContain('ambiguous');
+  });
+
+  it('rejects a puzzle with ambiguous 2×2 checkerboard clues', () => {
+    // Clues [1],[1] / [1],[1] on a 2×2 grid have two solutions
+    const ambiguous = validatePuzzleDefinition({
+      id: 'ambiguous-2x2',
+      name: 'Ambiguous',
+      kind: 'bw',
+      rows: 2,
+      cols: 2,
+      palette: [{ id: B, name: 'Black', value: '#000' }],
+      solution: [[B, null], [null, B]],
+      rowClues: [[run(1)], [run(1)]],
+      colClues: [[run(1)], [run(1)]],
+    });
+    expect(Array.isArray(ambiguous)).toBe(false); // Structurally valid
+
+    const uniqueness = validatePuzzleUniqueness(ambiguous as ValidatedPuzzle);
+    expect(Array.isArray(uniqueness)).toBe(true);
+    const errors = uniqueness as ValidationError[];
+    expect(errors[0].message).toContain('ambiguous');
+  });
+
+  it('respects maxNodes budget', () => {
+    const result = validatePuzzleUniqueness(crossPuzzle, { maxNodes: 10_000 });
+    expect(Array.isArray(result)).toBe(false);
   });
 });
