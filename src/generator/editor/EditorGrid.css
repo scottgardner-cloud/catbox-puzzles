@@ -1,0 +1,84 @@
+/* Editor grid styles */
+
+.pap-editor-grid-wrapper {
+  user-select: none;
+  touch-action: none;
+}
+
+.pap-editor-grid {
+  border-collapse: collapse;
+  cursor: crosshair;
+}
+
+.pap-editor-grid:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Clue cells ──────────────────────────────────── */
+
+.pap-editor-grid__spacer {
+  background: transparent;
+}
+
+.pap-editor-grid__clue-cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  text-align: center;
+  vertical-align: middle;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  padding: 0;
+}
+
+.pap-editor-grid__clue-cell--row {
+  text-align: right;
+  padding-right: 4px;
+}
+
+.pap-editor-grid__clue-cell--col {
+  vertical-align: bottom;
+  padding-bottom: 2px;
+}
+
+/* ── Grid cells ──────────────────────────────────── */
+
+.pap-editor-grid__cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  min-width: var(--cell-size);
+  min-height: var(--cell-size);
+  border: 1px solid #ccc;
+  background: #fff;
+  padding: 0;
+  transition: background-color 0.05s;
+}
+
+.pap-editor-grid__cell:hover {
+  outline: 2px solid #90caf9;
+  outline-offset: -2px;
+  z-index: 1;
+  position: relative;
+}
+
+.pap-editor-grid__cell--filled {
+  /* backgroundColor set inline via style prop */
+}
+
+.pap-editor-grid__cell--focused {
+  outline: 3px solid #1976d2;
+  outline-offset: -3px;
+  z-index: 2;
+  position: relative;
+}
+
+/* 5-cell grid dividers */
+.pap-editor-grid__cell--divider-right {
+  border-right: 2px solid #999;
+}
+
+.pap-editor-grid__cell--divider-bottom {
+  border-bottom: 2px solid #999;
+}

@@ -1,0 +1,249 @@
+/* Editor page styles */
+
+.pap-editor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 960px;
+}
+
+.pap-editor h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.pap-editor__subtitle {
+  color: #666;
+  margin: -16px 0 0;
+  font-size: 14px;
+}
+
+/* ── Layout ──────────────────────────────────────── */
+
+.pap-editor__layout {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.pap-editor__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 220px;
+  max-width: 260px;
+}
+
+.pap-editor__canvas {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+}
+
+/* ── Toolbar ─────────────────────────────────────── */
+
+.pap-editor-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.pap-editor-toolbar__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pap-editor-toolbar__field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+.pap-editor-toolbar__field input[type='text'],
+.pap-editor-toolbar__field select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.pap-editor-toolbar__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.pap-editor-toolbar__separator {
+  font-size: 16px;
+  color: #999;
+  padding-bottom: 8px;
+}
+
+.pap-editor-toolbar__tools {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pap-editor-toolbar__tools legend {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.pap-editor-toolbar__tool-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.pap-editor-toolbar__actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.pap-editor-toolbar__status {
+  font-size: 13px;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.pap-editor-toolbar__status--ok {
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.pap-editor-toolbar__status--error {
+  background: #fff3e0;
+  border: 1px solid #ff9800;
+  color: #333;
+}
+
+.pap-editor-toolbar__status--error p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.pap-editor-toolbar__status--error ul {
+  margin: 4px 0 0;
+  padding-left: 16px;
+  font-size: 12px;
+}
+
+/* ── Palette ─────────────────────────────────────── */
+
+.pap-editor-palette {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.pap-editor-palette__title {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.pap-editor-palette__colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pap-editor-palette__entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.pap-editor-palette__swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pap-editor-palette__swatch--selected {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px #90caf9;
+}
+
+.pap-editor-palette__swatch:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+.pap-editor-palette__remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #999;
+  padding: 0;
+  line-height: 1;
+}
+
+.pap-editor-palette__remove:hover {
+  color: #d32f2f;
+}
+
+.pap-editor-palette__add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.pap-editor-palette__add-label {
+  font-size: 13px;
+  color: #555;
+}
+
+.pap-editor-palette__add-select {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* ── Unsaved indicator ───────────────────────────── */
+
+.pap-editor__unsaved {
+  font-size: 13px;
+  color: #e65100;
+  font-style: italic;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+
+@media (max-width: 720px) {
+  .pap-editor__layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pap-editor__sidebar {
+    min-width: unset;
+    max-width: 100%;
+    width: 100%;
+  }
+}

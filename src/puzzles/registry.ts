@@ -95,6 +95,51 @@ export function saveCustomPuzzle(puzzle: PuzzleDefinition): PuzzleEntry | null {
   };
 }
 
+/**
+ * Updates an existing custom puzzle in-place.
+ * Preserves the same internalId and manifest entry. Deletes any stale saved game
+ * since the puzzle definition has changed.
+ * Returns null if validation fails or entryId is not a custom puzzle.
+ */
+export function updateCustomPuzzle(entryId: string, puzzle: PuzzleDefinition): PuzzleEntry | null {
+  if (!entryId.startsWith('custom:')) return null;
+  const internalId = entryId.slice('custom:'.length);
+
+  // Verify the entry exists
+  const existing = localStorage.getItem(CUSTOM_PREFIX + internalId);
+  if (!existing) return null;
+
+  const result = validatePuzzleDefinition(puzzle);
+  if (Array.isArray(result)) return null;
+
+  let createdAt: string;
+  try {
+    const stored: unknown = JSON.parse(existing);
+    createdAt = isValidStoredPuzzle(stored) ? stored.createdAt : new Date().toISOString();
+  } catch {
+    createdAt = new Date().toISOString();
+  }
+
+  const updated: StoredCustomPuzzle = {
+    version: 1,
+    puzzle,
+    internalId,
+    createdAt,
+  };
+
+  localStorage.setItem(CUSTOM_PREFIX + internalId, JSON.stringify(updated));
+
+  // Delete stale saved game — puzzle has changed, old progress is invalid
+  deleteSave(entryId);
+
+  return {
+    puzzle: result,
+    source: 'custom',
+    entryId,
+    createdAt,
+  };
+}
+
 /** Removes a custom puzzle and its associated game save from localStorage. */
 export function deleteCustomPuzzle(entryId: string): void {
   if (!entryId.startsWith('custom:')) return;

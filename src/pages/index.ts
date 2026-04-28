@@ -3,3 +3,4 @@ export type { LayoutContext } from './AppLayout';
 export { BrowserPage } from './BrowserPage';
 export { GameRoute } from './GamePage';
 export { GeneratorPage } from './GeneratorPage';
+export { EditorPage } from './EditorPage';
