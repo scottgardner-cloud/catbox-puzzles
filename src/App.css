@@ -98,6 +98,15 @@
   background: #ffebee;
 }
 
+.pap-btn--hint {
+  color: #e65100;
+  border-color: #e65100;
+}
+
+.pap-btn--hint:hover:not(:disabled) {
+  background: #fff3e0;
+}
+
 .pap-controls {
   display: flex;
   gap: 8px;

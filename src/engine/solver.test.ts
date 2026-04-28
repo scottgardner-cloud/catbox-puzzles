@@ -5,10 +5,11 @@ import {
   solvePuzzleLogic,
   solveStep,
   createSolverBoard,
+  playerBoardToSolverBoard,
+  getHint,
   type SolverCell,
-  type SolverBoard,
 } from './solver';
-import type { LineClue, ClueRun, ColorId, ValidatedPuzzle } from '../types';
+import type { ClueRun, ColorId, ValidatedPuzzle, PlayerCellState } from '../types';
 import { colorId } from '../types';
 import {
   crossPuzzle,
@@ -578,5 +579,75 @@ describe('solveStep — contradiction ordering', () => {
     if (!result.progress) {
       expect(result.reason).toBe('contradiction');
     }
+  });
+});
+
+describe('playerBoardToSolverBoard', () => {
+  it('converts filled, empty, and unknown cells', () => {
+    const board: PlayerCellState[][] = [
+      [{ kind: 'filled', colorId: B }, { kind: 'empty' }, { kind: 'unknown' }],
+    ];
+    const result = playerBoardToSolverBoard(board);
+    expect(result[0][0]).toBe(B);
+    expect(result[0][1]).toBe(null);
+    expect(result[0][2]).toBe('unknown');
+  });
+});
+
+describe('getHint', () => {
+  it('returns a hint on an empty board for a solvable puzzle', () => {
+    const emptyBoard: PlayerCellState[][] = [];
+    for (let r = 0; r < crossPuzzle.rows; r++) {
+      const row: PlayerCellState[] = [];
+      for (let c = 0; c < crossPuzzle.cols; c++) {
+        row.push({ kind: 'unknown' });
+      }
+      emptyBoard.push(row);
+    }
+
+    const result = getHint(crossPuzzle, emptyBoard);
+    expect(result.kind).toBe('hint');
+    if (result.kind === 'hint') {
+      expect(result.cells.length).toBeGreaterThan(0);
+      expect(result.line).toMatch(/^(row|col)$/);
+    }
+  });
+
+  it('returns error when board has contradictions', () => {
+    const board: PlayerCellState[][] = [];
+    for (let r = 0; r < crossPuzzle.rows; r++) {
+      const row: PlayerCellState[] = [];
+      for (let c = 0; c < crossPuzzle.cols; c++) {
+        row.push({ kind: 'unknown' });
+      }
+      board.push(row);
+    }
+    board[1][0] = { kind: 'empty' };
+
+    const result = getHint(crossPuzzle, board);
+    expect(result.kind).toBe('error');
+  });
+
+  it('returns no-hint when no deductions available', () => {
+    const ambiguous: ValidatedPuzzle = {
+      id: 'ambiguous-2x2',
+      name: 'Ambiguous',
+      kind: 'bw',
+      rows: 2,
+      cols: 2,
+      palette: [{ id: B, name: 'Black', value: '#000' }],
+      solution: [[B, null], [null, B]],
+      rowClues: [[run(1)], [run(1)]],
+      colClues: [[run(1)], [run(1)]],
+      __validated: true,
+    } as ValidatedPuzzle;
+
+    const board: PlayerCellState[][] = [
+      [{ kind: 'unknown' }, { kind: 'unknown' }],
+      [{ kind: 'unknown' }, { kind: 'unknown' }],
+    ];
+
+    const result = getHint(ambiguous, board);
+    expect(result.kind).toBe('no-hint');
   });
 });

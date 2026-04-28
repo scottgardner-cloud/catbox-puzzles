@@ -10,7 +10,7 @@
  * @module
  */
 
-import type { ValidatedPuzzle, LineClue, ClueRun, ColorId } from '../types';
+import type { ValidatedPuzzle, LineClue, ColorId, PlayerCellState } from '../types';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -669,4 +669,72 @@ export function solveStep(
   }
 
   return { progress: false, reason: 'no-progress' };
+}
+
+// ---------------------------------------------------------------------------
+// Board conversion — bridge between player state and solver
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a player board (PlayerCellState[][]) to a solver board (SolverBoard).
+ *
+ * - `filled` cells → their ColorId
+ * - `empty` cells → null
+ * - `unknown` cells → 'unknown'
+ */
+export function playerBoardToSolverBoard(
+  board: readonly (readonly PlayerCellState[])[],
+): SolverBoard {
+  return board.map((row) =>
+    row.map((cell): SolverCell => {
+      switch (cell.kind) {
+        case 'filled':
+          return cell.colorId;
+        case 'empty':
+          return null;
+        case 'unknown':
+          return 'unknown';
+      }
+    }),
+  );
+}
+
+/** Result of requesting a hint from the player's perspective. */
+export type HintResult =
+  | {
+      readonly kind: 'hint';
+      readonly line: 'row' | 'col';
+      readonly index: number;
+      readonly cells: readonly CellDetermination[];
+    }
+  | { readonly kind: 'no-hint' }
+  | { readonly kind: 'error' };
+
+/**
+ * Get a hint for the current player board state.
+ *
+ * Converts the player board to a solver board, runs one logic step,
+ * and returns the result in a UI-friendly format.
+ */
+export function getHint(
+  puzzle: ValidatedPuzzle,
+  board: readonly (readonly PlayerCellState[])[],
+): HintResult {
+  const solverBoard = playerBoardToSolverBoard(board);
+  const step = solveStep(puzzle, solverBoard);
+
+  if (step.progress) {
+    return {
+      kind: 'hint',
+      line: step.line,
+      index: step.index,
+      cells: step.cells,
+    };
+  }
+
+  if (step.reason === 'contradiction') {
+    return { kind: 'error' };
+  }
+
+  return { kind: 'no-hint' };
 }

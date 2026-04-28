@@ -20,6 +20,8 @@ export {
   solvePuzzleLogic,
   solveStep,
   createSolverBoard,
+  playerBoardToSolverBoard,
+  getHint,
 } from './solver';
 export type {
   SolverCell,
@@ -28,4 +30,5 @@ export type {
   SolverOptions,
   SolveStepResult,
   CellDetermination,
+  HintResult,
 } from './solver';

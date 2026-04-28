@@ -10,7 +10,9 @@ import {
   resetBoard,
   checkErrors,
   isSolved,
+  getHint,
 } from '../engine';
+import type { HintResult } from '../engine';
 import { getEntryById } from '../puzzles/registry';
 import type { PuzzleEntry } from '../puzzles/types';
 import { saveGame, loadGame, restoreGameState } from '../state/persistence';
@@ -206,6 +208,38 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
     navigate('/');
   }, [entry.entryId, navigate]);
 
+  // ── Hint state ──────────────────────────────────────────────────
+  const [hintCells, setHintCells] = useState<ReadonlySet<string>>(new Set());
+
+  /** Clear hints whenever the board changes. */
+  useEffect(() => {
+    if (hintCells.size > 0) {
+      setHintCells(new Set());
+    }
+    // Only clear on board changes, not when hintCells itself changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState.board]);
+
+  const handleHint = useCallback(() => {
+    if (solved) return;
+    const result: HintResult = getHint(puzzle, gameState.board);
+    switch (result.kind) {
+      case 'hint': {
+        const keys = new Set(result.cells.map((c) => `${c.row},${c.col}`));
+        setHintCells(keys);
+        const lineLabel = result.line === 'row' ? `row ${result.index + 1}` : `column ${result.index + 1}`;
+        announce(`Hint: look at ${lineLabel} — ${result.cells.length} cell${result.cells.length === 1 ? '' : 's'} can be determined.`);
+        break;
+      }
+      case 'error':
+        announce('Your board has an error. Use Check to find mistakes.');
+        break;
+      case 'no-hint':
+        announce('No hints available right now.');
+        break;
+    }
+  }, [puzzle, gameState.board, solved, announce]);
+
   // ── Announce solved state ───────────────────────────────────────
   const prevSolvedRef = useRef(false);
   useEffect(() => {
@@ -293,6 +327,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onAnnounce={announce}
+        hintCells={hintCells}
       />
 
       <div className="pap-controls">
@@ -314,6 +349,9 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         </button>
         <button type="button" className="pap-btn" onClick={handleCheck}>
           ✓ Check
+        </button>
+        <button type="button" className="pap-btn pap-btn--hint" onClick={handleHint} disabled={solved}>
+          💡 Hint
         </button>
         <button type="button" className="pap-btn" onClick={handleSave}>
           💾 Save

@@ -74,6 +74,8 @@ export interface GridProps {
   readonly onDragEnd: () => void;
   /** Callback to announce a message to screen readers via live region. */
   readonly onAnnounce?: (message: string) => void;
+  /** Set of cell keys ("row,col") that are currently highlighted as hints. */
+  readonly hintCells?: ReadonlySet<string>;
 }
 
 /** Default cell size in pixels. */
@@ -104,6 +106,7 @@ export function Grid({
   onDragStart,
   onDragEnd,
   onAnnounce,
+  hintCells,
 }: GridProps): React.JSX.Element {
   const rows = board.length;
   const cols = rows > 0 ? board[0].length : 0;
@@ -370,6 +373,7 @@ export function Grid({
                       ariaRowIndex={ri + 1}
                       ariaColIndex={ci + 1}
                       isFocused={cellIsFocused}
+                      isHinted={hintCells?.has(`${ri},${ci}`) ?? false}
                     />
                   </div>
                 );

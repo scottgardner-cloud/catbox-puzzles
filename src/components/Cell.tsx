@@ -20,6 +20,8 @@ export interface CellProps {
   readonly ariaColIndex?: number;
   /** Whether this cell has keyboard focus. */
   readonly isFocused?: boolean;
+  /** Whether this cell is highlighted as a hint. */
+  readonly isHinted?: boolean;
 }
 
 /**
@@ -40,6 +42,7 @@ export function Cell({
   ariaRowIndex,
   ariaColIndex,
   isFocused,
+  isHinted,
 }: CellProps): React.JSX.Element {
   const classNames = ['pap-cell'];
 
@@ -54,6 +57,11 @@ export function Cell({
   // Keyboard focus indicator
   if (isFocused) {
     classNames.push('pap-cell--focused');
+  }
+
+  // Hint highlight
+  if (isHinted) {
+    classNames.push('pap-cell--hinted');
   }
 
   const style: React.CSSProperties = {
