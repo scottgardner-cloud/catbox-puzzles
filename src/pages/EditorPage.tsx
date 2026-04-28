@@ -31,9 +31,12 @@ export function EditorPage(): React.JSX.Element {
     () => createInitialState('bw', 10, 10),
   );
 
-  // Load existing puzzle for editing
+  // Load existing puzzle for editing, or reset to new state
   useEffect(() => {
-    if (!entryId) return;
+    if (!entryId) {
+      dispatch({ type: 'LOAD_PUZZLE', state: createInitialState('bw', 10, 10) });
+      return;
+    }
     const decoded = decodeURIComponent(entryId);
     const entry = getEntryById(decoded);
     if (!entry || entry.source !== 'custom') {
@@ -73,6 +76,7 @@ export function EditorPage(): React.JSX.Element {
     if (!state.isDirty) return;
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
+      e.returnValue = '';
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);

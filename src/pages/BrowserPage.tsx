@@ -19,13 +19,6 @@ export function BrowserPage(): React.JSX.Element {
     [navigate],
   );
 
-  const handleEditPuzzle = useCallback(
-    (entryId: string) => {
-      navigate(`/editor/${encodeURIComponent(entryId)}`);
-    },
-    [navigate],
-  );
-
   const handleDeletePuzzle = useCallback((entryId: string) => {
     deleteCustomPuzzle(entryId);
     setEntries(getAllEntries());

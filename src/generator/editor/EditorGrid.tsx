@@ -50,15 +50,19 @@ export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridPr
       dragAction.current = action;
       handleCellAction(row, col, action);
       dispatch({ type: 'SET_FOCUSED_CELL', cell: { row, col } });
-      (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
     },
     [state.grid, handleCellAction, dispatch],
   );
 
-  const handlePointerEnter = useCallback(
-    (row: number, col: number) => {
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
       if (!isDragging.current) return;
-      handleCellAction(row, col, dragAction.current);
+      const target = document.elementFromPoint(e.clientX, e.clientY);
+      if (!(target instanceof HTMLElement)) return;
+      const rowStr = target.dataset.row;
+      const colStr = target.dataset.col;
+      if (rowStr == null || colStr == null) return;
+      handleCellAction(Number(rowStr), Number(colStr), dragAction.current);
     },
     [handleCellAction],
   );
@@ -209,6 +213,7 @@ export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridPr
           tabIndex={0}
           onKeyDown={handleKeyDown}
           onFocus={handleGridFocus}
+          onPointerMove={handlePointerMove}
         >
           {state.grid.map((row, r) =>
             row.map((cell, c) => {
@@ -233,7 +238,6 @@ export function EditorGrid({ state, dispatch, rowClues, colClues }: EditorGridPr
                     .join(' ')}
                   style={colorValue ? { backgroundColor: colorValue } : undefined}
                   onPointerDown={(e) => handlePointerDown(r, c, e)}
-                  onPointerEnter={() => handlePointerEnter(r, c)}
                   data-row={r}
                   data-col={c}
                 />
