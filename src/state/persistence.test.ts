@@ -274,3 +274,97 @@ describe('deleteSave', () => {
     expect(loadGame(entryId)).toBeNull();
   });
 });
+
+describe('timer persistence', () => {
+  it('round-trips timer fields through save/load', () => {
+    const state = createInitialGameState(crossPuzzle);
+    const timerState = { ...state, elapsedMs: 42000, timerStatus: 'running' as const };
+    saveGame(timerState, entryId);
+    const loaded = loadGame(entryId)!;
+    expect(loaded.elapsedMs).toBe(42000);
+    expect(loaded.timerStatus).toBe('running');
+  });
+
+  it('saves with timerOverride taking precedence over state', () => {
+    const state = createInitialGameState(crossPuzzle);
+    saveGame(state, entryId, { elapsedMs: 99000, timerStatus: 'stopped' });
+    const loaded = loadGame(entryId)!;
+    expect(loaded.elapsedMs).toBe(99000);
+    expect(loaded.timerStatus).toBe('stopped');
+  });
+
+  it('loads legacy save without timer fields with defaults', () => {
+    const legacySave = {
+      version: 1,
+      puzzleId: crossPuzzle.id,
+      board: createInitialGameState(crossPuzzle).board,
+      selectedColorId: 'black',
+      undoStack: [],
+      redoStack: [],
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('pap-save-' + entryId, JSON.stringify(legacySave));
+    const loaded = loadGame(entryId)!;
+    expect(loaded).not.toBeNull();
+    expect(loaded.elapsedMs).toBe(0);
+    expect(loaded.timerStatus).toBe('idle');
+  });
+
+  it('restores legacy save with timer defaults via restoreGameState', () => {
+    const legacySave = {
+      version: 1,
+      puzzleId: crossPuzzle.id,
+      board: createInitialGameState(crossPuzzle).board,
+      selectedColorId: 'black',
+      undoStack: [],
+      redoStack: [],
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('pap-save-' + entryId, JSON.stringify(legacySave));
+    const loaded = loadGame(entryId)!;
+    const restored = restoreGameState(loaded, crossPuzzle)!;
+    expect(restored).not.toBeNull();
+    expect(restored.elapsedMs).toBe(0);
+    expect(restored.timerStatus).toBe('idle');
+  });
+
+  it('rejects save with invalid timerStatus', () => {
+    const bad = {
+      version: 1,
+      puzzleId: crossPuzzle.id,
+      board: createInitialGameState(crossPuzzle).board,
+      selectedColorId: 'black',
+      undoStack: [],
+      redoStack: [],
+      savedAt: new Date().toISOString(),
+      elapsedMs: 1000,
+      timerStatus: 'bogus',
+    };
+    localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
+    expect(loadGame(entryId)).toBeNull();
+  });
+
+  it('rejects save with non-number elapsedMs', () => {
+    const bad = {
+      version: 1,
+      puzzleId: crossPuzzle.id,
+      board: createInitialGameState(crossPuzzle).board,
+      selectedColorId: 'black',
+      undoStack: [],
+      redoStack: [],
+      savedAt: new Date().toISOString(),
+      elapsedMs: 'not-a-number',
+      timerStatus: 'idle',
+    };
+    localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
+    expect(loadGame(entryId)).toBeNull();
+  });
+
+  it('preserves timer through restoreGameState with running status', () => {
+    const save = makeValidSave({ elapsedMs: 15000, timerStatus: 'running' });
+    const restored = restoreGameState(save, crossPuzzle)!;
+    expect(restored).not.toBeNull();
+    expect(restored.elapsedMs).toBe(15000);
+    expect(restored.timerStatus).toBe('running');
+  });
+});
