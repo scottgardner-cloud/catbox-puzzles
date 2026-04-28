@@ -85,7 +85,12 @@ export function GeneratorPage(): React.JSX.Element {
       {/* Step 3: Preview (shown after successful generation) */}
       {puzzle && <PreviewGrid puzzle={puzzle} />}
 
-      {/* Solvability warning */}
+      {/* Solvability status */}
+      {gen.result?.ok && gen.result.solvability.solvable && (
+        <div className="pap-gen-solvability-ok" role="status">
+          <p>✓ Uniquely solvable — this puzzle can be solved with logic alone.</p>
+        </div>
+      )}
       {gen.result?.ok && !gen.result.solvability.solvable && (
         <div className="pap-gen-solvability-warning" role="alert">
           <p><strong>⚠ Solvability warning:</strong> {gen.result.solvability.reason}</p>
