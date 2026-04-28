@@ -13,3 +13,17 @@ export {
   validateLine,
   computeLineValidation,
 } from './game-logic';
+
+export {
+  solveLine,
+  solvePuzzle,
+  solveStep,
+  createSolverBoard,
+} from './solver';
+export type {
+  SolverCell,
+  SolverBoard,
+  SolverResult,
+  SolveStepResult,
+  CellDetermination,
+} from './solver';
