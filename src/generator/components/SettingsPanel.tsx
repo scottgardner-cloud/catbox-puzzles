@@ -1,5 +1,7 @@
 import type { GeneratorFormSettings } from '../hooks/usePuzzleGenerator';
 
+const GRID_SIZES = [10, 15, 20, 25, 30] as const;
+
 export interface SettingsPanelProps {
   readonly settings: GeneratorFormSettings;
   readonly onUpdate: (partial: Partial<GeneratorFormSettings>) => void;
@@ -43,24 +45,26 @@ export function SettingsPanel({
         <legend>Grid size</legend>
         <div className="pap-gen-settings__row">
           <label htmlFor="gen-rows">Rows</label>
-          <input
+          <select
             id="gen-rows"
-            type="number"
-            min={5}
-            max={25}
             value={settings.targetRows}
-            onChange={(e) => onUpdate({ targetRows: clampGrid(e.target.valueAsNumber) })}
-          />
+            onChange={(e) => onUpdate({ targetRows: Number(e.target.value) })}
+          >
+            {GRID_SIZES.map((n) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
           <span aria-hidden="true">×</span>
           <label htmlFor="gen-cols">Cols</label>
-          <input
+          <select
             id="gen-cols"
-            type="number"
-            min={5}
-            max={25}
             value={settings.targetCols}
-            onChange={(e) => onUpdate({ targetCols: clampGrid(e.target.valueAsNumber) })}
-          />
+            onChange={(e) => onUpdate({ targetCols: Number(e.target.value) })}
+          >
+            {GRID_SIZES.map((n) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
         </div>
       </fieldset>
 
@@ -109,6 +113,9 @@ export function SettingsPanel({
             aria-valuemax={255}
             aria-valuenow={settings.bwThreshold}
           />
+          <span className="pap-gen-settings__field-hint">
+            Lower = fewer filled cells (only dark pixels). Higher = more filled cells.
+          </span>
         </div>
       )}
 
@@ -192,9 +199,4 @@ export function SettingsPanel({
       </div>
     </section>
   );
-}
-
-function clampGrid(n: number): number {
-  if (Number.isNaN(n)) return 10;
-  return Math.max(5, Math.min(25, Math.round(n)));
 }
