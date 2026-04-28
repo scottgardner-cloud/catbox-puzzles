@@ -17,6 +17,7 @@ export {
 export {
   solveLine,
   solvePuzzle,
+  solvePuzzleLogic,
   solveStep,
   createSolverBoard,
 } from './solver';
@@ -24,6 +25,7 @@ export type {
   SolverCell,
   SolverBoard,
   SolverResult,
+  SolverOptions,
   SolveStepResult,
   CellDetermination,
 } from './solver';

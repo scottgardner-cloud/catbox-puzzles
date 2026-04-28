@@ -30,7 +30,13 @@ export type SolverBoard = SolverCell[][];
 /** Result of solving a complete puzzle. */
 export type SolverResult =
   | { readonly solved: true; readonly board: SolverBoard }
-  | { readonly solved: false; readonly board: SolverBoard; readonly reason: 'stuck' | 'contradiction' };
+  | { readonly solved: false; readonly board: SolverBoard; readonly reason: 'stuck' | 'contradiction' | 'budget-exceeded' };
+
+/** Options for the full solver (with search/backtracking). */
+export interface SolverOptions {
+  /** Maximum number of search nodes to explore before giving up. Default: 10_000. */
+  readonly maxNodes?: number;
+}
 
 /** A single cell determination made by the solver. */
 export interface CellDetermination {
@@ -477,23 +483,57 @@ function cloneBoard(board: SolverBoard): SolverBoard {
   return board.map((row) => [...row]);
 }
 
+/** Mutable counter shared across recursive search calls. */
+interface SearchBudget {
+  remaining: number;
+}
+
 /**
- * Solve a puzzle using constraint propagation with backtracking.
+ * Solve a puzzle using constraint propagation only (no backtracking).
  *
- * First applies line-by-line constraint propagation. If that stalls,
- * uses depth-limited probing: pick an unknown cell, try each possible
- * value, propagate, and check for contradiction. If exactly one value
- * survives, that cell is determined. Repeats until solved or truly stuck.
+ * This is the appropriate solver for the hint system — it finds deductions
+ * that a human could make by examining one line at a time.
  */
-export function solvePuzzle(puzzle: ValidatedPuzzle): SolverResult {
+export function solvePuzzleLogic(puzzle: ValidatedPuzzle): SolverResult {
   const { rows, cols, rowClues, colClues, kind } = puzzle;
   const isBW = kind === 'bw';
   const board = createSolverBoard(rows, cols);
 
-  return solveWithBacktracking(board, rows, cols, rowClues, colClues, isBW, puzzle.palette);
+  const status = propagate(board, rows, cols, rowClues, colClues, isBW);
+
+  if (status === 'solved') return { solved: true, board };
+  if (status === 'contradiction') return { solved: false, board, reason: 'contradiction' };
+  return { solved: false, board, reason: 'stuck' };
 }
 
-function solveWithBacktracking(
+/**
+ * Solve a puzzle using constraint propagation with backtracking search.
+ *
+ * Proves unique solvability: returns `solved: true` only when exactly one
+ * valid solution exists. A `stuck` result from a subtree is conservatively
+ * treated as "possibly multiple solutions" — the solver never falsely
+ * claims uniqueness.
+ *
+ * Use this for puzzle validation and generator uniqueness checks.
+ * For the hint system, prefer `solvePuzzleLogic()`.
+ */
+export function solvePuzzle(puzzle: ValidatedPuzzle, options?: SolverOptions): SolverResult {
+  const { rows, cols, rowClues, colClues, kind } = puzzle;
+  const isBW = kind === 'bw';
+  const board = createSolverBoard(rows, cols);
+  const budget: SearchBudget = { remaining: options?.maxNodes ?? 10_000 };
+
+  return solveWithSearch(board, rows, cols, rowClues, colClues, isBW, puzzle.palette, budget);
+}
+
+/**
+ * Recursive search: propagate, then branch on an unknown cell.
+ *
+ * Returns solved:true only when exactly one complete solution is found.
+ * Stuck subtrees are treated as potentially containing multiple solutions
+ * (conservative — never falsely claims uniqueness).
+ */
+function solveWithSearch(
   board: SolverBoard,
   rows: number,
   cols: number,
@@ -501,76 +541,62 @@ function solveWithBacktracking(
   colClues: readonly LineClue[],
   isBW: boolean,
   palette: ValidatedPuzzle['palette'],
+  budget: SearchBudget,
 ): SolverResult {
+  if (budget.remaining <= 0) {
+    return { solved: false, board, reason: 'budget-exceeded' };
+  }
+  budget.remaining--;
+
   const status = propagate(board, rows, cols, rowClues, colClues, isBW);
 
   if (status === 'solved') return { solved: true, board };
   if (status === 'contradiction') return { solved: false, board, reason: 'contradiction' };
 
-  // Propagation stalled — try probing unknown cells
-  // Find first unknown cell
+  // Propagation stalled — find first unknown cell and branch
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (board[r][c] !== 'unknown') continue;
 
-      // Candidate values: null (empty) + each palette color
       const candidates: (ColorId | null)[] = [null];
       for (const p of palette) {
         candidates.push(p.id);
       }
 
-      let survivingBoard: SolverBoard | null = null;
-      let survivingCount = 0;
-
-      for (const value of candidates) {
-        const trial = cloneBoard(board);
-        trial[r][c] = value;
-        const trialStatus = propagate(trial, rows, cols, rowClues, colClues, isBW);
-
-        if (trialStatus !== 'contradiction') {
-          survivingCount++;
-          survivingBoard = trial;
-          if (survivingCount > 1) break; // Multiple valid — can't determine yet
-        }
-      }
-
-      if (survivingCount === 0) {
-        return { solved: false, board, reason: 'contradiction' };
-      }
-
-      if (survivingCount === 1 && survivingBoard) {
-        // Only one value works — copy the result and continue solving
-        for (let ri = 0; ri < rows; ri++) {
-          for (let ci = 0; ci < cols; ci++) {
-            board[ri][ci] = survivingBoard[ri][ci];
-          }
-        }
-        // Recurse to continue solving after this determination
-        return solveWithBacktracking(board, rows, cols, rowClues, colClues, isBW, palette);
-      }
-
-      // Multiple values survived — try deeper: recurse into each surviving branch
-      // to see if only one leads to a complete solution
       let solutionBoard: SolverBoard | null = null;
       let solutionCount = 0;
 
       for (const value of candidates) {
+        if (budget.remaining <= 0 || solutionCount > 1) break;
+
         const trial = cloneBoard(board);
         trial[r][c] = value;
-        const result = solveWithBacktracking(trial, rows, cols, rowClues, colClues, isBW, palette);
+        const result = solveWithSearch(trial, rows, cols, rowClues, colClues, isBW, palette, budget);
 
         if (result.solved) {
           solutionCount++;
           solutionBoard = result.board;
-          if (solutionCount > 1) break; // Multiple solutions — ambiguous
+        } else if (result.reason !== 'contradiction') {
+          // stuck or budget-exceeded: subtree may contain multiple solutions
+          // Conservatively treat as ambiguous
+          solutionCount = 2;
         }
+        // contradiction: this branch is dead, continue to next candidate
+      }
+
+      if (budget.remaining <= 0) {
+        return { solved: false, board, reason: 'budget-exceeded' };
       }
 
       if (solutionCount === 1 && solutionBoard) {
         return { solved: true, board: solutionBoard };
       }
 
-      // Multiple solutions or none — can't solve uniquely
+      if (solutionCount === 0) {
+        return { solved: false, board, reason: 'contradiction' };
+      }
+
+      // solutionCount > 1 — ambiguous
       return { solved: false, board, reason: 'stuck' };
     }
   }
@@ -585,6 +611,9 @@ function solveWithBacktracking(
  * Useful for the hint system — tells the player which line to look at
  * and what can be deduced.
  *
+ * Scans all lines for contradictions first (early detection of broken boards),
+ * then does a second pass looking for lines with deducible progress.
+ *
  * @param puzzle - The validated puzzle definition.
  * @param board - The current solver board state.
  * @returns The first line with deducible progress, or a no-progress/contradiction indicator.
@@ -596,12 +625,25 @@ export function solveStep(
   const { rows, cols, rowClues, colClues, kind } = puzzle;
   const isBW = kind === 'bw';
 
-  // Try rows first, then columns
+  // Pass 1: check all lines for contradictions
+  const rowResults: (SolverCell[] | null)[] = [];
   for (let r = 0; r < rows; r++) {
     const result = solveLine(rowClues[r], board[r], isBW);
-    if (result === null) {
-      return { progress: false, reason: 'contradiction' };
-    }
+    if (result === null) return { progress: false, reason: 'contradiction' };
+    rowResults.push(result);
+  }
+
+  const colResults: (SolverCell[] | null)[] = [];
+  for (let c = 0; c < cols; c++) {
+    const col = getColumn(board, c);
+    const result = solveLine(colClues[c], col, isBW);
+    if (result === null) return { progress: false, reason: 'contradiction' };
+    colResults.push(result);
+  }
+
+  // Pass 2: find first line with deducible progress
+  for (let r = 0; r < rows; r++) {
+    const result = rowResults[r]!;
     const determinations: CellDetermination[] = [];
     for (let c = 0; c < cols; c++) {
       if (board[r][c] === 'unknown' && result[c] !== 'unknown') {
@@ -614,14 +656,10 @@ export function solveStep(
   }
 
   for (let c = 0; c < cols; c++) {
-    const col = getColumn(board, c);
-    const result = solveLine(colClues[c], col, isBW);
-    if (result === null) {
-      return { progress: false, reason: 'contradiction' };
-    }
+    const result = colResults[c]!;
     const determinations: CellDetermination[] = [];
     for (let r = 0; r < rows; r++) {
-      if (col[r] === 'unknown' && result[r] !== 'unknown') {
+      if (board[r][c] === 'unknown' && result[r] !== 'unknown') {
         determinations.push({ row: r, col: c, value: result[r] as ColorId | null });
       }
     }

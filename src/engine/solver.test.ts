@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   solveLine,
   solvePuzzle,
+  solvePuzzleLogic,
   solveStep,
   createSolverBoard,
   type SolverCell,
@@ -412,6 +413,170 @@ describe('solvePuzzle — ambiguous puzzles', () => {
     expect(result.solved).toBe(false);
     if (!result.solved) {
       expect(result.reason).toBe('stuck');
+    }
+  });
+
+  it('rejects 3×4 puzzle with many solutions (regression)', () => {
+    // 3×4 B&W: rows [[1,1], [1,1], [1]], cols [[2], [1], [1], [1]]
+    // Has dozens of valid solutions — must NOT return solved:true
+    const multiSolution: ValidatedPuzzle = {
+      id: 'multi-3x4',
+      name: 'Multi',
+      kind: 'bw',
+      rows: 3,
+      cols: 4,
+      palette: [{ id: B, name: 'Black', value: '#000' }],
+      solution: [
+        [B, null, B, null],
+        [B, null, null, B],
+        [null, B, null, null],
+      ],
+      rowClues: [[run(1), run(1)], [run(1), run(1)], [run(1)]],
+      colClues: [[run(2)], [run(1)], [run(1)], [run(1)]],
+      __validated: true,
+    } as ValidatedPuzzle;
+
+    const result = solvePuzzle(multiSolution);
+    expect(result.solved).toBe(false);
+  });
+
+  it('brute-force oracle: tiny 3×3 unique puzzle agrees with solver', () => {
+    // 3×3 L-shape: unique solution verified by enumeration
+    // Solution:
+    //   X . .
+    //   X . .
+    //   X X X
+    const puzzle: ValidatedPuzzle = {
+      id: 'oracle-3x3',
+      name: 'Oracle',
+      kind: 'bw',
+      rows: 3,
+      cols: 3,
+      palette: [{ id: B, name: 'Black', value: '#000' }],
+      solution: [
+        [B, null, null],
+        [B, null, null],
+        [B, B, B],
+      ],
+      rowClues: [[run(1)], [run(1)], [run(3)]],
+      colClues: [[run(3)], [run(1)], [run(1)]],
+      __validated: true,
+    } as ValidatedPuzzle;
+
+    // Brute-force: enumerate all 2^9 = 512 possible boards
+    const solutions: boolean[][] = [];
+    for (let mask = 0; mask < 512; mask++) {
+      const grid: (typeof B | null)[][] = [];
+      for (let r = 0; r < 3; r++) {
+        const row: (typeof B | null)[] = [];
+        for (let c = 0; c < 3; c++) {
+          row.push((mask >> (r * 3 + c)) & 1 ? B : null);
+        }
+        grid.push(row);
+      }
+
+      // Check if this grid matches all clues
+      let valid = true;
+      // Check row clues
+      for (let r = 0; r < 3 && valid; r++) {
+        const runs = deriveRuns(grid[r]);
+        if (!runsEqual(runs, puzzle.rowClues[r])) valid = false;
+      }
+      // Check column clues
+      for (let c = 0; c < 3 && valid; c++) {
+        const col = [grid[0][c], grid[1][c], grid[2][c]];
+        const runs = deriveRuns(col);
+        if (!runsEqual(runs, puzzle.colClues[c])) valid = false;
+      }
+      if (valid) {
+        solutions.push(grid.flat().map((c) => c !== null));
+      }
+    }
+
+    // Should have exactly 1 solution
+    expect(solutions.length).toBe(1);
+
+    // Solver should agree
+    const result = solvePuzzle(puzzle);
+    expect(result.solved).toBe(true);
+  });
+});
+
+// Helpers for brute-force oracle
+function deriveRuns(cells: readonly (ColorId | null)[]): ClueRun[] {
+  const runs: ClueRun[] = [];
+  let i = 0;
+  while (i < cells.length) {
+    if (cells[i] !== null) {
+      let len = 1;
+      while (i + len < cells.length && cells[i + len] !== null) len++;
+      runs.push({ length: len, colorId: cells[i]! });
+      i += len;
+    } else {
+      i++;
+    }
+  }
+  return runs;
+}
+
+function runsEqual(a: ClueRun[], b: readonly ClueRun[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i].length !== b[i].length || a[i].colorId !== b[i].colorId) return false;
+  }
+  return true;
+}
+
+describe('solvePuzzleLogic', () => {
+  it('solves simple puzzles without backtracking', () => {
+    const result = solvePuzzleLogic(crossPuzzle);
+    expect(result.solved).toBe(true);
+  });
+
+  it('returns stuck for puzzles needing backtracking', () => {
+    // anchor 15×15 needs backtracking — logic-only should return stuck
+    const result = solvePuzzleLogic(anchorPuzzle);
+    expect(result.solved).toBe(false);
+    if (!result.solved) {
+      expect(result.reason).toBe('stuck');
+    }
+  });
+});
+
+describe('solvePuzzle — search budget', () => {
+  it('respects maxNodes budget', () => {
+    // Anchor needs backtracking. With a tiny budget, should report budget-exceeded.
+    const result = solvePuzzle(anchorPuzzle, { maxNodes: 1 });
+    expect(result.solved).toBe(false);
+    if (!result.solved) {
+      expect(result.reason).toBe('budget-exceeded');
+    }
+  });
+
+  it('solves with sufficient budget', () => {
+    const result = solvePuzzle(anchorPuzzle, { maxNodes: 10_000 });
+    expect(result.solved).toBe(true);
+  });
+});
+
+describe('solveStep — contradiction ordering', () => {
+  it('detects late-row contradiction even if early rows have progress', () => {
+    // Set up a board where row 0 has deducible progress,
+    // but a later row has a contradiction.
+    // Cross puzzle: row 1 clue is [5]. If we mark cell 0 of row 1 as empty,
+    // row 1 is contradicted. But row 0 (clue [1,1]) might still have progress
+    // if we give it a partial state.
+    const board = createSolverBoard(crossPuzzle.rows, crossPuzzle.cols);
+    // Give row 0 some known state so it has progress (but don't fully solve it)
+    board[0][1] = B; // row 0 clue is [1,1] in 5 cells — knowing pos 1 is B helps
+    // Create contradiction on row 1
+    board[1][0] = null; // row 1 clue is [5] — can't have empty at pos 0
+
+    const result = solveStep(crossPuzzle, board);
+    // Should detect the contradiction on row 1, NOT return progress from row 0
+    expect(result.progress).toBe(false);
+    if (!result.progress) {
+      expect(result.reason).toBe('contradiction');
     }
   });
 });
