@@ -23,6 +23,40 @@ function countRunAt(line: readonly PlayerCellState[], pos: number): number {
   return end - start + 1;
 }
 
+/**
+ * Pick white or black text for readability against a background color.
+ * Uses the W3C relative luminance formula for WCAG contrast.
+ */
+function contrastText(cssColor: string): '#fff' | '#000' {
+  // Parse hex colors (#RGB or #RRGGBB)
+  let r = 0, g = 0, b = 0;
+  if (cssColor.startsWith('#')) {
+    const hex = cssColor.slice(1);
+    if (hex.length === 3) {
+      r = parseInt(hex[0] + hex[0], 16);
+      g = parseInt(hex[1] + hex[1], 16);
+      b = parseInt(hex[2] + hex[2], 16);
+    } else if (hex.length >= 6) {
+      r = parseInt(hex.slice(0, 2), 16);
+      g = parseInt(hex.slice(2, 4), 16);
+      b = parseInt(hex.slice(4, 6), 16);
+    }
+  }
+  // Relative luminance (sRGB)
+  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return lum > 0.5 ? '#000' : '#fff';
+}
+
+/** Build inline style for a color clue number badge. */
+function clueColorStyle(cssColor: string): React.CSSProperties {
+  return {
+    backgroundColor: cssColor,
+    color: contrastText(cssColor),
+    borderRadius: 3,
+    padding: '0 3px',
+  };
+}
+
 /** Build inline style for a run indicator based on the hovered cell's state. */
 function runIndicatorStyle(
   cell: PlayerCellState,
@@ -292,7 +326,7 @@ export function Grid({
                   <span
                     key={ri}
                     className="pap-clue-num"
-                    style={isColorPuzzle ? { color: resolveColor(run.colorId) } : undefined}
+                    style={isColorPuzzle ? clueColorStyle(resolveColor(run.colorId)) : undefined}
                   >
                     {run.length}
                   </span>
@@ -324,7 +358,7 @@ export function Grid({
                   <span
                     key={ci}
                     className="pap-clue-num"
-                    style={isColorPuzzle ? { color: resolveColor(run.colorId) } : undefined}
+                    style={isColorPuzzle ? clueColorStyle(resolveColor(run.colorId)) : undefined}
                   >
                     {run.length}
                   </span>
