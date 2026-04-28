@@ -20,5 +20,12 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  // AppLayout exports both a component and useLayoutContext hook — accepted exception
+  {
+    files: ['src/pages/AppLayout.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
   eslintConfigPrettier,
 ]);

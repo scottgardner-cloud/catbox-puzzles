@@ -3,12 +3,7 @@ import { saveGame, loadGame, restoreGameState, deleteSave } from './persistence'
 import { createInitialGameState, cycleCell, undo } from '../engine';
 import { crossPuzzle } from '../puzzles/samples';
 import { colorId } from '../types';
-import type {
-  SavedGameState,
-  PlayerCellState,
-  GameAction,
-  CellChange,
-} from '../types';
+import type { SavedGameState, PlayerCellState, GameAction, CellChange } from '../types';
 
 const B = colorId('black');
 const entryId = 'builtin:sample-cross-5x5';
