@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PuzzleBrowser } from '../components';
+import { PuzzleBrowser, ImportPuzzle } from '../components';
 import { getAllEntries, deleteCustomPuzzle } from '../puzzles/registry';
 
 /**
@@ -9,6 +9,7 @@ import { getAllEntries, deleteCustomPuzzle } from '../puzzles/registry';
  */
 export function BrowserPage(): React.JSX.Element {
   const [entries, setEntries] = useState(() => getAllEntries());
+  const [showImport, setShowImport] = useState(false);
   const navigate = useNavigate();
 
   const handleSelectPuzzle = useCallback(
@@ -26,11 +27,25 @@ export function BrowserPage(): React.JSX.Element {
     [],
   );
 
+  const handleImport = useCallback(() => {
+    setShowImport(false);
+    setEntries(getAllEntries());
+  }, []);
+
   return (
-    <PuzzleBrowser
-      entries={entries}
-      onSelectPuzzle={handleSelectPuzzle}
-      onDeletePuzzle={handleDeletePuzzle}
-    />
+    <>
+      <PuzzleBrowser
+        entries={entries}
+        onSelectPuzzle={handleSelectPuzzle}
+        onDeletePuzzle={handleDeletePuzzle}
+        onImportPuzzle={() => setShowImport(true)}
+      />
+      {showImport && (
+        <ImportPuzzle
+          onImport={handleImport}
+          onClose={() => setShowImport(false)}
+        />
+      )}
+    </>
   );
 }

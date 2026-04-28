@@ -15,6 +15,8 @@ export interface PuzzleBrowserProps {
   readonly onSelectPuzzle: (entryId: string) => void;
   /** Called when the player deletes a custom puzzle. */
   readonly onDeletePuzzle?: (entryId: string) => void;
+  /** Called when the player wants to import a puzzle. */
+  readonly onImportPuzzle?: () => void;
 }
 
 /** Determine progress status for a puzzle entry. Safe against corrupt saves. */
@@ -75,6 +77,7 @@ export function PuzzleBrowser({
   entries,
   onSelectPuzzle,
   onDeletePuzzle,
+  onImportPuzzle,
 }: PuzzleBrowserProps): React.JSX.Element {
   const builtinEntries = useMemo(() => entries.filter((e) => e.source === 'builtin'), [entries]);
   const customEntries = useMemo(() => entries.filter((e) => e.source === 'custom'), [entries]);
@@ -117,7 +120,14 @@ export function PuzzleBrowser({
         })}
       </ul>
 
-      <h2 className="pap-browser__section-header">My Puzzles</h2>
+      <div className="pap-browser__section-row">
+        <h2 className="pap-browser__section-header">My Puzzles</h2>
+        {onImportPuzzle && (
+          <button type="button" className="pap-btn pap-browser__import-btn" onClick={onImportPuzzle}>
+            + Import
+          </button>
+        )}
+      </div>
       {customEntries.length === 0 ? (
         <p className="pap-browser__empty">No custom puzzles yet</p>
       ) : (
