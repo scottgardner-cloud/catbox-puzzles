@@ -48,12 +48,14 @@ function filterEntries(
   query: string,
   activeTypes: ReadonlySet<string>,
   activeStatuses: ReadonlySet<string>,
+  activeSizes: ReadonlySet<string>,
   statusMap: ReadonlyMap<string, PuzzleStatus>,
 ): PuzzleEntry[] {
   const q = query.toLowerCase().trim();
   return entries.filter((e) => {
     if (q && !e.puzzle.name.toLowerCase().includes(q)) return false;
     if (activeTypes.size > 0 && !activeTypes.has(e.puzzle.kind)) return false;
+    if (activeSizes.size > 0 && !activeSizes.has(`${e.puzzle.rows}×${e.puzzle.cols}`)) return false;
     if (activeStatuses.size > 0) {
       const status = statusMap.get(e.entryId) ?? 'new';
       if (!activeStatuses.has(status)) return false;
@@ -159,7 +161,21 @@ export function PuzzleBrowser({
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTypes, setActiveTypes] = useState<ReadonlySet<string>>(new Set());
   const [activeStatuses, setActiveStatuses] = useState<ReadonlySet<string>>(new Set());
+  const [activeSizes, setActiveSizes] = useState<ReadonlySet<string>>(new Set());
   const [sortBy, setSortBy] = useState<SortBy>('size');
+
+  // ── Available sizes (auto-generated, sorted by area) ─────────────
+  const availableSizes = useMemo(() => {
+    const sizeSet = new Set<string>();
+    for (const e of entries) {
+      sizeSet.add(`${e.puzzle.rows}×${e.puzzle.cols}`);
+    }
+    return [...sizeSet].sort((a, b) => {
+      const [ar, ac] = a.split('×').map(Number);
+      const [br, bc] = b.split('×').map(Number);
+      return ar * ac - br * bc;
+    });
+  }, [entries]);
 
   // ── Precompute status for all entries ────────────────────────────
   const statusMap = useMemo(() => {
@@ -186,8 +202,9 @@ export function PuzzleBrowser({
 
   // ── Filter + sort ────────────────────────────────────────────────
   const filtered = useMemo(
-    () => filterEntries(tabEntries, searchQuery, activeTypes, activeStatuses, statusMap),
-    [tabEntries, searchQuery, activeTypes, activeStatuses, statusMap],
+    () =>
+      filterEntries(tabEntries, searchQuery, activeTypes, activeStatuses, activeSizes, statusMap),
+    [tabEntries, searchQuery, activeTypes, activeStatuses, activeSizes, statusMap],
   );
 
   const sorted = useMemo(
@@ -271,6 +288,19 @@ export function PuzzleBrowser({
             {kind === 'bw' ? 'B&W' : 'Color'}
           </button>
         ))}
+        <span className="pap-browser__chip-sep" aria-hidden="true" />
+        {availableSizes.map((size) => (
+          <button
+            key={size}
+            type="button"
+            className={`pap-browser__chip${activeSizes.has(size) ? ' pap-browser__chip--active' : ''}`}
+            aria-pressed={activeSizes.has(size)}
+            onClick={() => setActiveSizes(toggleSetItem(activeSizes, size))}
+          >
+            {size}
+          </button>
+        ))}
+        <span className="pap-browser__chip-sep" aria-hidden="true" />
         {(['new', 'in-progress', 'solved'] as const).map((status) => (
           <button
             key={status}

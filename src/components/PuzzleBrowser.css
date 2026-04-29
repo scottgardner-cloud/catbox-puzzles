@@ -99,6 +99,14 @@
   color: #1976d2;
 }
 
+.pap-browser__chip-sep {
+  width: 1px;
+  height: 20px;
+  background: #e0e0e0;
+  margin: 0 2px;
+  align-self: center;
+}
+
 /* Result count */
 .pap-browser__count {
   font-size: 13px;
