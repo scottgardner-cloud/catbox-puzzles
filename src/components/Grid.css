@@ -50,7 +50,6 @@
 .pap-rows {
   display: flex;
   flex-direction: column;
-  gap: 1px;
 }
 
 .pap-row {
@@ -80,7 +79,7 @@
 /* ── Cells row (the actual grid) ── */
 .pap-cells-row {
   display: grid;
-  gap: 1px;
+  gap: 0;
 }
 
 /* ── Line validation indicator (row / col) ── */
@@ -89,7 +88,6 @@
   align-items: center;
   justify-content: center;
   width: 20px;
-  height: 30px;
   font-size: 14px;
   font-weight: 700;
 }
@@ -201,7 +199,6 @@
   align-items: center;
   justify-content: center;
   min-width: 24px;
-  height: 24px;
   font-size: 12px;
   font-weight: 700;
   color: #1976d2;

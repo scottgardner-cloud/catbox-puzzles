@@ -12,14 +12,28 @@ import './Grid.css';
 
 /**
  * Count consecutive cells of the same state around a position in a line.
+ * For filled cells in color puzzles, only counts cells of the same color.
  * Returns the total run length containing the cell at `pos`.
  */
 function countRunAt(line: readonly PlayerCellState[], pos: number): number {
-  const state = line[pos].kind;
+  const cell = line[pos];
+  const state = cell.kind;
+  const color = cell.kind === 'filled' ? cell.colorId : null;
+
   let start = pos;
-  while (start > 0 && line[start - 1].kind === state) start--;
+  while (start > 0) {
+    const prev = line[start - 1];
+    if (prev.kind !== state) break;
+    if (color !== null && prev.kind === 'filled' && prev.colorId !== color) break;
+    start--;
+  }
   let end = pos;
-  while (end < line.length - 1 && line[end + 1].kind === state) end++;
+  while (end < line.length - 1) {
+    const next = line[end + 1];
+    if (next.kind !== state) break;
+    if (color !== null && next.kind === 'filled' && next.colorId !== color) break;
+    end++;
+  }
   return end - start + 1;
 }
 
