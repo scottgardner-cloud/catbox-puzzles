@@ -105,6 +105,19 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return markDirty({ ...state, rows, cols, grid: newGrid, focusedCell });
     }
 
+    case 'SET_KIND': {
+      if (action.kind === state.kind) return state;
+      const palette = action.kind === 'bw' ? [...BW_PALETTE] : [PRESET_COLORS[0]];
+      // Clear grid when switching kind — colors are incompatible
+      return markDirty({
+        ...state,
+        kind: action.kind,
+        palette,
+        grid: createEmptyGrid(state.rows, state.cols),
+        selectedColor: palette[0].id,
+      });
+    }
+
     case 'ADD_PALETTE_COLOR': {
       if (state.kind === 'bw') return state;
       if (state.palette.some((c) => c.id === action.color.id)) return state;

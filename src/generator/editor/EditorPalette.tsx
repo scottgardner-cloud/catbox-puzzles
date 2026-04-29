@@ -1,4 +1,3 @@
-import type { ColorId } from '../../types';
 import type { EditorAction, EditorState } from './types';
 import { PRESET_COLORS } from './types';
 
@@ -48,28 +47,25 @@ export function EditorPalette({ state, dispatch }: EditorPaletteProps): React.JS
       </div>
       {availableToAdd.length > 0 && (
         <div className="pap-editor-palette__add">
-          <label htmlFor="pap-editor-add-color" className="pap-editor-palette__add-label">
-            Add color:
-          </label>
-          <select
-            id="pap-editor-add-color"
-            className="pap-editor-palette__add-select"
-            value=""
-            onChange={(e) => {
-              const colorId = e.target.value as ColorId;
-              const color = PRESET_COLORS.find((c) => c.id === colorId);
-              if (color) dispatch({ type: 'ADD_PALETTE_COLOR', color });
-            }}
-          >
-            <option value="" disabled>
-              Choose…
-            </option>
+          <p className="pap-editor-palette__add-label">Add color:</p>
+          <div className="pap-editor-palette__add-grid">
             {availableToAdd.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
+              <button
+                key={c.id}
+                type="button"
+                className="pap-editor-palette__add-btn"
+                onClick={() => dispatch({ type: 'ADD_PALETTE_COLOR', color: c })}
+                aria-label={`Add ${c.name}`}
+                title={`Add ${c.name}`}
+              >
+                <span
+                  className="pap-editor-palette__add-swatch"
+                  style={{ backgroundColor: c.value }}
+                />
+                <span className="pap-editor-palette__add-name">{c.name}</span>
+              </button>
             ))}
-          </select>
+          </div>
         </div>
       )}
     </div>

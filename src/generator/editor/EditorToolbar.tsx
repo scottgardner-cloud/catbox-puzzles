@@ -61,6 +61,31 @@ export function EditorToolbar({
         />
       </div>
 
+      {/* Puzzle kind (B&W / Color) — disabled in edit mode */}
+      <fieldset className="pap-editor-toolbar__tools">
+        <legend>Type</legend>
+        <div className="pap-editor-toolbar__tool-btns">
+          <button
+            type="button"
+            className={`pap-btn${state.kind === 'bw' ? ' pap-btn--active' : ''}`}
+            onClick={() => dispatch({ type: 'SET_KIND', kind: 'bw' })}
+            disabled={state.mode === 'edit'}
+            aria-pressed={state.kind === 'bw'}
+          >
+            B&W
+          </button>
+          <button
+            type="button"
+            className={`pap-btn${state.kind === 'color' ? ' pap-btn--active' : ''}`}
+            onClick={() => dispatch({ type: 'SET_KIND', kind: 'color' })}
+            disabled={state.mode === 'edit'}
+            aria-pressed={state.kind === 'color'}
+          >
+            Color
+          </button>
+        </div>
+      </fieldset>
+
       {/* Grid dimensions */}
       <div className="pap-editor-toolbar__row">
         <div className="pap-editor-toolbar__field">

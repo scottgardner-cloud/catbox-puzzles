@@ -228,21 +228,59 @@
 
 .pap-editor-palette__add {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 6px;
   margin-top: 4px;
 }
 
 .pap-editor-palette__add-label {
   font-size: 13px;
+  font-weight: 600;
   color: #555;
+  margin: 0;
 }
 
-.pap-editor-palette__add-select {
+.pap-editor-palette__add-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.pap-editor-palette__add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 4px 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #e0e0e0;
   border-radius: 6px;
-  font-size: 13px;
+  background: #fafafa;
+  cursor: pointer;
+  font-size: 12px;
+  color: #333;
+}
+
+.pap-editor-palette__add-btn:hover {
+  background: #f0f0f0;
+  border-color: #bbb;
+}
+
+.pap-editor-palette__add-btn:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 1px;
+}
+
+.pap-editor-palette__add-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.pap-editor-palette__add-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Unsaved indicator ───────────────────────────── */

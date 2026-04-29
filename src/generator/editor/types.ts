@@ -54,6 +54,7 @@ export type EditorAction =
   | { type: 'CLEAR_GRID' }
   | { type: 'FILL_GRID' }
   | { type: 'RESIZE_GRID'; rows: number; cols: number }
+  | { type: 'SET_KIND'; kind: 'bw' | 'color' }
   | { type: 'ADD_PALETTE_COLOR'; color: PaletteColor }
   | { type: 'REMOVE_PALETTE_COLOR'; colorId: ColorId }
   | { type: 'SET_FOCUSED_CELL'; cell: CellCoord | null }
@@ -67,13 +68,21 @@ export type EditorAction =
 
 export const PRESET_COLORS: readonly PaletteColor[] = [
   { id: 'black' as ColorId, name: 'Black', value: '#000000' },
-  { id: 'red' as ColorId, name: 'Red', value: '#d32f2f' },
-  { id: 'blue' as ColorId, name: 'Blue', value: '#1976d2' },
-  { id: 'green' as ColorId, name: 'Green', value: '#388e3c' },
-  { id: 'yellow' as ColorId, name: 'Yellow', value: '#fbc02d' },
-  { id: 'orange' as ColorId, name: 'Orange', value: '#e64a19' },
-  { id: 'purple' as ColorId, name: 'Purple', value: '#7b1fa2' },
+  { id: 'gray' as ColorId, name: 'Gray', value: '#757575' },
   { id: 'brown' as ColorId, name: 'Brown', value: '#795548' },
+  { id: 'tan' as ColorId, name: 'Tan', value: '#d4a574' },
+  { id: 'red' as ColorId, name: 'Red', value: '#d32f2f' },
+  { id: 'coral' as ColorId, name: 'Coral', value: '#ff7043' },
+  { id: 'orange' as ColorId, name: 'Orange', value: '#e64a19' },
+  { id: 'yellow' as ColorId, name: 'Yellow', value: '#fbc02d' },
+  { id: 'lime' as ColorId, name: 'Lime', value: '#7cb342' },
+  { id: 'green' as ColorId, name: 'Green', value: '#388e3c' },
+  { id: 'teal' as ColorId, name: 'Teal', value: '#00897b' },
+  { id: 'light-blue' as ColorId, name: 'Light Blue', value: '#42a5f5' },
+  { id: 'blue' as ColorId, name: 'Blue', value: '#1976d2' },
+  { id: 'indigo' as ColorId, name: 'Indigo', value: '#3949ab' },
+  { id: 'purple' as ColorId, name: 'Purple', value: '#7b1fa2' },
+  { id: 'pink' as ColorId, name: 'Pink', value: '#e91e63' },
 ];
 
 /** Default B&W palette (single black color). */
