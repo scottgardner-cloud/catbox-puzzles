@@ -143,25 +143,23 @@ describe('PuzzleBrowser', () => {
     expect(screen.getByText('No puzzles match your filters.')).toBeInTheDocument();
   });
 
-  it('renders thumbnail canvas for each puzzle card', () => {
+  it('renders thumbnail for each puzzle card', () => {
     const entries = getEntries();
     render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
-    const thumbnails = screen.getAllByRole('img', { name: /preview/i });
+    // All unsolved puzzles get placeholder thumbnails (role="img")
+    const thumbnails = screen.getAllByRole('img', { name: /preview|not yet solved/i });
     expect(thumbnails.length).toBeGreaterThan(0);
-    // Verify canvas attributes
-    const canvas = thumbnails[0] as HTMLCanvasElement;
-    expect(canvas.tagName.toLowerCase()).toBe('canvas');
-    expect(canvas.width).toBeGreaterThan(0);
-    expect(canvas.height).toBeGreaterThan(0);
   });
 
-  it('thumbnail has accessible label with puzzle name', () => {
+  it('unsolved thumbnail shows placeholder with accessible label', () => {
     const entries = getEntries();
     render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
     const firstBuiltin = entries.find((e) => e.source === 'builtin')!;
+    // Unsolved puzzles show "not yet solved" placeholder
     const thumbnail = screen.getByRole('img', {
-      name: `${firstBuiltin.puzzle.name} preview`,
+      name: `${firstBuiltin.puzzle.name} — not yet solved`,
     });
     expect(thumbnail).toBeInTheDocument();
+    expect(thumbnail.textContent).toBe('?');
   });
 });

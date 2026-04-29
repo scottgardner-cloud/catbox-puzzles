@@ -5,32 +5,52 @@ import type { ValidatedPuzzle } from '../types';
 export interface PuzzleThumbnailProps {
   /** The puzzle to render a preview for. */
   readonly puzzle: ValidatedPuzzle;
-  /** Whether the puzzle has been solved (shows full color vs gray silhouette). */
+  /** Whether the puzzle has been solved (shows full color vs placeholder). */
   readonly solved: boolean;
   /** Canvas size in CSS pixels (default 64). The canvas scales to fit. */
   readonly size?: number;
 }
 
-const SILHOUETTE_COLOR = '#bdbdbd';
-const EMPTY_COLOR = '#ffffff';
-
 /**
- * Renders a small canvas preview of a puzzle's solution.
+ * Renders a puzzle preview thumbnail.
  *
- * - **Solved**: Shows the full-color solution image.
- * - **Unsolved**: Shows a gray silhouette (filled cells in gray, empty cells white).
+ * - **Solved**: Canvas showing the full-color solution image.
+ * - **Unsolved**: Question mark placeholder (no spoilers).
  *
- * Uses `image-rendering: pixelated` for crisp pixel art scaling.
+ * Uses `image-rendering: pixelated` for crisp pixel art scaling on canvas.
  */
 export const PuzzleThumbnail = memo(function PuzzleThumbnail({
   puzzle,
   solved,
   size = 64,
 }: PuzzleThumbnailProps): React.JSX.Element {
+  if (!solved) {
+    return (
+      <div
+        className="pap-browser__thumbnail pap-browser__thumbnail--placeholder"
+        style={{ width: size, height: size }}
+        role="img"
+        aria-label={`${puzzle.name} — not yet solved`}
+      >
+        ?
+      </div>
+    );
+  }
+
+  return <SolvedCanvas puzzle={puzzle} size={size} />;
+});
+
+/** Canvas rendering of a solved puzzle's solution. */
+function SolvedCanvas({
+  puzzle,
+  size,
+}: {
+  readonly puzzle: ValidatedPuzzle;
+  readonly size: number;
+}): React.JSX.Element {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { rows, cols, solution, palette } = puzzle;
 
-  // Build a color lookup from the palette
   const colorMap = new Map<string, string>();
   for (const color of palette) {
     colorMap.set(color.id as string, color.value);
@@ -42,17 +62,10 @@ export const PuzzleThumbnail = memo(function PuzzleThumbnail({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Draw each cell as a single pixel (canvas is rows×cols, CSS scales it)
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const cell = solution[r][c];
-        if (cell === null) {
-          ctx.fillStyle = EMPTY_COLOR;
-        } else if (solved) {
-          ctx.fillStyle = colorMap.get(cell as string) ?? SILHOUETTE_COLOR;
-        } else {
-          ctx.fillStyle = SILHOUETTE_COLOR;
-        }
+        ctx.fillStyle = cell === null ? '#ffffff' : (colorMap.get(cell as string) ?? '#bdbdbd');
         ctx.fillRect(c, r, 1, 1);
       }
     }
@@ -69,4 +82,4 @@ export const PuzzleThumbnail = memo(function PuzzleThumbnail({
       aria-label={`${puzzle.name} preview`}
     />
   );
-});
+}
