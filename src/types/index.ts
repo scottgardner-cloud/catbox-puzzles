@@ -146,6 +146,9 @@ export type GameAction =
       readonly type: 'reset';
       /** Snapshot of the board before reset, enabling undo. */
       readonly previousBoard: readonly (readonly PlayerCellState[])[];
+      /** Timer state before reset, enabling undo. */
+      readonly previousElapsedMs: number;
+      readonly previousTimerStatus: TimerStatus;
     };
 
 /**

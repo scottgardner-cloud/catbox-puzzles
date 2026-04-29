@@ -222,6 +222,23 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Sync timer refs when gameState timer fields change (e.g., undo/redo reset)
+  useEffect(() => {
+    if (
+      baseElapsedRef.current !== gameState.elapsedMs ||
+      timerStatusRef.current !== gameState.timerStatus
+    ) {
+      baseElapsedRef.current = gameState.elapsedMs;
+      timerStatusRef.current = gameState.timerStatus;
+      setDisplayMs(gameState.elapsedMs);
+      if (gameState.timerStatus === 'running' && !solved) {
+        startTimerInterval();
+      } else if (gameState.timerStatus !== 'running') {
+        stopTimerInterval();
+      }
+    }
+  }, [gameState.elapsedMs, gameState.timerStatus, solved, startTimerInterval, stopTimerInterval]);
+
   /** Wrap setGameState to also mark dirty. */
   const updateGameState = useCallback((updater: (s: GameState) => GameState) => {
     setGameState(updater);
@@ -252,6 +269,21 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         });
       }
     };
+  }, [entry.entryId, flushTimer]);
+
+  // ── Flush timer on tab close / browser crash (S12) ──────────────
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (isDirtyRef.current || runningSinceRef.current !== null) {
+        const flushedMs = flushTimer();
+        saveGame(gameStateRef.current, entry.entryId, {
+          elapsedMs: flushedMs,
+          timerStatus: timerStatusRef.current,
+        });
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [entry.entryId, flushTimer]);
 
   // ── Drag state (ephemeral UI concern) ───────────────────────────

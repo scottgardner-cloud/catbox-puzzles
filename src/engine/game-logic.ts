@@ -213,6 +213,12 @@ export function undo(state: GameState, puzzle: ValidatedPuzzle): GameState {
   const action = state.undoStack[state.undoStack.length - 1];
   const newBoard = reverseAction(state.board, action);
 
+  // Restore timer state when undoing a reset (guard for legacy saves without timer fields)
+  const timerRestore =
+    action.type === 'reset' && typeof action.previousElapsedMs === 'number'
+      ? { elapsedMs: action.previousElapsedMs, timerStatus: action.previousTimerStatus }
+      : {};
+
   return {
     ...state,
     board: newBoard,
@@ -220,6 +226,7 @@ export function undo(state: GameState, puzzle: ValidatedPuzzle): GameState {
     ...computeLineValidation(newBoard, puzzle),
     undoStack: state.undoStack.slice(0, -1),
     redoStack: [...state.redoStack, action],
+    ...timerRestore,
   };
 }
 
@@ -235,6 +242,10 @@ export function redo(state: GameState, puzzle: ValidatedPuzzle): GameState {
   const cols = puzzle.cols;
   const newBoard = applyAction(state.board, action, rows, cols);
 
+  // Re-clear timer when redoing a reset
+  const timerRestore =
+    action.type === 'reset' ? { elapsedMs: 0, timerStatus: 'idle' as const } : {};
+
   return {
     ...state,
     board: newBoard,
@@ -242,6 +253,7 @@ export function redo(state: GameState, puzzle: ValidatedPuzzle): GameState {
     ...computeLineValidation(newBoard, puzzle),
     undoStack: [...state.undoStack, action],
     redoStack: state.redoStack.slice(0, -1),
+    ...timerRestore,
   };
 }
 
@@ -262,6 +274,8 @@ export function resetBoard(state: GameState, puzzle: ValidatedPuzzle): GameState
   const action: GameAction = {
     type: 'reset',
     previousBoard: state.board,
+    previousElapsedMs: state.elapsedMs,
+    previousTimerStatus: state.timerStatus,
   };
 
   return {
