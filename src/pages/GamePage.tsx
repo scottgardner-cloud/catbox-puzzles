@@ -12,7 +12,7 @@ import {
   isSolved,
   getHint,
 } from '../engine';
-import type { HintResult } from '../engine';
+import type { HintResult, DeductionReason } from '../engine';
 import { getEntryById } from '../puzzles/registry';
 import type { PuzzleEntry } from '../puzzles/types';
 import { saveGame, loadGame, restoreGameState } from '../state/persistence';
@@ -59,6 +59,25 @@ function formatTime(ms: number): string {
     return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   }
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+/** Build a human-readable explanation from per-cell deduction reasons. */
+function buildExplanation(reasons: readonly (DeductionReason | undefined)[]): string {
+  const counts: Record<string, number> = {};
+  for (const r of reasons) {
+    if (!r) continue;
+    counts[r.kind] = (counts[r.kind] ?? 0) + 1;
+  }
+
+  const parts: string[] = [];
+  if (counts['overlap']) parts.push(`${counts['overlap']} by run overlap`);
+  if (counts['single-placement']) parts.push(`${counts['single-placement']} by single placement`);
+  if (counts['intersection']) parts.push(`${counts['intersection']} by elimination`);
+  if (counts['unreachable']) parts.push(`${counts['unreachable']} unreachable`);
+  if (counts['forced-separator']) parts.push(`${counts['forced-separator']} gap between runs`);
+  if (counts['elimination']) parts.push(`${counts['elimination']} empty by elimination`);
+
+  return parts.length > 0 ? parts.join(', ') : '';
 }
 
 /**
@@ -300,6 +319,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
 
   // ── Hint state ──────────────────────────────────────────────────
   const [hintCells, setHintCells] = useState<ReadonlySet<string>>(new Set());
+  const [hintExplanation, setHintExplanation] = useState('');
   const [hintShake, setHintShake] = useState(false);
   const [checkPulse, setCheckPulse] = useState(false);
 
@@ -309,6 +329,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
     setPrevBoard(gameState.board);
     if (hintCells.size > 0) {
       setHintCells(new Set());
+      setHintExplanation('');
     }
   }
 
@@ -321,8 +342,15 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         setHintCells(keys);
         const lineLabel =
           result.line === 'row' ? `row ${result.index + 1}` : `column ${result.index + 1}`;
+        const reasons = result.cells.map((c) => c.reason);
+        const explanation = buildExplanation(reasons);
+        setHintExplanation(
+          explanation
+            ? `${lineLabel}: ${explanation}`
+            : `${lineLabel}: ${result.cells.length} cell${result.cells.length === 1 ? '' : 's'} can be determined`,
+        );
         announce(
-          `Hint: look at ${lineLabel} — ${result.cells.length} cell${result.cells.length === 1 ? '' : 's'} can be determined.`,
+          `Hint: look at ${lineLabel} — ${explanation || `${result.cells.length} cell${result.cells.length === 1 ? '' : 's'} can be determined`}.`,
         );
         break;
       }
@@ -330,10 +358,12 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         announce('Your board has an error. Use Check to find mistakes.');
         setHintShake(true);
         setCheckPulse(true);
+        setHintExplanation('');
         break;
       case 'no-hint':
         announce('No hints available right now.');
         setHintShake(true);
+        setHintExplanation('');
         break;
     }
   }, [puzzle, gameState.board, solved, announce]);
@@ -495,6 +525,12 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
           }}
         />
       </div>
+
+      {hintExplanation && (
+        <div className="pap-hint-explanation" role="status">
+          💡 {hintExplanation}
+        </div>
+      )}
     </>
   );
 }

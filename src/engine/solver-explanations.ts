@@ -102,7 +102,17 @@ function classifyReasons(
 
     if (determined === null) {
       // Empty cell — classify why
-      reasons[i] = classifyEmpty(i, numRuns, runs, validStarts, runMaxReach, runMinReach, globalMinReach, globalMaxReach, isBW);
+      reasons[i] = classifyEmpty(
+        i,
+        numRuns,
+        runs,
+        validStarts,
+        runMaxReach,
+        runMinReach,
+        globalMinReach,
+        globalMaxReach,
+        isBW,
+      );
     } else {
       // Filled cell — classify why
       reasons[i] = classifyFilled(i, numRuns, runs, validStarts, determined);
@@ -143,12 +153,8 @@ function classifyEmpty(
     // and earliest start of run r+1, where all valid placements agree
     // this cell must be empty as a separator.
     // Check: is cell i always between run r and run r+1?
-    const rAlwaysEndsBefore = validStarts[r].every(
-      (p) => p + runs[r].length <= i,
-    );
-    const rPlusOneAlwaysStartsAfter = validStarts[r + 1].every(
-      (p) => p > i,
-    );
+    const rAlwaysEndsBefore = validStarts[r].every((p) => p + runs[r].length <= i);
+    const rPlusOneAlwaysStartsAfter = validStarts[r + 1].every((p) => p > i);
     if (rAlwaysEndsBefore && rPlusOneAlwaysStartsAfter) {
       return { kind: 'forced-separator' };
     }
@@ -171,9 +177,7 @@ function classifyFilled(
   for (let r = 0; r < numRuns; r++) {
     if (runs[r].colorId !== color) continue;
     // Does any valid placement of run r cover cell i?
-    const covers = validStarts[r].some(
-      (p) => p <= i && i < p + runs[r].length,
-    );
+    const covers = validStarts[r].some((p) => p <= i && i < p + runs[r].length);
     if (covers) {
       coveringRuns.push(r);
     }

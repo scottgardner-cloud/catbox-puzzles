@@ -209,6 +209,26 @@
   opacity: 0.4;
 }
 
+.pap-hint-explanation {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #f0f7ff;
+  border: 1px solid #c2d9f0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1a4a7a;
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Visually hidden but accessible to screen readers */
 .pap-sr-only {
   position: absolute;
