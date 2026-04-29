@@ -244,6 +244,48 @@
   color: #d32f2f;
 }
 
+/* ── Custom color picker ─────────────────────────── */
+
+.pap-editor-palette__custom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.pap-editor-palette__custom-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pap-editor-palette__color-input {
+  width: 36px;
+  height: 30px;
+  padding: 2px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.pap-editor-palette__name-input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.pap-editor-palette__warning {
+  font-size: 12px;
+  color: #e65100;
+  margin: 0;
+}
+
+/* ── Preset colors ───────────────────────────────── */
+
 .pap-editor-palette__add {
   display: flex;
   flex-direction: column;
