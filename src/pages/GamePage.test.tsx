@@ -227,4 +227,18 @@ describe('GamePage', () => {
     expect(timer.className).toContain('pap-timer--idle');
     expect(timer.textContent).toContain('00:00');
   });
+
+  it('hint button shows explanation panel', async () => {
+    const user = userEvent.setup();
+    const entry = getSmallBuiltinEntry();
+    renderGame(entry);
+
+    await user.click(screen.getByRole('button', { name: /hint/i }));
+
+    // Explanation panel should appear with some text
+    const explanation = screen.queryByText(
+      /by run overlap|by single placement|unreachable|gap between runs|by elimination|can be determined/i,
+    );
+    expect(explanation).toBeInTheDocument();
+  });
 });
