@@ -97,9 +97,10 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
   /** Flush timer: compute accurate elapsed time from wall-clock delta. */
   const flushTimer = useCallback((): number => {
     if (runningSinceRef.current === null) return baseElapsedRef.current;
-    const delta = Date.now() - runningSinceRef.current;
+    const now = Date.now();
+    const delta = now - runningSinceRef.current;
     baseElapsedRef.current += delta;
-    runningSinceRef.current = Date.now();
+    runningSinceRef.current = now;
     return baseElapsedRef.current;
   }, []);
 
