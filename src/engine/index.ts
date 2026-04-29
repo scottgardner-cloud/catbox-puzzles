@@ -30,5 +30,9 @@ export type {
   SolverOptions,
   SolveStepResult,
   CellDetermination,
+  DeductionReason,
   HintResult,
 } from './solver';
+
+export { solveLineWithReasons } from './solver-explanations';
+export type { LineWithReasons } from './solver-explanations';

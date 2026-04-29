@@ -11,6 +11,7 @@
  */
 
 import type { ValidatedPuzzle, LineClue, ColorId, PlayerCellState } from '../types';
+import { solveLineWithReasons } from './solver-explanations';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -782,8 +783,11 @@ export type HintResult =
 /**
  * Get a hint for the current player board state.
  *
- * Converts the player board to a solver board, runs one logic step,
- * and returns the result in a UI-friendly format.
+ * Two-pass approach:
+ * 1. solveStep() finds the first line with deducible progress (cheap, no reasons).
+ * 2. solveLineWithReasons() runs only on that target line to classify deductions.
+ *
+ * This avoids computing expensive explanations for every line.
  */
 export function getHint(
   puzzle: ValidatedPuzzle,
@@ -793,6 +797,40 @@ export function getHint(
   const step = solveStep(puzzle, solverBoard);
 
   if (step.progress) {
+    // Pass 2: re-solve the target line with explanation support
+    const isBW = puzzle.kind === 'bw';
+    let lineCells: readonly SolverCell[];
+    let lineClue: LineClue;
+
+    if (step.line === 'row') {
+      lineCells = solverBoard[step.index];
+      lineClue = puzzle.rowClues[step.index];
+    } else {
+      lineCells = getColumn(solverBoard, step.index);
+      lineClue = puzzle.colClues[step.index];
+    }
+
+    const detailed = solveLineWithReasons(lineClue, lineCells, isBW);
+
+    if (detailed) {
+      // Map reasons onto the determinations from step
+      const cellsWithReasons: CellDetermination[] = step.cells.map((cell) => {
+        const linePos = step.line === 'row' ? cell.col : cell.row;
+        return {
+          ...cell,
+          reason: detailed.reasons[linePos],
+        };
+      });
+
+      return {
+        kind: 'hint',
+        line: step.line,
+        index: step.index,
+        cells: cellsWithReasons,
+      };
+    }
+
+    // Fallback: return without reasons if detailed solve fails
     return {
       kind: 'hint',
       line: step.line,
