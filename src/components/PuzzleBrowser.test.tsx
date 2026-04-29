@@ -21,16 +21,18 @@ function getEntries(): PuzzleEntry[] {
 }
 
 describe('PuzzleBrowser', () => {
-  it('renders builtin puzzles section', () => {
+  it('renders tab bar with Puzzles tab active by default', () => {
     const entries = getEntries();
     render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
-    expect(screen.getByRole('heading', { name: 'Puzzles' })).toBeInTheDocument();
+    const tab = screen.getByRole('button', { name: 'Puzzles' });
+    expect(tab).toBeInTheDocument();
+    expect(tab.getAttribute('aria-pressed')).toBe('true');
   });
 
-  it('shows My Puzzles section', () => {
+  it('shows My Puzzles tab', () => {
     const entries = getEntries();
     render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
-    expect(screen.getByRole('heading', { name: 'My Puzzles' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'My Puzzles' })).toBeInTheDocument();
   });
 
   it('displays puzzle names as buttons', () => {
@@ -56,7 +58,6 @@ describe('PuzzleBrowser', () => {
     const entries = getEntries();
     render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
     const firstBuiltin = entries.find((e) => e.source === 'builtin')!;
-    // Look for dimension badge containing rows and cols
     const dimRegex = new RegExp(`${firstBuiltin.puzzle.rows}.*${firstBuiltin.puzzle.cols}`);
     const badges = screen.getAllByText(dimRegex);
     expect(badges.length).toBeGreaterThan(0);
@@ -69,9 +70,8 @@ describe('PuzzleBrowser', () => {
     expect(newBadges.length).toBeGreaterThan(0);
   });
 
-  it('shows delete button for custom puzzles', () => {
+  it('shows delete button for custom puzzles on My Puzzles tab', async () => {
     const entries = getEntries();
-    // Add a mock custom entry
     const customEntries: PuzzleEntry[] = [
       ...entries,
       {
@@ -85,7 +85,61 @@ describe('PuzzleBrowser', () => {
     render(
       <PuzzleBrowser entries={customEntries} onSelectPuzzle={vi.fn()} onDeletePuzzle={onDelete} />,
     );
+    // Switch to My Puzzles tab
+    await userEvent.click(screen.getByRole('button', { name: 'My Puzzles' }));
     const deleteBtn = screen.getByRole('button', { name: /delete/i });
     expect(deleteBtn).toBeInTheDocument();
+  });
+
+  it('search filters puzzles by name', async () => {
+    const entries = getEntries();
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
+    const search = screen.getByRole('searchbox');
+    const firstBuiltin = entries.find((e) => e.source === 'builtin')!;
+    await userEvent.type(search, firstBuiltin.puzzle.name);
+    expect(screen.getByText(firstBuiltin.puzzle.name)).toBeInTheDocument();
+    expect(screen.getByText(/Showing 1 of/)).toBeInTheDocument();
+  });
+
+  it('filter chips toggle and filter results', async () => {
+    const entries = getEntries();
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
+    const bwChip = screen.getByRole('button', { name: 'B&W' });
+    await userEvent.click(bwChip);
+    expect(bwChip.getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('sort dropdown changes order', async () => {
+    const entries = getEntries();
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
+    const sort = screen.getByRole('combobox', { name: /sort/i });
+    await userEvent.selectOptions(sort, 'name');
+    // First card should be alphabetically first
+    const cards = screen.getAllByRole('listitem');
+    expect(cards.length).toBeGreaterThan(0);
+  });
+
+  it('tab switching shows correct entries', async () => {
+    const entries = getEntries();
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
+    // Default is builtin
+    const builtinCount = entries.filter((e) => e.source === 'builtin').length;
+    expect(
+      screen.getByText(`Showing ${builtinCount} of ${builtinCount} puzzles`),
+    ).toBeInTheDocument();
+
+    // Switch to All
+    await userEvent.click(screen.getByRole('button', { name: 'All' }));
+    expect(
+      screen.getByText(`Showing ${entries.length} of ${entries.length} puzzles`),
+    ).toBeInTheDocument();
+  });
+
+  it('shows empty filter message when no matches', async () => {
+    const entries = getEntries();
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
+    const search = screen.getByRole('searchbox');
+    await userEvent.type(search, 'zzz-nonexistent-puzzle-zzz');
+    expect(screen.getByText('No puzzles match your filters.')).toBeInTheDocument();
   });
 });

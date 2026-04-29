@@ -57,8 +57,8 @@ beforeEach(() => {
 describe('Route rendering', () => {
   it('renders BrowserPage at /', () => {
     renderApp('/');
-    // Section header "Puzzles" inside the browser component
-    expect(screen.getByRole('heading', { level: 2, name: 'Puzzles' })).toBeInTheDocument();
+    // Tab button "Puzzles" inside the browser component
+    expect(screen.getByRole('button', { name: 'Puzzles' })).toBeInTheDocument();
     // Should show puzzle cards
     const entry = getFirstBuiltinEntry();
     expect(screen.getByText(entry.puzzle.name)).toBeInTheDocument();
@@ -80,12 +80,12 @@ describe('Route rendering', () => {
 describe('Redirects', () => {
   it('redirects unknown routes to /', () => {
     renderApp('/some/nonexistent/path');
-    expect(screen.getByRole('heading', { level: 2, name: 'Puzzles' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Puzzles' })).toBeInTheDocument();
   });
 
   it('redirects invalid entryId to /', () => {
     renderApp('/play/this-entry-does-not-exist');
-    expect(screen.getByRole('heading', { level: 2, name: 'Puzzles' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Puzzles' })).toBeInTheDocument();
   });
 });
 
@@ -98,7 +98,7 @@ describe('Navigation', () => {
     const puzzlesLink = screen.getByRole('link', { name: /puzzles/i });
     await user.click(puzzlesLink);
 
-    expect(screen.getByRole('heading', { level: 2, name: 'Puzzles' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Puzzles' })).toBeInTheDocument();
     const entry = getFirstBuiltinEntry();
     expect(screen.getByText(entry.puzzle.name)).toBeInTheDocument();
   });
@@ -135,7 +135,7 @@ describe('Navigation', () => {
     const backButton = screen.getByRole('button', { name: /back to puzzles/i });
     await user.click(backButton);
 
-    expect(screen.getByRole('heading', { level: 2, name: 'Puzzles' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Puzzles' })).toBeInTheDocument();
   });
 });
 
