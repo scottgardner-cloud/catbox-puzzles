@@ -342,11 +342,9 @@ describe('solveStep', () => {
 
   it('detects contradiction on invalid board', () => {
     const board = createSolverBoard(crossPuzzle.rows, crossPuzzle.cols);
-    // Fill a cell incorrectly — row 0 clue is [1,1] but we fill cell 0
-    // which should be empty in the solution
-    board[1][0] = null; // Row 1 clue is [5] — all filled. Setting cell 0 to empty is a contradiction.
+    // Row 2 clue is [5] — all filled. Setting cell 0 to empty is a contradiction.
+    board[2][0] = null;
     const result = solveStep(crossPuzzle, board);
-    // Row 1 should detect contradiction since it can't fit [5] with cell 0 empty
     expect(result.progress).toBe(false);
     if (!result.progress) {
       expect(result.reason).toBe('contradiction');
@@ -550,19 +548,14 @@ describe('solvePuzzle — search budget', () => {
 
 describe('solveStep — contradiction ordering', () => {
   it('detects late-row contradiction even if early rows have progress', () => {
-    // Set up a board where row 0 has deducible progress,
-    // but a later row has a contradiction.
-    // Cross puzzle: row 1 clue is [5]. If we mark cell 0 of row 1 as empty,
-    // row 1 is contradicted. But row 0 (clue [1,1]) might still have progress
-    // if we give it a partial state.
+    // New cross: row 0 clue is [1], row 2 clue is [5].
+    // If we mark cell 0 of row 2 as empty, row 2 is contradicted.
     const board = createSolverBoard(crossPuzzle.rows, crossPuzzle.cols);
-    // Give row 0 some known state so it has progress (but don't fully solve it)
-    board[0][1] = B; // row 0 clue is [1,1] in 5 cells — knowing pos 1 is B helps
-    // Create contradiction on row 1
-    board[1][0] = null; // row 1 clue is [5] — can't have empty at pos 0
+    board[0][2] = B; // row 0 clue is [1] — knowing pos 2 is B helps
+    // Create contradiction on row 2
+    board[2][0] = null; // row 2 clue is [5] — can't have empty at pos 0
 
     const result = solveStep(crossPuzzle, board);
-    // Should detect the contradiction on row 1, NOT return progress from row 0
     expect(result.progress).toBe(false);
     if (!result.progress) {
       expect(result.reason).toBe('contradiction');
@@ -610,7 +603,8 @@ describe('getHint', () => {
       }
       board.push(row);
     }
-    board[1][0] = { kind: 'empty' };
+    // Row 2 clue is [5] — marking cell 0 empty creates contradiction
+    board[2][0] = { kind: 'empty' };
 
     const result = getHint(crossPuzzle, board);
     expect(result.kind).toBe('error');

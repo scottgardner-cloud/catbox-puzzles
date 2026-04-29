@@ -239,13 +239,13 @@ describe('checkErrors', () => {
 
   it('marks wrong-empty cells', () => {
     const state = createInitialGameState(crossPuzzle);
-    // cell (0,1) should be filled in cross puzzle — mark it empty
+    // cell (0,2) should be filled in cross puzzle — mark it empty
     const changes: CellChange[] = [
-      { row: 0, col: 1, prev: { kind: 'unknown' }, next: { kind: 'empty' } },
+      { row: 0, col: 2, prev: { kind: 'unknown' }, next: { kind: 'empty' } },
     ];
     const modified = setCells(state, changes, crossPuzzle);
     const checked = checkErrors(modified, crossPuzzle);
-    expect(checked.cellValidation[0][1]).toBe('wrong-empty');
+    expect(checked.cellValidation[0][2]).toBe('wrong-empty');
   });
 
   it('marks unknown cells as unchecked', () => {
@@ -302,7 +302,7 @@ describe('isSolved', () => {
 });
 
 describe('validateLine', () => {
-  const solution = crossPuzzle.solution[0]; // [null, B, null, B, null]
+  const solution = crossPuzzle.solution[0]; // [null, null, B, null, null]
 
   it('returns incomplete when line has unknown cells', () => {
     const player: PlayerCellState[] = [
@@ -318,9 +318,9 @@ describe('validateLine', () => {
   it('returns correct when all cells match', () => {
     const player: PlayerCellState[] = [
       { kind: 'empty' },
-      { kind: 'filled', colorId: B },
       { kind: 'empty' },
       { kind: 'filled', colorId: B },
+      { kind: 'empty' },
       { kind: 'empty' },
     ];
     expect(validateLine(player, solution)).toBe('correct');
