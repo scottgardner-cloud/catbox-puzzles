@@ -2,11 +2,18 @@ import { useMemo, useState } from 'react';
 import { loadGame, restoreGameState } from '../state/persistence';
 import { isSolved } from '../engine';
 import type { PuzzleEntry } from '../puzzles/types';
+import type { PlayerCellState } from '../types';
 import { PuzzleThumbnail } from './PuzzleThumbnail';
 import './PuzzleBrowser.css';
 
 /** Progress status for a puzzle. */
 type PuzzleStatus = 'new' | 'in-progress' | 'solved';
+
+/** Cached status info including player board for in-progress puzzles. */
+interface StatusInfo {
+  readonly status: PuzzleStatus;
+  readonly board?: readonly (readonly PlayerCellState[])[];
+}
 
 type ViewTab = 'builtin' | 'custom' | 'all';
 type SortBy = 'name' | 'size' | 'status';
@@ -28,15 +35,16 @@ export interface PuzzleBrowserProps {
 // ---------------------------------------------------------------------------
 
 /** Determine progress status for a puzzle entry. Safe against corrupt saves. */
-function getEntryStatus(entry: PuzzleEntry): PuzzleStatus {
+function getEntryStatusInfo(entry: PuzzleEntry): StatusInfo {
   try {
     const save = loadGame(entry.entryId);
-    if (!save) return 'new';
+    if (!save) return { status: 'new' };
     const state = restoreGameState(save, entry.puzzle);
-    if (!state) return 'new';
-    return isSolved(state, entry.puzzle) ? 'solved' : 'in-progress';
+    if (!state) return { status: 'new' };
+    if (isSolved(state, entry.puzzle)) return { status: 'solved' };
+    return { status: 'in-progress', board: state.board };
   } catch {
-    return 'new';
+    return { status: 'new' };
   }
 }
 
@@ -50,7 +58,7 @@ function filterEntries(
   activeTypes: ReadonlySet<string>,
   activeStatuses: ReadonlySet<string>,
   activeSizes: ReadonlySet<string>,
-  statusMap: ReadonlyMap<string, PuzzleStatus>,
+  statusMap: ReadonlyMap<string, StatusInfo>,
 ): PuzzleEntry[] {
   const q = query.toLowerCase().trim();
   return entries.filter((e) => {
@@ -58,7 +66,7 @@ function filterEntries(
     if (activeTypes.size > 0 && !activeTypes.has(e.puzzle.kind)) return false;
     if (activeSizes.size > 0 && !activeSizes.has(`${e.puzzle.rows}×${e.puzzle.cols}`)) return false;
     if (activeStatuses.size > 0) {
-      const status = statusMap.get(e.entryId) ?? 'new';
+      const status = (statusMap.get(e.entryId) ?? { status: 'new' }).status;
       if (!activeStatuses.has(status)) return false;
     }
     return true;
@@ -70,7 +78,7 @@ const STATUS_RANK: Record<PuzzleStatus, number> = { new: 0, 'in-progress': 1, so
 function sortEntries(
   entries: PuzzleEntry[],
   sortBy: SortBy,
-  statusMap: ReadonlyMap<string, PuzzleStatus>,
+  statusMap: ReadonlyMap<string, StatusInfo>,
 ): PuzzleEntry[] {
   return [...entries].sort((a, b) => {
     switch (sortBy) {
@@ -87,8 +95,8 @@ function sortEntries(
         return nameCmp !== 0 ? nameCmp : a.entryId.localeCompare(b.entryId);
       }
       case 'status': {
-        const sa = STATUS_RANK[statusMap.get(a.entryId) ?? 'new'];
-        const sb = STATUS_RANK[statusMap.get(b.entryId) ?? 'new'];
+        const sa = STATUS_RANK[(statusMap.get(a.entryId) ?? { status: 'new' }).status];
+        const sb = STATUS_RANK[(statusMap.get(b.entryId) ?? { status: 'new' }).status];
         if (sa !== sb) return sa - sb;
         const nameCmp = a.puzzle.name.localeCompare(b.puzzle.name);
         return nameCmp !== 0 ? nameCmp : a.entryId.localeCompare(b.entryId);
@@ -105,16 +113,18 @@ function sortEntries(
 function CardContent({
   entry,
   status,
+  playerBoard,
   showSource,
 }: {
   readonly entry: PuzzleEntry;
   readonly status: PuzzleStatus;
+  readonly playerBoard?: readonly (readonly PlayerCellState[])[];
   readonly showSource?: boolean;
 }): React.JSX.Element {
   const { puzzle } = entry;
   return (
     <>
-      <PuzzleThumbnail puzzle={puzzle} solved={status === 'solved'} />
+      <PuzzleThumbnail puzzle={puzzle} status={status} playerBoard={playerBoard} />
       <p className="pap-browser__card-name">{puzzle.name}</p>
       <div className="pap-browser__card-meta">
         <span className="pap-browser__badge pap-browser__badge--size">
@@ -181,9 +191,9 @@ export function PuzzleBrowser({
 
   // ── Precompute status for all entries ────────────────────────────
   const statusMap = useMemo(() => {
-    const map = new Map<string, PuzzleStatus>();
+    const map = new Map<string, StatusInfo>();
     for (const entry of entries) {
-      map.set(entry.entryId, getEntryStatus(entry));
+      map.set(entry.entryId, getEntryStatusInfo(entry));
     }
     return map;
   }, [entries]);
@@ -340,15 +350,20 @@ export function PuzzleBrowser({
       {sorted.length > 0 && (
         <ul className="pap-browser__grid">
           {sorted.map((entry) => {
-            const status = statusMap.get(entry.entryId) ?? 'new';
+            const info = statusMap.get(entry.entryId) ?? { status: 'new' as const };
             return (
-              <li key={entry.entryId} className={cardClass(status)}>
+              <li key={entry.entryId} className={cardClass(info.status)}>
                 <button
                   type="button"
                   className="pap-browser__card-select"
                   onClick={() => onSelectPuzzle(entry.entryId)}
                 >
-                  <CardContent entry={entry} status={status} showSource={viewTab === 'all'} />
+                  <CardContent
+                    entry={entry}
+                    status={info.status}
+                    playerBoard={info.board}
+                    showSource={viewTab === 'all'}
+                  />
                 </button>
                 {entry.source === 'custom' && onDeletePuzzle && (
                   <button
