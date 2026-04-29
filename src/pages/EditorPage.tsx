@@ -47,6 +47,15 @@ export function EditorPage(): React.JSX.Element {
   const validation = useEditorValidation(state, dispatch);
 
   const handleExport = useCallback(async () => {
+    // Auto-validate if not already checked (S15)
+    if (state.validationStatus !== 'valid') {
+      const isValid = await validation.checkSolvability();
+      if (!isValid) {
+        announce('Puzzle failed validation. See errors above.');
+        return;
+      }
+    }
+
     const fields = buildPuzzleFields(state);
     const { rowClues, colClues } = deriveClues(state.grid);
     const puzzle: PuzzleDefinition = { ...fields, rowClues, colClues };
@@ -65,7 +74,7 @@ export function EditorPage(): React.JSX.Element {
     } else {
       announce('Failed to save puzzle. Check validation.');
     }
-  }, [state, announce, navigate]);
+  }, [state, validation, announce, navigate]);
 
   // Navigation guard for unsaved changes
   useEffect(() => {

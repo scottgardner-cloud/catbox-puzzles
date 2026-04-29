@@ -44,7 +44,7 @@ export function EditorToolbar({
     [dispatch, state.rows],
   );
 
-  const canExport = state.validationStatus === 'valid' && state.name.trim().length > 0;
+  const canExport = state.name.trim().length > 0 && !isChecking;
 
   return (
     <div className="pap-editor-toolbar">
@@ -142,14 +142,8 @@ export function EditorToolbar({
       </div>
 
       {/* Save requirements hint */}
-      {!canExport && (
-        <p className="pap-editor-toolbar__hint">
-          {state.name.trim().length === 0 && state.validationStatus !== 'valid'
-            ? 'Enter a name and check solvability to save.'
-            : state.name.trim().length === 0
-              ? 'Enter a puzzle name to save.'
-              : 'Check solvability before saving.'}
-        </p>
+      {state.name.trim().length === 0 && (
+        <p className="pap-editor-toolbar__hint">Enter a puzzle name to save.</p>
       )}
 
       {/* Validation status */}
