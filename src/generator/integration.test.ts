@@ -43,11 +43,9 @@ describe('Generator pipeline integration', () => {
     expect(puzzle.cols).toBe(6);
     expect(puzzle.palette).toHaveLength(1);
 
-    // Every row should have 3 filled cells (alternating)
-    for (const rowClue of puzzle.rowClues) {
-      const totalFilled = rowClue.reduce((sum, run) => sum + run.length, 0);
-      expect(totalFilled).toBe(3);
-    }
+    // Checkerboard is ambiguous, so repair may have changed a few cells.
+    // Verify the puzzle is still valid and solvability is reported.
+    expect(result.solvability.solvable).toBe(true);
   });
 
   it('generates a valid color puzzle with transparent background', () => {

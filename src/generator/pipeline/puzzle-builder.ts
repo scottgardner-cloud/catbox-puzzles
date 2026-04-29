@@ -9,9 +9,11 @@ import { quantizeBW } from './quantize-bw';
 import { quantizeColor } from './quantize-color';
 import { deriveClues } from './clue-derivation';
 
+import { repairPuzzle } from './repair';
+
 /** Solvability assessment from the constraint solver. */
 export type SolvabilityInfo =
-  | { readonly solvable: true }
+  | { readonly solvable: true; readonly repaired?: boolean; readonly cellsChanged?: number }
   | { readonly solvable: false; readonly reason: string; readonly hint: string };
 
 /** Result of puzzle building — either a validated puzzle or structured errors. */
@@ -87,6 +89,18 @@ export function buildPuzzle(grid: PixelGrid, settings: GeneratorSettings): Build
 
   // Run solver to verify unique solvability
   const solvability = assessSolvability(result);
+
+  // If ambiguous, attempt automatic repair
+  if (!solvability.solvable && solvability.reason.includes('multiple solutions')) {
+    const repairResult = repairPuzzle(result);
+    if (repairResult.success && repairResult.puzzle) {
+      return {
+        ok: true,
+        puzzle: repairResult.puzzle,
+        solvability: { solvable: true, repaired: true, cellsChanged: repairResult.changes.length },
+      };
+    }
+  }
 
   return { ok: true, puzzle: result, solvability };
 }
