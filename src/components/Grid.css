@@ -24,7 +24,7 @@
 /* ── Column clues ── */
 .pap-col-clues {
   display: grid;
-  gap: 1px;
+  gap: 0;
   justify-self: end;
 }
 
@@ -42,7 +42,7 @@
 /* ── Column validation row ── */
 .pap-col-validation {
   display: grid;
-  gap: 1px;
+  gap: 0;
   justify-self: end;
 }
 
@@ -210,8 +210,13 @@
 
 .pap-col-run-indicators {
   display: grid;
-  gap: 1px;
+  gap: 0;
   justify-self: end;
+}
+
+/* Reserve space for column run indicators to prevent layout shift */
+.pap-col-run-indicators .pap-run-indicator {
+  min-height: 24px;
 }
 
 /* ── Row/column hover highlighting ── */
