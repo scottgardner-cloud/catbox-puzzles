@@ -36,14 +36,16 @@ export { crossPuzzle as crossDefinition };
  * 10×10 B&W puzzle — a heart shape.
  *
  * Solution (X = filled):
- *   .XX..XX.
- *   XXXXXXXX
- *   XXXXXXXX
- *   XXXXXXXX
- *   .XXXXXX.
- *   ..XXXX..
- *   ...XX...
- *   ....X...    (use 9 rows to fill space)
+ *   ..XX..XX..
+ *   .XXXX.XXXX
+ *   XXXXXXXXXX
+ *   XXXXXXXXXX
+ *   XXXXXXXXXX
+ *   .XXXXXXXX.
+ *   ..XXXXXX..
+ *   ...XXXX...
+ *   ....XX....
+ *   ..........
  */
 // prettier-ignore
 export const heartPuzzle: ValidatedPuzzle = buildSample({
@@ -52,15 +54,15 @@ export const heartPuzzle: ValidatedPuzzle = buildSample({
   kind: 'bw',
   palette: [{ id: B, name: 'Black', value: '#000000' }],
   solution: [
-    [null, B,    B,    null, null, null, B,    B,    null, null],
-    [B,    B,    B,    B,    null, B,    B,    B,    B,    null],
-    [B,    B,    B,    B,    B,    B,    B,    B,    B,    null],
-    [B,    B,    B,    B,    B,    B,    B,    B,    B,    null],
+    [null, null, B,    B,    null, null, B,    B,    null, null],
+    [null, B,    B,    B,    B,    B,    B,    B,    B,    null],
+    [B,    B,    B,    B,    B,    B,    B,    B,    B,    B   ],
+    [B,    B,    B,    B,    B,    B,    B,    B,    B,    B   ],
+    [B,    B,    B,    B,    B,    B,    B,    B,    B,    B   ],
     [null, B,    B,    B,    B,    B,    B,    B,    B,    null],
     [null, null, B,    B,    B,    B,    B,    B,    null, null],
     [null, null, null, B,    B,    B,    B,    null, null, null],
     [null, null, null, null, B,    B,    null, null, null, null],
-    [null, null, null, null, null, B,    null, null, null, null],
     [null, null, null, null, null, null, null, null, null, null],
   ],
 });
