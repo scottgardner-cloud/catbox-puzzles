@@ -91,4 +91,4 @@ export const BW_PALETTE: readonly PaletteColor[] = [
 ];
 
 /** Grid size presets available in the editor. */
-export const GRID_SIZE_PRESETS = [5, 10, 15, 20, 25, 30] as const;
+export const GRID_SIZE_PRESETS = [5, 10, 15, 20, 25, 30, 35] as const;

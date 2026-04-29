@@ -16,7 +16,8 @@ function getCellSize(rows: number, cols: number): number {
   const maxDim = Math.max(rows, cols);
   if (maxDim <= 10) return 30;
   if (maxDim <= 20) return 24;
-  return 20;
+  if (maxDim <= 30) return 20;
+  return 16;
 }
 
 /**

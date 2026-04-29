@@ -1,6 +1,6 @@
 import type { GeneratorFormSettings } from '../hooks/usePuzzleGenerator';
 
-const GRID_SIZES = [10, 15, 20, 25, 30] as const;
+const GRID_SIZES = [10, 15, 20, 25, 30, 35] as const;
 
 export interface SettingsPanelProps {
   readonly settings: GeneratorFormSettings;

@@ -55,8 +55,8 @@ export type BackgroundMode =
 export interface GeneratorSettings {
   readonly name: string;
   readonly kind: 'bw' | 'color';
-  readonly targetRows: number; // 10–30
-  readonly targetCols: number; // 10–30
+  readonly targetRows: number; // 10–35
+  readonly targetCols: number; // 10–35
   /** B&W threshold (0–255). Pixels darker than this → filled. Default: 128. */
   readonly bwThreshold?: number;
   /** Max filled colors for color mode (2–8). Does not count background. Default: 4. */
