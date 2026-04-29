@@ -212,11 +212,9 @@ describe('validatePuzzleUniqueness', () => {
     expect(Array.isArray(result)).toBe(false);
   });
 
-  it('rejects an ambiguous puzzle (cherry 15×15)', () => {
+  it('accepts cherry 15×15 as uniquely solvable (fixed in S5)', () => {
     const result = validatePuzzleUniqueness(cherryPuzzle);
-    expect(Array.isArray(result)).toBe(true);
-    const errors = result as ValidationError[];
-    expect(errors[0].message).toContain('ambiguous');
+    expect(Array.isArray(result)).toBe(false);
   });
 
   it('rejects a puzzle with ambiguous 2×2 checkerboard clues', () => {

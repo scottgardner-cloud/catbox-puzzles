@@ -353,8 +353,7 @@ describe('solveStep', () => {
 });
 
 describe('solvePuzzle — all sample puzzles', () => {
-  // Note: cherry 15×15 is excluded — solver correctly identifies it as ambiguous
-  // (4 cells have two valid placements). The clues don't uniquely determine the solution.
+  // Note: cherry 15×15 was previously ambiguous (S5) — now redesigned to be uniquely solvable.
   const allPuzzles: [string, ValidatedPuzzle][] = [
     // 15×15 B&W
     ['anchor 15×15', anchorPuzzle],
@@ -362,8 +361,9 @@ describe('solvePuzzle — all sample puzzles', () => {
     ['house 15×15', housePuzzle],
     ['skull 15×15', skullPuzzle],
     ['tree 15×15', treePuzzle],
-    // 15×15 color (cherry excluded — ambiguous)
+    // 15×15 color
     ['boat 15×15 color', boatPuzzle],
+    ['cherry 15×15 color', cherryPuzzle],
     ['flower 15×15 color', flowerPuzzle],
     ['mushroom 15×15 color', mushroomPuzzle],
     ['sunset 15×15 color', sunsetPuzzle],
@@ -395,12 +395,9 @@ describe('solvePuzzle — all sample puzzles', () => {
 });
 
 describe('solvePuzzle — ambiguous puzzles', () => {
-  it('correctly identifies cherry 15×15 as ambiguous', () => {
+  it('correctly solves cherry 15×15 (previously ambiguous, fixed in S5)', () => {
     const result = solvePuzzle(cherryPuzzle);
-    expect(result.solved).toBe(false);
-    if (!result.solved) {
-      expect(result.reason).toBe('stuck');
-    }
+    expect(result.solved).toBe(true);
   });
 
   it('rejects 3×4 puzzle with many solutions (regression)', () => {
