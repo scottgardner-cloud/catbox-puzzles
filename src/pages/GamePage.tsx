@@ -69,15 +69,34 @@ function buildExplanation(reasons: readonly (DeductionReason | undefined)[]): st
     counts[r.kind] = (counts[r.kind] ?? 0) + 1;
   }
 
+  const s = (n: number) => (n === 1 ? '' : 's');
   const parts: string[] = [];
-  if (counts['overlap']) parts.push(`${counts['overlap']} by run overlap`);
-  if (counts['single-placement']) parts.push(`${counts['single-placement']} by single placement`);
-  if (counts['intersection']) parts.push(`${counts['intersection']} by elimination`);
-  if (counts['unreachable']) parts.push(`${counts['unreachable']} unreachable`);
-  if (counts['forced-separator']) parts.push(`${counts['forced-separator']} gap between runs`);
-  if (counts['elimination']) parts.push(`${counts['elimination']} empty by elimination`);
+  if (counts['overlap']) {
+    const n = counts['overlap'];
+    parts.push(`${n} cell${s(n)} must be filled — the run is too long to avoid them`);
+  }
+  if (counts['single-placement']) {
+    const n = counts['single-placement'];
+    parts.push(`${n} cell${s(n)} determined — this group can only fit in one spot`);
+  }
+  if (counts['intersection']) {
+    const n = counts['intersection'];
+    parts.push(`${n} cell${s(n)} — only one arrangement works here`);
+  }
+  if (counts['unreachable']) {
+    const n = counts['unreachable'];
+    parts.push(`${n} cell${s(n)} must be empty — no clue can reach them`);
+  }
+  if (counts['forced-separator']) {
+    const n = counts['forced-separator'];
+    parts.push(`${n} cell${s(n)} must be empty — gap required between groups`);
+  }
+  if (counts['elimination']) {
+    const n = counts['elimination'];
+    parts.push(`${n} cell${s(n)} must be empty — can't belong to any group`);
+  }
 
-  return parts.length > 0 ? parts.join(', ') : '';
+  return parts.length > 0 ? parts.join('. ') + '.' : '';
 }
 
 /**

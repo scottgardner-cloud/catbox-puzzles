@@ -237,7 +237,7 @@ describe('GamePage', () => {
 
     // Explanation panel should appear with some text
     const explanation = screen.queryByText(
-      /by run overlap|by single placement|unreachable|gap between runs|by elimination|can be determined/i,
+      /must be filled|can only fit|no clue can reach|gap required|can't belong|one arrangement|can be determined/i,
     );
     expect(explanation).toBeInTheDocument();
   });
