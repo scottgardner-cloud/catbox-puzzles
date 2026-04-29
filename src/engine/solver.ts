@@ -47,7 +47,28 @@ export interface CellDetermination {
   readonly row: number;
   readonly col: number;
   readonly value: ColorId | null;
+  /** Why this cell was determined. Present when explanation is requested. */
+  readonly reason?: DeductionReason;
 }
+
+/** Why a cell was determined during line solving. */
+export type DeductionReason =
+  | { readonly kind: 'unreachable' }
+  | { readonly kind: 'forced-separator' }
+  | { readonly kind: 'elimination' }
+  | {
+      readonly kind: 'overlap';
+      readonly runIndex: number;
+      readonly runLength: number;
+      readonly runColor: ColorId;
+    }
+  | {
+      readonly kind: 'single-placement';
+      readonly runIndex: number;
+      readonly runLength: number;
+      readonly runColor: ColorId;
+    }
+  | { readonly kind: 'intersection' };
 
 /** Result of a single solve step (for hint system). */
 export type SolveStepResult =
@@ -64,23 +85,33 @@ export type SolveStepResult =
 // ---------------------------------------------------------------------------
 
 /**
- * Solve a single line: given its clue and current cell states, determine
- * which unknown cells can be definitively resolved.
- *
- * Uses a DP approach: for each cell position, determine which values
- * (colors or empty) are possible across ALL valid placements of the runs.
- * If a cell has only one possible value in all valid placements, it's determined.
- *
- * @param clue - The line's clue runs.
- * @param cells - Current cell states (length = line length).
- * @param isBW - Whether gaps are required between ALL adjacent runs (B&W mode).
- * @returns Updated cell states with any new determinations, or `null` if contradicted.
+ * Intermediate DP data from line solving.
+ * Exposed for the explanation module — not part of the public API.
  */
-export function solveLine(
+export interface LineDPData {
+  /** Forward DP: fdp[r][p] = can runs[0..r] be placed with run r at position p. */
+  readonly fdp: readonly (readonly boolean[])[];
+  /** Backward DP: bdp[r][p] = can runs[r..end] be placed with run r at position p. */
+  readonly bdp: readonly (readonly boolean[])[];
+  /** Per-cell: can this cell be empty in some valid placement? */
+  readonly canBeEmpty: readonly boolean[];
+  /** Per-cell: which colors can appear here in some valid placement? */
+  readonly canBeColor: readonly ReadonlyMap<string, true>[];
+  /** The determined cell states. */
+  readonly result: readonly SolverCell[];
+}
+
+/**
+ * Core DP computation for a single line. Computes all valid run placements
+ * and derives per-cell possible values.
+ *
+ * @returns Structured DP data including result cells, or `null` on contradiction.
+ */
+export function solveLineCore(
   clue: LineClue,
   cells: readonly SolverCell[],
   isBW: boolean,
-): SolverCell[] | null {
+): LineDPData | null {
   const n = cells.length;
   const runs = clue;
   const numRuns = runs.length;
@@ -94,7 +125,13 @@ export function solveLine(
       }
       result.push(null);
     }
-    return result;
+    return {
+      fdp: [],
+      bdp: [],
+      canBeEmpty: result.map(() => true),
+      canBeColor: result.map(() => new Map()),
+      result,
+    };
   }
 
   // For each cell, track which values are possible across all valid placements.
@@ -397,7 +434,27 @@ export function solveLine(
     }
   }
 
-  return result;
+  return { fdp, bdp, canBeEmpty, canBeColor, result };
+}
+
+/**
+ * Solve a single line: given its clue and current cell states, determine
+ * which unknown cells can be definitively resolved.
+ *
+ * Thin wrapper around solveLineCore — discards DP intermediates.
+ *
+ * @param clue - The line's clue runs.
+ * @param cells - Current cell states (length = line length).
+ * @param isBW - Whether gaps are required between ALL adjacent runs (B&W mode).
+ * @returns Updated cell states with any new determinations, or `null` if contradicted.
+ */
+export function solveLine(
+  clue: LineClue,
+  cells: readonly SolverCell[],
+  isBW: boolean,
+): SolverCell[] | null {
+  const data = solveLineCore(clue, cells, isBW);
+  return data ? [...data.result] : null;
 }
 
 // ---------------------------------------------------------------------------
