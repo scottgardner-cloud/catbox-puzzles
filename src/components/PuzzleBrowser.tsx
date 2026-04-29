@@ -26,6 +26,8 @@ export interface PuzzleBrowserProps {
   readonly onSelectPuzzle: (entryId: string) => void;
   /** Called when the player deletes a custom puzzle. */
   readonly onDeletePuzzle?: (entryId: string) => void;
+  /** Called when the player wants to edit a custom puzzle. */
+  readonly onEditPuzzle?: (entryId: string) => void;
   /** Called when the player wants to import a puzzle. */
   readonly onImportPuzzle?: () => void;
 }
@@ -166,11 +168,13 @@ export function PuzzleBrowser({
   entries,
   onSelectPuzzle,
   onDeletePuzzle,
+  onEditPuzzle,
   onImportPuzzle,
 }: PuzzleBrowserProps): React.JSX.Element {
   // ── Browser state ────────────────────────────────────────────────
   const [viewTab, setViewTab] = useState<ViewTab>('builtin');
   const [searchQuery, setSearchQuery] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [activeTypes, setActiveTypes] = useState<ReadonlySet<string>>(new Set());
   const [activeStatuses, setActiveStatuses] = useState<ReadonlySet<string>>(new Set());
   const [activeSizes, setActiveSizes] = useState<ReadonlySet<string>>(new Set());
@@ -365,16 +369,41 @@ export function PuzzleBrowser({
                     showSource={viewTab === 'all'}
                   />
                 </button>
-                {entry.source === 'custom' && onDeletePuzzle && (
+                {entry.source === 'custom' && onEditPuzzle && (
                   <button
                     type="button"
-                    className="pap-browser__card-delete"
-                    aria-label={`Delete ${entry.puzzle.name}`}
-                    onClick={() => onDeletePuzzle(entry.entryId)}
+                    className="pap-browser__card-edit"
+                    aria-label={`Edit ${entry.puzzle.name}`}
+                    onClick={() => onEditPuzzle(entry.entryId)}
                   >
-                    ×
+                    ✏️
                   </button>
                 )}
+                {entry.source === 'custom' &&
+                  onDeletePuzzle &&
+                  (confirmDeleteId === entry.entryId ? (
+                    <button
+                      type="button"
+                      className="pap-browser__card-delete pap-browser__card-delete--confirm"
+                      aria-label={`Confirm delete ${entry.puzzle.name}`}
+                      onClick={() => {
+                        onDeletePuzzle(entry.entryId);
+                        setConfirmDeleteId(null);
+                      }}
+                      onBlur={() => setConfirmDeleteId(null)}
+                    >
+                      Delete?
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="pap-browser__card-delete"
+                      aria-label={`Delete ${entry.puzzle.name}`}
+                      onClick={() => setConfirmDeleteId(entry.entryId)}
+                    >
+                      ×
+                    </button>
+                  ))}
               </li>
             );
           })}

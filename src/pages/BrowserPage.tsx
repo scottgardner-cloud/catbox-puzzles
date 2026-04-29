@@ -29,6 +29,13 @@ export function BrowserPage(): React.JSX.Element {
     setEntries(getAllEntries());
   }, []);
 
+  const handleEditPuzzle = useCallback(
+    (entryId: string) => {
+      navigate(`/editor/${encodeURIComponent(entryId)}`);
+    },
+    [navigate],
+  );
+
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
@@ -44,6 +51,7 @@ export function BrowserPage(): React.JSX.Element {
         entries={entries}
         onSelectPuzzle={handleSelectPuzzle}
         onDeletePuzzle={handleDeletePuzzle}
+        onEditPuzzle={handleEditPuzzle}
         onImportPuzzle={() => setShowImport(true)}
       />
       {showImport && <ImportPuzzle onImport={handleImport} onClose={() => setShowImport(false)} />}

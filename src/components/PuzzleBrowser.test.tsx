@@ -91,6 +91,34 @@ describe('PuzzleBrowser', () => {
     expect(deleteBtn).toBeInTheDocument();
   });
 
+  it('delete requires confirmation click', async () => {
+    const entries = getEntries();
+    const customEntries: PuzzleEntry[] = [
+      ...entries,
+      {
+        puzzle: entries[0].puzzle,
+        source: 'custom',
+        entryId: 'custom:test-id',
+        createdAt: new Date().toISOString(),
+      },
+    ];
+    const onDelete = vi.fn();
+    render(
+      <PuzzleBrowser entries={customEntries} onSelectPuzzle={vi.fn()} onDeletePuzzle={onDelete} />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'My Puzzles' }));
+
+    // First click shows confirmation
+    const deleteBtn = screen.getByRole('button', { name: /delete/i });
+    await userEvent.click(deleteBtn);
+    expect(onDelete).not.toHaveBeenCalled();
+    expect(screen.getByText('Delete?')).toBeInTheDocument();
+
+    // Second click confirms
+    await userEvent.click(screen.getByText('Delete?'));
+    expect(onDelete).toHaveBeenCalledWith('custom:test-id');
+  });
+
   it('search filters puzzles by name', async () => {
     const entries = getEntries();
     render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
