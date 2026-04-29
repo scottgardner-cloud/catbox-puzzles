@@ -9,3 +9,5 @@ export { PaletteBar } from './PaletteBar';
 export type { PaletteBarProps } from './PaletteBar';
 export { PuzzleBrowser } from './PuzzleBrowser';
 export type { PuzzleBrowserProps } from './PuzzleBrowser';
+export { PuzzleThumbnail } from './PuzzleThumbnail';
+export type { PuzzleThumbnailProps } from './PuzzleThumbnail';

@@ -142,4 +142,26 @@ describe('PuzzleBrowser', () => {
     await userEvent.type(search, 'zzz-nonexistent-puzzle-zzz');
     expect(screen.getByText('No puzzles match your filters.')).toBeInTheDocument();
   });
+
+  it('renders thumbnail canvas for each puzzle card', () => {
+    const entries = getEntries();
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
+    const thumbnails = screen.getAllByRole('img', { name: /preview/i });
+    expect(thumbnails.length).toBeGreaterThan(0);
+    // Verify canvas attributes
+    const canvas = thumbnails[0] as HTMLCanvasElement;
+    expect(canvas.tagName.toLowerCase()).toBe('canvas');
+    expect(canvas.width).toBeGreaterThan(0);
+    expect(canvas.height).toBeGreaterThan(0);
+  });
+
+  it('thumbnail has accessible label with puzzle name', () => {
+    const entries = getEntries();
+    render(<PuzzleBrowser entries={entries} onSelectPuzzle={vi.fn()} />);
+    const firstBuiltin = entries.find((e) => e.source === 'builtin')!;
+    const thumbnail = screen.getByRole('img', {
+      name: `${firstBuiltin.puzzle.name} preview`,
+    });
+    expect(thumbnail).toBeInTheDocument();
+  });
 });

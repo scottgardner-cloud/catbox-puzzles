@@ -172,13 +172,14 @@
 .pap-browser__card-select {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 8px;
   padding: 16px;
   border: none;
   border-radius: 10px;
   background: transparent;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
   width: 100%;
 }
 
@@ -276,4 +277,12 @@
 
 .pap-browser__status--solved {
   color: #2e7d32;
+}
+
+/* Thumbnail */
+.pap-browser__thumbnail {
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }

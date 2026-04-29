@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { loadGame, restoreGameState } from '../state/persistence';
 import { isSolved } from '../engine';
 import type { PuzzleEntry } from '../puzzles/types';
+import { PuzzleThumbnail } from './PuzzleThumbnail';
 import './PuzzleBrowser.css';
 
 /** Progress status for a puzzle. */
@@ -113,6 +114,7 @@ function CardContent({
   const { puzzle } = entry;
   return (
     <>
+      <PuzzleThumbnail puzzle={puzzle} solved={status === 'solved'} />
       <p className="pap-browser__card-name">{puzzle.name}</p>
       <div className="pap-browser__card-meta">
         <span className="pap-browser__badge pap-browser__badge--size">
