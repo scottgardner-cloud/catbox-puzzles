@@ -127,3 +127,21 @@
 .pap-editor-grid__cell--divider-bottom {
   border-bottom: 2px solid #999;
 }
+
+/* Proposed repair highlight — pulsing border */
+.pap-editor-grid__cell--repair {
+  outline: 3px solid #ff9800;
+  outline-offset: -3px;
+  z-index: 3;
+  position: relative;
+  animation: pap-repair-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes pap-repair-pulse {
+  from {
+    outline-color: #ff9800;
+  }
+  to {
+    outline-color: #ffcc02;
+  }
+}

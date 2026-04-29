@@ -44,7 +44,7 @@ export interface RepairOptions {
  * Modifies the pixel art minimally, re-derives clues, and re-validates.
  */
 export function repairPuzzle(puzzle: ValidatedPuzzle, options?: RepairOptions): RepairResult {
-  const maxIterations = options?.maxIterations ?? 50;
+  const maxIterations = options?.maxIterations ?? 100;
 
   // Step 1: Confirm ambiguity and get the stuck board
   const initial = solvePuzzle(puzzle, { maxNodes: 10_000 });
@@ -126,40 +126,66 @@ export function repairPuzzle(puzzle: ValidatedPuzzle, options?: RepairOptions): 
 
 // ── Internal helpers ─────────────────────────────────────────────────
 
-/** Rank candidate cells for repair. Unknowns first, then border cells of unknown regions. */
+/**
+ * Rank candidate cells for repair.
+ * Includes: unknowns (border first), plus empty cells adjacent to filled cells.
+ * The second group helps sparse puzzles by adding constraints.
+ */
 function rankCandidates(
   board: SolverBoard,
   puzzle: ValidatedPuzzle,
 ): { row: number; col: number }[] {
   const rows = puzzle.rows;
   const cols = puzzle.cols;
-  const unknowns: { row: number; col: number; score: number }[] = [];
+  const seen = new Set<string>();
+  const candidates: { row: number; col: number; score: number }[] = [];
 
+  const dirs = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ] as const;
+
+  // Phase 1: Unknown cells from solver (border cells scored higher)
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (board[r][c] !== 'unknown') continue;
-
-      // Score: prefer cells adjacent to known cells (border of ambiguous region)
       let knownNeighbors = 0;
-      for (const [dr, dc] of [
-        [-1, 0],
-        [1, 0],
-        [0, -1],
-        [0, 1],
-      ] as const) {
+      for (const [dr, dc] of dirs) {
         const nr = r + dr;
         const nc = c + dc;
         if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && board[nr][nc] !== 'unknown') {
           knownNeighbors++;
         }
       }
-      unknowns.push({ row: r, col: c, score: knownNeighbors });
+      // Score 100+ for unknowns so they sort before expansion candidates
+      candidates.push({ row: r, col: c, score: 100 + knownNeighbors });
+      seen.add(`${r},${c}`);
     }
   }
 
-  // Sort by score descending: border cells first (more constrained, more likely to help)
-  unknowns.sort((a, b) => b.score - a.score);
-  return unknowns.map(({ row, col }) => ({ row, col }));
+  // Phase 2: Empty cells adjacent to filled cells (adds constraints to sparse puzzles)
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (puzzle.solution[r][c] !== null || seen.has(`${r},${c}`)) continue;
+      let filledNeighbors = 0;
+      for (const [dr, dc] of dirs) {
+        const nr = r + dr;
+        const nc = c + dc;
+        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && puzzle.solution[nr][nc] !== null) {
+          filledNeighbors++;
+        }
+      }
+      if (filledNeighbors > 0) {
+        candidates.push({ row: r, col: c, score: filledNeighbors });
+        seen.add(`${r},${c}`);
+      }
+    }
+  }
+
+  candidates.sort((a, b) => b.score - a.score);
+  return candidates.map(({ row, col }) => ({ row, col }));
 }
 
 /** Try applying edits to the puzzle. Returns the validated result if uniquely solvable, else null. */

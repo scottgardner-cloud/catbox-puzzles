@@ -30,6 +30,7 @@ export function createInitialState(kind: 'bw' | 'color', rows: number, cols: num
     isDirty: false,
     validationStatus: 'unchecked',
     validationErrors: [],
+    proposedRepair: null,
   };
 }
 
@@ -37,8 +38,8 @@ export function createInitialState(kind: 'bw' | 'color', rows: number, cols: num
 
 /** Invalidate validation state — called on any content-changing action. */
 function invalidateValidation(state: EditorState): EditorState {
-  if (state.validationStatus === 'unchecked') return state;
-  return { ...state, validationStatus: 'unchecked', validationErrors: [] };
+  if (state.validationStatus === 'unchecked' && state.proposedRepair === null) return state;
+  return { ...state, validationStatus: 'unchecked', validationErrors: [], proposedRepair: null };
 }
 
 /** Mark state as dirty and invalidate validation. */
@@ -151,6 +152,27 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case 'VALIDATION_FAILURE':
       return { ...state, validationStatus: 'invalid', validationErrors: action.errors };
 
+    case 'PROPOSE_REPAIR':
+      return { ...state, proposedRepair: action.changes };
+
+    case 'ACCEPT_REPAIR': {
+      if (!state.proposedRepair) return state;
+      const newGrid = state.grid.map((r) => [...r]);
+      for (const change of state.proposedRepair) {
+        newGrid[change.row][change.col] = change.to;
+      }
+      return markDirty({
+        ...state,
+        grid: newGrid,
+        proposedRepair: null,
+        validationStatus: 'valid',
+        validationErrors: [],
+      });
+    }
+
+    case 'REJECT_REPAIR':
+      return { ...state, proposedRepair: null };
+
     case 'LOAD_PUZZLE':
       return action.state;
 
@@ -225,5 +247,6 @@ export function stateFromPuzzle(
     isDirty: false,
     validationStatus: 'unchecked',
     validationErrors: [],
+    proposedRepair: null,
   };
 }

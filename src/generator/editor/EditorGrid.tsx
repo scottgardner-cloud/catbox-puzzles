@@ -238,18 +238,22 @@ export function EditorGrid({
           {state.grid.map((row, r) =>
             row.map((cell, c) => {
               const isFocused = state.focusedCell?.row === r && state.focusedCell?.col === c;
-              const colorValue = getCellColor(cell);
+              const repairChange = state.proposedRepair?.find((ch) => ch.row === r && ch.col === c);
+              // Show proposed value if repair is pending, otherwise current cell
+              const displayCell = repairChange ? repairChange.to : cell;
+              const colorValue = getCellColor(displayCell);
               const showDividerRight = (c + 1) % 5 === 0 && c < state.cols - 1;
               const showDividerBottom = (r + 1) % 5 === 0 && r < state.rows - 1;
               return (
                 <div
                   key={`${r}-${c}`}
                   role="gridcell"
-                  aria-label={`Row ${r + 1}, Column ${c + 1}${cell ? `, filled ${state.palette.find((p) => p.id === cell)?.name ?? ''}` : ', empty'}`}
+                  aria-label={`Row ${r + 1}, Column ${c + 1}${displayCell ? `, filled ${state.palette.find((p) => p.id === displayCell)?.name ?? ''}` : ', empty'}${repairChange ? ' (proposed repair)' : ''}`}
                   className={[
                     'pap-editor-grid__cell',
-                    cell ? 'pap-editor-grid__cell--filled' : '',
+                    displayCell ? 'pap-editor-grid__cell--filled' : '',
                     isFocused ? 'pap-editor-grid__cell--focused' : '',
+                    repairChange ? 'pap-editor-grid__cell--repair' : '',
                     showDividerRight ? 'pap-editor-grid__cell--divider-right' : '',
                     showDividerBottom ? 'pap-editor-grid__cell--divider-bottom' : '',
                   ]

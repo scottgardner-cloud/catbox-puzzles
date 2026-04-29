@@ -41,6 +41,16 @@ export interface EditorState {
   readonly validationStatus: ValidationStatus;
   /** Validation error messages (populated when status is 'invalid'). */
   readonly validationErrors: readonly string[];
+  /** Proposed repair changes awaiting user confirmation (null if none). */
+  readonly proposedRepair: readonly RepairChange[] | null;
+}
+
+/** A single cell change proposed by the repair algorithm. */
+export interface RepairChange {
+  readonly row: number;
+  readonly col: number;
+  readonly from: ColorId | null;
+  readonly to: ColorId | null;
 }
 
 // ── Actions ──────────────────────────────────────────────────────────
@@ -61,6 +71,9 @@ export type EditorAction =
   | { type: 'VALIDATION_START' }
   | { type: 'VALIDATION_SUCCESS' }
   | { type: 'VALIDATION_FAILURE'; errors: string[] }
+  | { type: 'PROPOSE_REPAIR'; changes: RepairChange[] }
+  | { type: 'ACCEPT_REPAIR' }
+  | { type: 'REJECT_REPAIR' }
   | { type: 'LOAD_PUZZLE'; state: EditorState }
   | { type: 'MARK_SAVED' };
 

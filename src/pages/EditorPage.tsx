@@ -103,6 +103,7 @@ export function EditorPage(): React.JSX.Element {
             state={state}
             dispatch={dispatch}
             onCheckSolvability={validation.checkSolvability}
+            onAttemptRepair={validation.attemptRepair}
             onExport={handleExport}
             isChecking={validation.isChecking}
           />

@@ -6,6 +6,7 @@ interface EditorToolbarProps {
   readonly state: EditorState;
   readonly dispatch: React.Dispatch<EditorAction>;
   readonly onCheckSolvability: () => Promise<void>;
+  readonly onAttemptRepair: () => Promise<void>;
   readonly onExport: () => void;
   readonly isChecking: boolean;
 }
@@ -18,6 +19,7 @@ export function EditorToolbar({
   state,
   dispatch,
   onCheckSolvability,
+  onAttemptRepair,
   onExport,
   isChecking,
 }: EditorToolbarProps): React.JSX.Element {
@@ -160,6 +162,47 @@ export function EditorToolbar({
               <li key={i}>{err}</li>
             ))}
           </ul>
+          <button
+            type="button"
+            className="pap-btn pap-btn--primary"
+            onClick={onAttemptRepair}
+            disabled={isChecking}
+            style={{ marginTop: 8 }}
+          >
+            🔧 Fix Solvability
+          </button>
+        </div>
+      )}
+
+      {/* Proposed repair confirmation */}
+      {state.proposedRepair && (
+        <div
+          className="pap-editor-toolbar__status pap-editor-toolbar__status--repair"
+          role="status"
+        >
+          <p>
+            🔧 Repair found: {state.proposedRepair.length} cell
+            {state.proposedRepair.length !== 1 ? 's' : ''} would change.
+          </p>
+          <p className="pap-editor-toolbar__repair-hint">
+            Changed cells are highlighted on the grid.
+          </p>
+          <div className="pap-editor-toolbar__actions">
+            <button
+              type="button"
+              className="pap-btn pap-btn--primary"
+              onClick={() => dispatch({ type: 'ACCEPT_REPAIR' })}
+            >
+              ✓ Apply Changes
+            </button>
+            <button
+              type="button"
+              className="pap-btn"
+              onClick={() => dispatch({ type: 'REJECT_REPAIR' })}
+            >
+              ✗ Cancel
+            </button>
+          </div>
         </div>
       )}
     </div>

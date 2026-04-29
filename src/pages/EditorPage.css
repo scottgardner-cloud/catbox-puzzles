@@ -162,6 +162,24 @@
   font-size: 12px;
 }
 
+.pap-editor-toolbar__status--repair {
+  background: #fff8e1;
+  border: 1px solid #ff9800;
+  color: #333;
+}
+
+.pap-editor-toolbar__status--repair p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.pap-editor-toolbar__repair-hint {
+  font-size: 12px;
+  font-weight: 400 !important;
+  color: #666;
+  margin-top: 4px !important;
+}
+
 /* ── Palette ─────────────────────────────────────── */
 
 .pap-editor-palette {
