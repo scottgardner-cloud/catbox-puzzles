@@ -34,5 +34,5 @@ export type {
   HintResult,
 } from './solver';
 
-export { solveLineWithReasons } from './solver-explanations';
+export { solveLineWithReasons, getHintWithExplanations } from './solver-explanations';
 export type { LineWithReasons } from './solver-explanations';

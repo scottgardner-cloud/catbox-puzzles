@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { solveLineWithReasons, type LineWithReasons } from './solver-explanations';
-import { getHint } from './solver';
+import {
+  solveLineWithReasons,
+  getHintWithExplanations,
+  type LineWithReasons,
+} from './solver-explanations';
 import type { ClueRun, ColorId, PlayerCellState } from '../types';
 import { colorId } from '../types';
 import { crossPuzzle } from '../puzzles/samples';
@@ -135,13 +138,13 @@ describe('solveLineWithReasons', () => {
   });
 });
 
-describe('getHint with explanations', () => {
+describe('getHintWithExplanations', () => {
   it('returns reasons on hint cells for cross puzzle', () => {
     const puzzle = crossPuzzle;
     const emptyBoard: PlayerCellState[][] = Array.from({ length: puzzle.rows }, () =>
       Array.from({ length: puzzle.cols }, () => ({ kind: 'unknown' as const })),
     );
-    const result = getHint(puzzle, emptyBoard);
+    const result = getHintWithExplanations(puzzle, emptyBoard);
     expect(result.kind).toBe('hint');
     if (result.kind === 'hint') {
       // Every cell should have a reason

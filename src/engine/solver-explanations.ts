@@ -7,9 +7,15 @@
  * @module
  */
 
-import type { LineClue, ColorId } from '../types';
-import type { SolverCell, LineDPData, DeductionReason } from './solver';
-import { solveLineCore } from './solver';
+import type { LineClue, ColorId, ValidatedPuzzle, PlayerCellState } from '../types';
+import type {
+  SolverCell,
+  LineDPData,
+  DeductionReason,
+  CellDetermination,
+  HintResult,
+} from './solver';
+import { solveLineCore, solveStep, playerBoardToSolverBoard } from './solver';
 
 /** Result of solving a line with deduction reasons. */
 export interface LineWithReasons {
@@ -211,4 +217,68 @@ function classifyFilled(
 
   // Multiple runs or partial coverage — general intersection
   return { kind: 'intersection' };
+}
+
+// ---------------------------------------------------------------------------
+// Two-pass hint with explanations
+// ---------------------------------------------------------------------------
+
+/**
+ * Get a hint with deduction explanations.
+ *
+ * Two-pass approach:
+ * 1. `solveStep()` finds the first line with deducible progress (cheap).
+ * 2. `solveLineWithReasons()` runs only on that target line to classify reasons.
+ */
+export function getHintWithExplanations(
+  puzzle: ValidatedPuzzle,
+  board: readonly (readonly PlayerCellState[])[],
+): HintResult {
+  const solverBoard = playerBoardToSolverBoard(board);
+  const step = solveStep(puzzle, solverBoard);
+
+  if (step.progress) {
+    const isBW = puzzle.kind === 'bw';
+    let lineCells: readonly SolverCell[];
+    let lineClue: LineClue;
+
+    if (step.line === 'row') {
+      lineCells = solverBoard[step.index];
+      lineClue = puzzle.rowClues[step.index];
+    } else {
+      // Extract column
+      lineCells = solverBoard.map((row) => row[step.index]);
+      lineClue = puzzle.colClues[step.index];
+    }
+
+    const detailed = solveLineWithReasons(lineClue, lineCells, isBW);
+
+    if (detailed) {
+      const cellsWithReasons: CellDetermination[] = step.cells.map((cell) => {
+        const linePos = step.line === 'row' ? cell.col : cell.row;
+        return { ...cell, reason: detailed.reasons[linePos] };
+      });
+
+      return {
+        kind: 'hint',
+        line: step.line,
+        index: step.index,
+        cells: cellsWithReasons,
+      };
+    }
+
+    // Fallback without reasons
+    return {
+      kind: 'hint',
+      line: step.line,
+      index: step.index,
+      cells: step.cells,
+    };
+  }
+
+  if (step.reason === 'contradiction') {
+    return { kind: 'error' };
+  }
+
+  return { kind: 'no-hint' };
 }

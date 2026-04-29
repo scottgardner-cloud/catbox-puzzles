@@ -10,7 +10,7 @@ import {
   resetBoard,
   checkErrors,
   isSolved,
-  getHint,
+  getHintWithExplanations,
 } from '../engine';
 import type { HintResult, DeductionReason } from '../engine';
 import { getEntryById } from '../puzzles/registry';
@@ -81,7 +81,7 @@ function buildExplanation(reasons: readonly (DeductionReason | undefined)[]): st
   }
   if (counts['intersection']) {
     const n = counts['intersection'];
-    parts.push(`${n} cell${s(n)} — only one arrangement works here`);
+    parts.push(`${n} cell${s(n)} — multiple clues agree on this`);
   }
   if (counts['unreachable']) {
     const n = counts['unreachable'];
@@ -354,7 +354,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
 
   const handleHint = useCallback(() => {
     if (solved) return;
-    const result: HintResult = getHint(puzzle, gameState.board);
+    const result: HintResult = getHintWithExplanations(puzzle, gameState.board);
     switch (result.kind) {
       case 'hint': {
         const keys = new Set(result.cells.map((c) => `${c.row},${c.col}`));
