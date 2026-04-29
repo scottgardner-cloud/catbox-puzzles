@@ -100,6 +100,48 @@ function buildExplanation(reasons: readonly (DeductionReason | undefined)[]): st
 }
 
 /**
+ * Interpolate cells between last drag position and current position.
+ * Uses Bresenham's line algorithm to fill gaps from fast mouse movement.
+ * Returns cells to process (excludes the `from` cell, includes `to`).
+ */
+function interpolateCells(
+  from: { row: number; col: number } | null,
+  toRow: number,
+  toCol: number,
+): [number, number][] {
+  if (!from || (from.row === toRow && from.col === toCol)) {
+    return [[toRow, toCol]];
+  }
+
+  const cells: [number, number][] = [];
+  let r0 = from.row;
+  let c0 = from.col;
+  const r1 = toRow;
+  const c1 = toCol;
+  const dr = Math.abs(r1 - r0);
+  const dc = Math.abs(c1 - c0);
+  const sr = r0 < r1 ? 1 : -1;
+  const sc = c0 < c1 ? 1 : -1;
+  let err = dr - dc;
+
+  // Skip the starting cell (already processed on previous enter)
+  while (r0 !== r1 || c0 !== c1) {
+    const e2 = 2 * err;
+    if (e2 > -dc) {
+      err -= dc;
+      r0 += sr;
+    }
+    if (e2 < dr) {
+      err += dr;
+      c0 += sc;
+    }
+    cells.push([r0, c0]);
+  }
+
+  return cells;
+}
+
+/**
  * Game page component. Receives a resolved, valid puzzle entry.
  * Manages game state, drag interaction, keyboard shortcuts, and auto-save.
  */
@@ -216,6 +258,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
   const isDragging = useRef(false);
   const dragTarget = useRef<PlayerCellState['kind'] | null>(null);
   const dragChanges = useRef<CellChange[]>([]);
+  const lastDragCell = useRef<{ row: number; col: number } | null>(null);
 
   const handleCellClick = useCallback(
     (row: number, col: number) => {
@@ -244,6 +287,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
           break;
       }
       dragChanges.current = [];
+      lastDragCell.current = { row, col };
     },
     [gameState, solved, ensureTimerRunning],
   );
@@ -252,32 +296,37 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
     (row: number, col: number) => {
       if (!isDragging.current || solved || !dragTarget.current) return;
 
-      const current = gameState.board[row][col];
-      let next: PlayerCellState;
-      switch (dragTarget.current) {
-        case 'filled':
-          next = { kind: 'filled', colorId: gameState.selectedColorId };
-          break;
-        case 'empty':
-          next = { kind: 'empty' };
-          break;
-        case 'unknown':
-          next = { kind: 'unknown' };
-          break;
+      // Interpolate from last drag cell to fill any skipped cells
+      const cells = interpolateCells(lastDragCell.current, row, col);
+      lastDragCell.current = { row, col };
+
+      for (const [cr, cc] of cells) {
+        const current = gameState.board[cr][cc];
+        let next: PlayerCellState;
+        switch (dragTarget.current) {
+          case 'filled':
+            next = { kind: 'filled', colorId: gameState.selectedColorId };
+            break;
+          case 'empty':
+            next = { kind: 'empty' };
+            break;
+          case 'unknown':
+            next = { kind: 'unknown' };
+            break;
+        }
+
+        if (current.kind === next.kind) continue;
+
+        const change: CellChange = { row: cr, col: cc, prev: current, next };
+        dragChanges.current.push(change);
+
+        setGameState((s) => {
+          const newBoard = s.board.map((r, ri) =>
+            ri === cr ? r.map((c, ci) => (ci === cc ? next : c)) : r,
+          );
+          return { ...s, board: newBoard, isValidationActive: false };
+        });
       }
-
-      if (current.kind === next.kind) return;
-
-      const change: CellChange = { row, col, prev: current, next };
-      dragChanges.current.push(change);
-
-      // Drag-enter applies visual board update without undo stack (not dirty yet)
-      setGameState((s) => {
-        const newBoard = s.board.map((r, ri) =>
-          ri === row ? r.map((c, ci) => (ci === col ? next : c)) : r,
-        );
-        return { ...s, board: newBoard, isValidationActive: false };
-      });
     },
     [gameState, solved],
   );
@@ -290,6 +339,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
     isDragging.current = false;
     dragTarget.current = null;
     dragChanges.current = [];
+    lastDragCell.current = null;
   }, [puzzle, updateGameState]);
 
   const handleUndo = useCallback(
