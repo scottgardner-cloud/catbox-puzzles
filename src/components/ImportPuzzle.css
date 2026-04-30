@@ -1,4 +1,4 @@
-.pap-import__backdrop {
+.cb-import__backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.4);
@@ -6,10 +6,10 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: pap-fade-in 0.15s ease-out;
+  animation: cb-fade-in 0.15s ease-out;
 }
 
-.pap-import__modal {
+.cb-import__modal {
   background: #fff;
   border-radius: 12px;
   padding: 24px;
@@ -18,23 +18,23 @@
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  animation: pap-scale-in 0.15s ease-out;
+  animation: cb-scale-in 0.15s ease-out;
 }
 
-.pap-import__header {
+.cb-import__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
 }
 
-.pap-import__header h3 {
+.cb-import__header h3 {
   margin: 0;
   font-size: 18px;
   color: #333;
 }
 
-.pap-import__close {
+.cb-import__close {
   background: none;
   border: none;
   font-size: 24px;
@@ -44,24 +44,24 @@
   line-height: 1;
 }
 
-.pap-import__close:hover {
+.cb-import__close:hover {
   color: #333;
 }
 
-.pap-import__description {
+.cb-import__description {
   font-size: 14px;
   color: #666;
   margin: 0 0 12px;
 }
 
-.pap-import__description code {
+.cb-import__description code {
   background: #f5f5f5;
   padding: 1px 4px;
   border-radius: 3px;
   font-size: 13px;
 }
 
-.pap-import__textarea {
+.cb-import__textarea {
   width: 100%;
   font-family: monospace;
   font-size: 13px;
@@ -72,13 +72,13 @@
   min-height: 120px;
 }
 
-.pap-import__textarea:focus {
+.cb-import__textarea:focus {
   outline: 2px solid #7c4dff;
   outline-offset: -1px;
   border-color: #7c4dff;
 }
 
-.pap-import__error {
+.cb-import__error {
   color: #c62828;
   font-size: 13px;
   margin: 8px 0 0;
@@ -87,24 +87,24 @@
   border-radius: 6px;
 }
 
-.pap-import__actions {
+.cb-import__actions {
   display: flex;
   gap: 8px;
   margin-top: 16px;
 }
 
-.pap-import__submit {
+.cb-import__submit {
   background: #1976d2;
   color: #fff;
   border-color: #1976d2;
 }
 
-.pap-import__submit:hover:not(:disabled) {
+.cb-import__submit:hover:not(:disabled) {
   background: #1565c0;
   border-color: #1565c0;
 }
 
-.pap-import__upload {
+.cb-import__upload {
   cursor: pointer;
   display: inline-flex;
   align-items: center;

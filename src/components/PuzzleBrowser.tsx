@@ -127,25 +127,25 @@ function CardContent({
   return (
     <>
       <PuzzleThumbnail puzzle={puzzle} status={status} playerBoard={playerBoard} />
-      <p className="pap-browser__card-name">{puzzle.name}</p>
-      <div className="pap-browser__card-meta">
-        <span className="pap-browser__badge pap-browser__badge--size">
+      <p className="cb-browser__card-name">{puzzle.name}</p>
+      <div className="cb-browser__card-meta">
+        <span className="cb-browser__badge cb-browser__badge--size">
           {puzzle.rows}×{puzzle.cols}
         </span>
         <span
-          className={`pap-browser__badge ${
-            puzzle.kind === 'bw' ? 'pap-browser__badge--bw' : 'pap-browser__badge--color'
+          className={`cb-browser__badge ${
+            puzzle.kind === 'bw' ? 'cb-browser__badge--bw' : 'cb-browser__badge--color'
           }`}
         >
           {puzzle.kind === 'bw' ? 'B&W' : 'Color'}
         </span>
         {showSource && (
-          <span className="pap-browser__badge pap-browser__badge--source">
+          <span className="cb-browser__badge cb-browser__badge--source">
             {entry.source === 'builtin' ? 'Built-in' : 'Custom'}
           </span>
         )}
       </div>
-      <span className={`pap-browser__status pap-browser__status--${status}`}>
+      <span className={`cb-browser__status cb-browser__status--${status}`}>
         {status === 'new' && 'New'}
         {status === 'in-progress' && 'In Progress'}
         {status === 'solved' && 'Solved ✓'}
@@ -238,9 +238,9 @@ export function PuzzleBrowser({
 
   function cardClass(status: PuzzleStatus): string {
     return [
-      'pap-browser__card',
-      status === 'in-progress' && 'pap-browser__card--in-progress',
-      status === 'solved' && 'pap-browser__card--solved',
+      'cb-browser__card',
+      status === 'in-progress' && 'cb-browser__card--in-progress',
+      status === 'solved' && 'cb-browser__card--solved',
     ]
       .filter(Boolean)
       .join(' ');
@@ -251,14 +251,14 @@ export function PuzzleBrowser({
   const isFilteredEmpty = !isCustomTabEmpty && sorted.length === 0;
 
   return (
-    <div className="pap-browser">
+    <div className="cb-browser">
       {/* Tab bar */}
-      <div className="pap-browser__tabs" role="group" aria-label="Puzzle collection">
+      <div className="cb-browser__tabs" role="group" aria-label="Puzzle collection">
         {(['builtin', 'custom', 'all'] as const).map((tab) => (
           <button
             key={tab}
             type="button"
-            className={`pap-browser__tab${viewTab === tab ? ' pap-browser__tab--active' : ''}`}
+            className={`cb-browser__tab${viewTab === tab ? ' cb-browser__tab--active' : ''}`}
             onClick={() => setViewTab(tab)}
             aria-pressed={viewTab === tab}
           >
@@ -270,17 +270,17 @@ export function PuzzleBrowser({
       </div>
 
       {/* Toolbar: search + sort */}
-      <div className="pap-browser__toolbar">
+      <div className="cb-browser__toolbar">
         <input
           type="search"
-          className="pap-browser__search"
+          className="cb-browser__search"
           placeholder="Search puzzles…"
           aria-label="Search puzzles by name"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <select
-          className="pap-browser__sort"
+          className="cb-browser__sort"
           aria-label="Sort puzzles"
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortBy)}
@@ -292,36 +292,36 @@ export function PuzzleBrowser({
       </div>
 
       {/* Filter chips */}
-      <div className="pap-browser__chips">
+      <div className="cb-browser__chips">
         {(['bw', 'color'] as const).map((kind) => (
           <button
             key={kind}
             type="button"
-            className={`pap-browser__chip${activeTypes.has(kind) ? ' pap-browser__chip--active' : ''}`}
+            className={`cb-browser__chip${activeTypes.has(kind) ? ' cb-browser__chip--active' : ''}`}
             aria-pressed={activeTypes.has(kind)}
             onClick={() => setActiveTypes(toggleSetItem(activeTypes, kind))}
           >
             {kind === 'bw' ? 'B&W' : 'Color'}
           </button>
         ))}
-        <span className="pap-browser__chip-sep" aria-hidden="true" />
+        <span className="cb-browser__chip-sep" aria-hidden="true" />
         {availableSizes.map((size) => (
           <button
             key={size}
             type="button"
-            className={`pap-browser__chip${activeSizes.has(size) ? ' pap-browser__chip--active' : ''}`}
+            className={`cb-browser__chip${activeSizes.has(size) ? ' cb-browser__chip--active' : ''}`}
             aria-pressed={activeSizes.has(size)}
             onClick={() => setActiveSizes(toggleSetItem(activeSizes, size))}
           >
             {size}
           </button>
         ))}
-        <span className="pap-browser__chip-sep" aria-hidden="true" />
+        <span className="cb-browser__chip-sep" aria-hidden="true" />
         {(['new', 'in-progress', 'solved'] as const).map((status) => (
           <button
             key={status}
             type="button"
-            className={`pap-browser__chip${activeStatuses.has(status) ? ' pap-browser__chip--active' : ''}`}
+            className={`cb-browser__chip${activeStatuses.has(status) ? ' cb-browser__chip--active' : ''}`}
             aria-pressed={activeStatuses.has(status)}
             onClick={() => setActiveStatuses(toggleSetItem(activeStatuses, status))}
           >
@@ -333,33 +333,33 @@ export function PuzzleBrowser({
       </div>
 
       {/* Result count */}
-      <p className="pap-browser__count">
+      <p className="cb-browser__count">
         Showing {sorted.length} of {tabEntries.length} puzzles
       </p>
 
       {/* Import button (custom tab or all tab) */}
       {onImportPuzzle && (viewTab === 'custom' || viewTab === 'all') && (
-        <button type="button" className="pap-btn pap-browser__import-btn" onClick={onImportPuzzle}>
+        <button type="button" className="cb-btn cb-browser__import-btn" onClick={onImportPuzzle}>
           + Import
         </button>
       )}
 
       {/* Empty states */}
       {isCustomTabEmpty && (
-        <p className="pap-browser__empty">No custom puzzles yet. Import or create one!</p>
+        <p className="cb-browser__empty">No custom puzzles yet. Import or create one!</p>
       )}
-      {isFilteredEmpty && <p className="pap-browser__empty">No puzzles match your filters.</p>}
+      {isFilteredEmpty && <p className="cb-browser__empty">No puzzles match your filters.</p>}
 
       {/* Puzzle grid */}
       {sorted.length > 0 && (
-        <ul className="pap-browser__grid">
+        <ul className="cb-browser__grid">
           {sorted.map((entry) => {
             const info = statusMap.get(entry.entryId) ?? { status: 'new' as const };
             return (
               <li key={entry.entryId} className={cardClass(info.status)}>
                 <button
                   type="button"
-                  className="pap-browser__card-select"
+                  className="cb-browser__card-select"
                   onClick={() => onSelectPuzzle(entry.entryId)}
                 >
                   <CardContent
@@ -372,7 +372,7 @@ export function PuzzleBrowser({
                 {entry.source === 'custom' && onEditPuzzle && (
                   <button
                     type="button"
-                    className="pap-browser__card-edit"
+                    className="cb-browser__card-edit"
                     aria-label={`Edit ${entry.puzzle.name}`}
                     onClick={() => onEditPuzzle(entry.entryId)}
                   >
@@ -384,7 +384,7 @@ export function PuzzleBrowser({
                   (confirmDeleteId === entry.entryId ? (
                     <button
                       type="button"
-                      className="pap-browser__card-delete pap-browser__card-delete--confirm"
+                      className="cb-browser__card-delete cb-browser__card-delete--confirm"
                       aria-label={`Confirm delete ${entry.puzzle.name}`}
                       onClick={() => {
                         onDeletePuzzle(entry.entryId);
@@ -397,7 +397,7 @@ export function PuzzleBrowser({
                   ) : (
                     <button
                       type="button"
-                      className="pap-browser__card-delete"
+                      className="cb-browser__card-delete"
                       aria-label={`Delete ${entry.puzzle.name}`}
                       onClick={() => setConfirmDeleteId(entry.entryId)}
                     >

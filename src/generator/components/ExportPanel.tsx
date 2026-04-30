@@ -51,20 +51,20 @@ export function ExportPanel({
   }, [puzzle]);
 
   return (
-    <section className="pap-gen-export" aria-label="Export options">
+    <section className="cb-gen-export" aria-label="Export options">
       {/* Generation/system errors */}
       {error && (
-        <div className="pap-gen-export__error" role="alert">
+        <div className="cb-gen-export__error" role="alert">
           <p>
             <strong>Error:</strong> {error.message}
           </p>
-          {error.recoveryHint && <p className="pap-gen-export__hint">{error.recoveryHint}</p>}
+          {error.recoveryHint && <p className="cb-gen-export__hint">{error.recoveryHint}</p>}
         </div>
       )}
 
       {/* Validation errors from pipeline */}
       {errors && errors.length > 0 && (
-        <div className="pap-gen-export__errors" role="alert">
+        <div className="cb-gen-export__errors" role="alert">
           <p>
             <strong>Puzzle validation failed:</strong>
           </p>
@@ -78,20 +78,20 @@ export function ExportPanel({
 
       {/* Success actions */}
       {puzzle && (
-        <div className="pap-gen-export__actions">
+        <div className="cb-gen-export__actions">
           <button
             type="button"
-            className="pap-btn pap-btn--primary"
+            className="cb-btn cb-btn--primary"
             onClick={onSaveToLibrary}
             disabled={isSaving}
             aria-busy={isSaving}
           >
             {isSaving ? 'Saving…' : '💾 Save to Library'}
           </button>
-          <button type="button" className="pap-btn" onClick={handleDownload}>
+          <button type="button" className="cb-btn" onClick={handleDownload}>
             ⬇ Download JSON
           </button>
-          <button type="button" className="pap-btn" onClick={handleCopy}>
+          <button type="button" className="cb-btn" onClick={handleCopy}>
             {copyStatus === 'copied'
               ? '✓ Copied!'
               : copyStatus === 'failed'
@@ -102,8 +102,8 @@ export function ExportPanel({
       )}
 
       {/* Always show start over */}
-      <div className="pap-gen-export__secondary">
-        <button type="button" className="pap-btn" onClick={onReset}>
+      <div className="cb-gen-export__secondary">
+        <button type="button" className="cb-btn" onClick={onReset}>
           ↩ Start Over
         </button>
       </div>

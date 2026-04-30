@@ -62,7 +62,7 @@ describe('useTimer (via GamePage integration)', () => {
     const entry = getSmallBuiltinEntry();
     renderGame(entry);
     const timer = screen.getByLabelText(/solve timer/i);
-    expect(timer.className).toContain('pap-timer--idle');
+    expect(timer.className).toContain('cb-timer--idle');
   });
 
   it('timer starts on first cell click', async () => {
@@ -74,7 +74,7 @@ describe('useTimer (via GamePage integration)', () => {
     await user.click(cells[0]);
 
     const timer = screen.getByLabelText(/solve timer/i);
-    expect(timer.className).not.toContain('pap-timer--idle');
+    expect(timer.className).not.toContain('cb-timer--idle');
   });
 
   it('save includes timer override after cell interaction', async () => {
@@ -103,11 +103,11 @@ describe('useTimer (via GamePage integration)', () => {
     const cells = screen.getAllByRole('gridcell');
     await user.click(cells[0]);
     const timer = screen.getByLabelText(/solve timer/i);
-    expect(timer.className).not.toContain('pap-timer--idle');
+    expect(timer.className).not.toContain('cb-timer--idle');
 
     // Reset
     await user.click(screen.getByRole('button', { name: /reset/i }));
-    expect(timer.className).toContain('pap-timer--idle');
+    expect(timer.className).toContain('cb-timer--idle');
     expect(timer.textContent).toContain('00:00');
   });
 });

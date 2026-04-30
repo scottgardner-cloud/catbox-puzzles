@@ -1,6 +1,6 @@
 /* Editor page styles */
 
-.pap-editor {
+.cb-editor {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -9,13 +9,13 @@
   max-width: 960px;
 }
 
-.pap-editor h2 {
+.cb-editor h2 {
   margin: 0;
   font-size: 24px;
   color: #333;
 }
 
-.pap-editor__subtitle {
+.cb-editor__subtitle {
   color: #666;
   margin: -16px 0 0;
   font-size: 14px;
@@ -23,7 +23,7 @@
 
 /* ── Layout ──────────────────────────────────────── */
 
-.pap-editor__layout {
+.cb-editor__layout {
   display: flex;
   gap: 24px;
   width: 100%;
@@ -32,7 +32,7 @@
   min-height: 0;
 }
 
-.pap-editor__sidebar {
+.cb-editor__sidebar {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -44,7 +44,7 @@
   align-self: flex-start;
 }
 
-.pap-editor__canvas {
+.cb-editor__canvas {
   flex: 1;
   display: flex;
   justify-content: center;
@@ -61,7 +61,7 @@
 
 /* ── Toolbar ─────────────────────────────────────── */
 
-.pap-editor-toolbar {
+.cb-editor-toolbar {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -71,109 +71,109 @@
   padding: 16px;
 }
 
-.pap-editor-toolbar__field {
+.cb-editor-toolbar__field {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.pap-editor-toolbar__field label {
+.cb-editor-toolbar__field label {
   font-size: 13px;
   font-weight: 600;
   color: #555;
 }
 
-.pap-editor-toolbar__field input[type='text'],
-.pap-editor-toolbar__field select {
+.cb-editor-toolbar__field input[type='text'],
+.cb-editor-toolbar__field select {
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
 }
 
-.pap-editor-toolbar__row {
+.cb-editor-toolbar__row {
   display: flex;
   align-items: flex-end;
   gap: 8px;
 }
 
-.pap-editor-toolbar__separator {
+.cb-editor-toolbar__separator {
   font-size: 16px;
   color: #999;
   padding-bottom: 8px;
 }
 
-.pap-editor-toolbar__tools {
+.cb-editor-toolbar__tools {
   border: none;
   padding: 0;
   margin: 0;
 }
 
-.pap-editor-toolbar__tools legend {
+.cb-editor-toolbar__tools legend {
   font-size: 13px;
   font-weight: 600;
   color: #555;
   margin-bottom: 4px;
 }
 
-.pap-editor-toolbar__tool-btns {
+.cb-editor-toolbar__tool-btns {
   display: flex;
   gap: 6px;
 }
 
-.pap-editor-toolbar__actions {
+.cb-editor-toolbar__actions {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
 }
 
-.pap-editor-toolbar__hint {
+.cb-editor-toolbar__hint {
   font-size: 12px;
   color: #e65100;
   margin: 0;
 }
 
-.pap-editor-toolbar__status {
+.cb-editor-toolbar__status {
   font-size: 13px;
   border-radius: 6px;
   padding: 8px 12px;
 }
 
-.pap-editor-toolbar__status--ok {
+.cb-editor-toolbar__status--ok {
   background: #e8f5e9;
   color: #2e7d32;
   font-weight: 600;
 }
 
-.pap-editor-toolbar__status--error {
+.cb-editor-toolbar__status--error {
   background: #fff3e0;
   border: 1px solid #ff9800;
   color: #333;
 }
 
-.pap-editor-toolbar__status--error p {
+.cb-editor-toolbar__status--error p {
   margin: 0;
   font-weight: 600;
 }
 
-.pap-editor-toolbar__status--error ul {
+.cb-editor-toolbar__status--error ul {
   margin: 4px 0 0;
   padding-left: 16px;
   font-size: 12px;
 }
 
-.pap-editor-toolbar__status--repair {
+.cb-editor-toolbar__status--repair {
   background: #fff8e1;
   border: 1px solid #ff9800;
   color: #333;
 }
 
-.pap-editor-toolbar__status--repair p {
+.cb-editor-toolbar__status--repair p {
   margin: 0;
   font-weight: 600;
 }
 
-.pap-editor-toolbar__repair-hint {
+.cb-editor-toolbar__repair-hint {
   font-size: 12px;
   font-weight: 400 !important;
   color: #666;
@@ -182,7 +182,7 @@
 
 /* ── Palette ─────────────────────────────────────── */
 
-.pap-editor-palette {
+.cb-editor-palette {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -192,26 +192,26 @@
   padding: 16px;
 }
 
-.pap-editor-palette__title {
+.cb-editor-palette__title {
   margin: 0;
   font-size: 14px;
   color: #333;
 }
 
-.pap-editor-palette__colors {
+.cb-editor-palette__colors {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.pap-editor-palette__entry {
+.cb-editor-palette__entry {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
 }
 
-.pap-editor-palette__swatch {
+.cb-editor-palette__swatch {
   width: 32px;
   height: 32px;
   border-radius: 6px;
@@ -220,17 +220,17 @@
   padding: 0;
 }
 
-.pap-editor-palette__swatch--selected {
+.cb-editor-palette__swatch--selected {
   border-color: #1976d2;
   box-shadow: 0 0 0 2px #90caf9;
 }
 
-.pap-editor-palette__swatch:focus-visible {
+.cb-editor-palette__swatch:focus-visible {
   outline: 2px solid #1976d2;
   outline-offset: 2px;
 }
 
-.pap-editor-palette__remove {
+.cb-editor-palette__remove {
   background: none;
   border: none;
   cursor: pointer;
@@ -240,26 +240,26 @@
   line-height: 1;
 }
 
-.pap-editor-palette__remove:hover {
+.cb-editor-palette__remove:hover {
   color: #d32f2f;
 }
 
 /* ── Custom color picker ─────────────────────────── */
 
-.pap-editor-palette__custom {
+.cb-editor-palette__custom {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-top: 4px;
 }
 
-.pap-editor-palette__custom-row {
+.cb-editor-palette__custom-row {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.pap-editor-palette__color-input {
+.cb-editor-palette__color-input {
   width: 36px;
   height: 30px;
   padding: 2px;
@@ -269,7 +269,7 @@
   flex-shrink: 0;
 }
 
-.pap-editor-palette__name-input {
+.cb-editor-palette__name-input {
   flex: 1;
   min-width: 0;
   padding: 4px 8px;
@@ -278,7 +278,7 @@
   font-size: 13px;
 }
 
-.pap-editor-palette__warning {
+.cb-editor-palette__warning {
   font-size: 12px;
   color: #e65100;
   margin: 0;
@@ -286,27 +286,27 @@
 
 /* ── Preset colors ───────────────────────────────── */
 
-.pap-editor-palette__add {
+.cb-editor-palette__add {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-top: 4px;
 }
 
-.pap-editor-palette__add-label {
+.cb-editor-palette__add-label {
   font-size: 13px;
   font-weight: 600;
   color: #555;
   margin: 0;
 }
 
-.pap-editor-palette__add-grid {
+.cb-editor-palette__add-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4px;
 }
 
-.pap-editor-palette__add-btn {
+.cb-editor-palette__add-btn {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -319,17 +319,17 @@
   color: #333;
 }
 
-.pap-editor-palette__add-btn:hover {
+.cb-editor-palette__add-btn:hover {
   background: #f0f0f0;
   border-color: #bbb;
 }
 
-.pap-editor-palette__add-btn:focus-visible {
+.cb-editor-palette__add-btn:focus-visible {
   outline: 2px solid #1976d2;
   outline-offset: 1px;
 }
 
-.pap-editor-palette__add-swatch {
+.cb-editor-palette__add-swatch {
   width: 16px;
   height: 16px;
   border-radius: 3px;
@@ -337,7 +337,7 @@
   flex-shrink: 0;
 }
 
-.pap-editor-palette__add-name {
+.cb-editor-palette__add-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -345,7 +345,7 @@
 
 /* ── Unsaved indicator ───────────────────────────── */
 
-.pap-editor__unsaved {
+.cb-editor__unsaved {
   font-size: 13px;
   color: #e65100;
   font-style: italic;
@@ -354,12 +354,12 @@
 /* ── Responsive ──────────────────────────────────── */
 
 @media (max-width: 720px) {
-  .pap-editor__layout {
+  .cb-editor__layout {
     flex-direction: column;
     align-items: center;
   }
 
-  .pap-editor__sidebar {
+  .cb-editor__sidebar {
     min-width: unset;
     max-width: 100%;
     width: 100%;

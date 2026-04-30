@@ -50,14 +50,14 @@ export function EditorPalette({ state, dispatch }: EditorPaletteProps): React.JS
   const availableToAdd = PRESET_COLORS.filter((pc) => !state.palette.some((p) => p.id === pc.id));
 
   return (
-    <div className="pap-editor-palette">
-      <h3 className="pap-editor-palette__title">Palette</h3>
-      <div className="pap-editor-palette__colors" role="radiogroup" aria-label="Color palette">
+    <div className="cb-editor-palette">
+      <h3 className="cb-editor-palette__title">Palette</h3>
+      <div className="cb-editor-palette__colors" role="radiogroup" aria-label="Color palette">
         {state.palette.map((color) => (
-          <div key={color.id} className="pap-editor-palette__entry">
+          <div key={color.id} className="cb-editor-palette__entry">
             <button
               type="button"
-              className={`pap-editor-palette__swatch${state.selectedColor === color.id ? ' pap-editor-palette__swatch--selected' : ''}`}
+              className={`cb-editor-palette__swatch${state.selectedColor === color.id ? ' cb-editor-palette__swatch--selected' : ''}`}
               style={{ backgroundColor: color.value }}
               onClick={() => dispatch({ type: 'SELECT_COLOR', colorId: color.id })}
               role="radio"
@@ -68,7 +68,7 @@ export function EditorPalette({ state, dispatch }: EditorPaletteProps): React.JS
             {state.palette.length > 1 && (
               <button
                 type="button"
-                className="pap-editor-palette__remove"
+                className="cb-editor-palette__remove"
                 onClick={() => dispatch({ type: 'REMOVE_PALETTE_COLOR', colorId: color.id })}
                 aria-label={`Remove ${color.name}`}
                 title={`Remove ${color.name}`}
@@ -81,15 +81,15 @@ export function EditorPalette({ state, dispatch }: EditorPaletteProps): React.JS
       </div>
 
       {/* Custom color picker */}
-      <div className="pap-editor-palette__custom">
-        <p className="pap-editor-palette__add-label">Custom color:</p>
-        <div className="pap-editor-palette__custom-row">
+      <div className="cb-editor-palette__custom">
+        <p className="cb-editor-palette__add-label">Custom color:</p>
+        <div className="cb-editor-palette__custom-row">
           <input
             ref={pickerRef}
             type="color"
             value={customHex}
             onChange={(e) => handleCustomColorChange(e.target.value)}
-            className="pap-editor-palette__color-input"
+            className="cb-editor-palette__color-input"
             aria-label="Pick a custom color"
           />
           <input
@@ -98,14 +98,14 @@ export function EditorPalette({ state, dispatch }: EditorPaletteProps): React.JS
             onChange={(e) => setCustomName(e.target.value)}
             placeholder="Name (optional)"
             maxLength={20}
-            className="pap-editor-palette__name-input"
+            className="cb-editor-palette__name-input"
           />
-          <button type="button" className="pap-btn" onClick={handleAddCustomColor}>
+          <button type="button" className="cb-btn" onClick={handleAddCustomColor}>
             Add
           </button>
         </div>
         {luminanceWarning && (
-          <p className="pap-editor-palette__warning">
+          <p className="cb-editor-palette__warning">
             ⚠ Very light color — may be hard to see on the grid.
           </p>
         )}
@@ -113,23 +113,23 @@ export function EditorPalette({ state, dispatch }: EditorPaletteProps): React.JS
 
       {/* Preset colors */}
       {availableToAdd.length > 0 && (
-        <div className="pap-editor-palette__add">
-          <p className="pap-editor-palette__add-label">Presets:</p>
-          <div className="pap-editor-palette__add-grid">
+        <div className="cb-editor-palette__add">
+          <p className="cb-editor-palette__add-label">Presets:</p>
+          <div className="cb-editor-palette__add-grid">
             {availableToAdd.map((c) => (
               <button
                 key={c.id}
                 type="button"
-                className="pap-editor-palette__add-btn"
+                className="cb-editor-palette__add-btn"
                 onClick={() => dispatch({ type: 'ADD_PALETTE_COLOR', color: c })}
                 aria-label={`Add ${c.name}`}
                 title={`Add ${c.name}`}
               >
                 <span
-                  className="pap-editor-palette__add-swatch"
+                  className="cb-editor-palette__add-swatch"
                   style={{ backgroundColor: c.value }}
                 />
-                <span className="pap-editor-palette__add-name">{c.name}</span>
+                <span className="cb-editor-palette__add-name">{c.name}</span>
               </button>
             ))}
           </div>

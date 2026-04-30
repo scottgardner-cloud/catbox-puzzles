@@ -10,7 +10,7 @@ import type {
 } from '../types';
 import { computeLineValidation } from '../engine';
 
-const STORAGE_PREFIX = 'pap-save-';
+const STORAGE_PREFIX = 'catbox-nonogram-save-';
 
 // ── Helpers ─────────────────────────────────────────────────────────
 

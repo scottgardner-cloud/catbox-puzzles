@@ -14,10 +14,10 @@ export function PreviewGrid({ puzzle }: PreviewGridProps): React.JSX.Element {
   const cellSize = Math.max(12, Math.min(32, Math.floor(400 / Math.max(puzzle.rows, puzzle.cols))));
 
   return (
-    <section className="pap-gen-preview" aria-label="Puzzle preview">
+    <section className="cb-gen-preview" aria-label="Puzzle preview">
       <h3>Preview</h3>
       <div
-        className="pap-gen-preview__grid"
+        className="cb-gen-preview__grid"
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${puzzle.cols}, ${cellSize}px)`,
@@ -45,17 +45,17 @@ export function PreviewGrid({ puzzle }: PreviewGridProps): React.JSX.Element {
           }),
         )}
       </div>
-      <div className="pap-gen-preview__info">
+      <div className="cb-gen-preview__info">
         <p>
           {puzzle.rows}×{puzzle.cols} •{' '}
           {puzzle.kind === 'bw' ? 'B&W' : `${puzzle.palette.length} colors`}
         </p>
         {puzzle.kind === 'color' && (
-          <div className="pap-gen-preview__palette" aria-label="Color palette">
+          <div className="cb-gen-preview__palette" aria-label="Color palette">
             {puzzle.palette.map((c) => (
               <span
                 key={c.id}
-                className="pap-gen-preview__swatch"
+                className="cb-gen-preview__swatch"
                 style={{ backgroundColor: c.value }}
                 title={c.name}
               />

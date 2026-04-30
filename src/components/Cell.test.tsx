@@ -29,20 +29,20 @@ describe('Cell', () => {
   it('renders unknown state with neutral background', () => {
     renderCell({ kind: 'unknown' });
     const cell = screen.getByRole('gridcell');
-    expect(cell.className).toContain('pap-cell--unknown');
+    expect(cell.className).toContain('cb-cell--unknown');
   });
 
   it('renders filled state with background color', () => {
     renderCell({ kind: 'filled', colorId: B }, 'unchecked', { fillColor: '#000000' });
     const cell = screen.getByRole('gridcell');
-    expect(cell.className).toContain('pap-cell--filled');
+    expect(cell.className).toContain('cb-cell--filled');
     expect(cell.style.backgroundColor).toBe('rgb(0, 0, 0)');
   });
 
   it('renders empty state with × mark', () => {
     renderCell({ kind: 'empty' });
     const cell = screen.getByRole('gridcell');
-    expect(cell.className).toContain('pap-cell--empty');
+    expect(cell.className).toContain('cb-cell--empty');
     expect(cell.textContent).toBe('×');
   });
 
@@ -64,28 +64,28 @@ describe('Cell', () => {
   it('applies validation class for wrong-filled', () => {
     renderCell({ kind: 'filled', colorId: B }, 'wrong-filled');
     const cell = screen.getByRole('gridcell');
-    expect(cell.className).toContain('pap-cell--wrong-filled');
+    expect(cell.className).toContain('cb-cell--wrong-filled');
   });
 
   it('applies validation class for correct', () => {
     renderCell({ kind: 'filled', colorId: B }, 'correct');
-    expect(screen.getByRole('gridcell').className).toContain('pap-cell--correct');
+    expect(screen.getByRole('gridcell').className).toContain('cb-cell--correct');
   });
 
   it('does not apply validation class for unchecked', () => {
     renderCell({ kind: 'unknown' }, 'unchecked');
     const cell = screen.getByRole('gridcell');
-    expect(cell.className).not.toContain('pap-cell--unchecked');
+    expect(cell.className).not.toContain('cb-cell--unchecked');
   });
 
   it('applies focused class when isFocused', () => {
     renderCell({ kind: 'unknown' }, 'unchecked', { isFocused: true });
-    expect(screen.getByRole('gridcell').className).toContain('pap-cell--focused');
+    expect(screen.getByRole('gridcell').className).toContain('cb-cell--focused');
   });
 
   it('applies hinted class when isHinted', () => {
     renderCell({ kind: 'unknown' }, 'unchecked', { isHinted: true });
-    expect(screen.getByRole('gridcell').className).toContain('pap-cell--hinted');
+    expect(screen.getByRole('gridcell').className).toContain('cb-cell--hinted');
   });
 
   it('has accessible label for unknown unchecked', () => {

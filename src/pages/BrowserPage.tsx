@@ -41,7 +41,7 @@ export function BrowserPage(): React.JSX.Element {
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
         <button
           type="button"
-          className="pap-btn pap-btn--primary"
+          className="cb-btn cb-btn--primary"
           onClick={() => navigate('/editor')}
         >
           ✏️ Create New Puzzle

@@ -1,8 +1,8 @@
 /* ───────────────────────────────────────────
-   Pix-a-Pix Grid Layout
+   Nonogram Grid Layout
    ─────────────────────────────────────────── */
 
-.pap-grid-wrapper {
+.cb-grid-wrapper {
   display: inline-flex;
   flex-direction: column;
   align-items: stretch;
@@ -12,23 +12,23 @@
 }
 
 /* Wrapper row for column-aligned elements (clues, validation, run indicators) */
-.pap-col-header-row {
+.cb-col-header-row {
   display: flex;
   justify-content: flex-start;
 }
 
-.pap-col-header-spacer {
+.cb-col-header-spacer {
   flex-shrink: 0;
 }
 
 /* ── Column clues ── */
-.pap-col-clues {
+.cb-col-clues {
   display: grid;
   gap: 0;
   justify-self: end;
 }
 
-.pap-col-clue {
+.cb-col-clue {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -40,26 +40,26 @@
 }
 
 /* ── Column validation row ── */
-.pap-col-validation {
+.cb-col-validation {
   display: grid;
   gap: 0;
   justify-self: end;
 }
 
 /* ── Rows container ── */
-.pap-rows {
+.cb-rows {
   display: flex;
   flex-direction: column;
 }
 
-.pap-row {
+.cb-row {
   display: flex;
   align-items: center;
   gap: 2px;
 }
 
 /* ── Row clues ── */
-.pap-row-clue {
+.cb-row-clue {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -71,19 +71,19 @@
 }
 
 /* ── Clue number ── */
-.pap-clue-num {
+.cb-clue-num {
   min-width: 14px;
   text-align: center;
 }
 
 /* ── Cells row (the actual grid) ── */
-.pap-cells-row {
+.cb-cells-row {
   display: grid;
   gap: 0;
 }
 
 /* ── Line validation indicator (row / col) ── */
-.pap-line-indicator {
+.cb-line-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -92,29 +92,29 @@
   font-weight: 700;
 }
 
-.pap-line-indicator--correct {
+.cb-line-indicator--correct {
   color: #2e7d32;
 }
 
-.pap-line-indicator--incorrect {
+.cb-line-indicator--incorrect {
   color: #c62828;
 }
 
-.pap-line-indicator--incomplete {
+.cb-line-indicator--incomplete {
   color: transparent;
 }
 
 /* Hidden state: reserve space but don't show content */
-.pap-line-indicator--hidden {
+.cb-line-indicator--hidden {
   visibility: hidden;
 }
 
-.pap-col-validation--hidden {
+.cb-col-validation--hidden {
   visibility: hidden;
 }
 
 /* ── Cell ── */
-.pap-cell {
+.cb-cell {
   box-sizing: border-box;
   border: 1px solid #bbb;
   cursor: inherit;
@@ -124,27 +124,27 @@
   transition: background-color 0.1s ease;
 }
 
-.pap-cell:hover {
+.cb-cell:hover {
   outline: 2px solid #42a5f5;
   outline-offset: -2px;
   z-index: 1;
 }
 
 /* State variants */
-.pap-cell--unknown {
+.cb-cell--unknown {
   background-color: #f5f5f5;
 }
 
-.pap-cell--filled {
-  animation: pap-cell-fill 0.12s ease-out;
+.cb-cell--filled {
+  animation: cb-cell-fill 0.12s ease-out;
 }
 
-.pap-cell--empty {
+.cb-cell--empty {
   background-color: #e0e0e0;
-  animation: pap-cell-fill 0.12s ease-out;
+  animation: cb-cell-fill 0.12s ease-out;
 }
 
-.pap-cell__mark {
+.cb-cell__mark {
   font-size: 16px;
   font-weight: 700;
   color: #616161;
@@ -155,38 +155,38 @@
 /* filled cells get their color via inline style */
 
 /* ── Validation overlays ── */
-.pap-cell--wrong-filled {
+.cb-cell--wrong-filled {
   box-shadow: inset 0 0 0 3px #e53935;
 }
 
-.pap-cell--wrong-empty {
+.cb-cell--wrong-empty {
   box-shadow: inset 0 0 0 3px #e53935;
 }
 
-.pap-cell--wrong-empty .pap-cell__mark {
+.cb-cell--wrong-empty .cb-cell__mark {
   color: #e53935;
 }
 
-.pap-cell--wrong-color {
+.cb-cell--wrong-color {
   box-shadow: inset 0 0 0 3px #ef6c00;
 }
 
-.pap-cell--correct {
+.cb-cell--correct {
   box-shadow: inset 0 0 0 2px #43a047;
 }
 
 /* ── 5-cell grid dividers ── */
-.pap-cell--border-right > .pap-cell {
+.cb-cell--border-right > .cb-cell {
   border-right: 2px solid #333;
 }
 
-.pap-cell--border-bottom > .pap-cell {
+.cb-cell--border-bottom > .cb-cell {
   border-bottom: 2px solid #333;
 }
 
 /* ── Hidden spacers for alignment (used by wrapper) ── */
-.pap-clue-spacer,
-.pap-clue-spacer-col {
+.cb-clue-spacer,
+.cb-clue-spacer-col {
   /* These are invisible sizing aids rendered outside the visible grid */
   position: absolute;
   visibility: hidden;
@@ -194,7 +194,7 @@
 }
 
 /* ── Run-length indicators ── */
-.pap-run-indicator {
+.cb-run-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -204,53 +204,53 @@
   color: #1976d2;
 }
 
-.pap-run-indicator--hidden {
+.cb-run-indicator--hidden {
   visibility: hidden;
 }
 
-.pap-col-run-indicators {
+.cb-col-run-indicators {
   display: grid;
   gap: 0;
   justify-self: end;
 }
 
 /* Reserve space for column run indicators to prevent layout shift */
-.pap-col-run-indicators .pap-run-indicator {
+.cb-col-run-indicators .cb-run-indicator {
   min-height: 24px;
 }
 
 /* ── Row/column hover highlighting ── */
-.pap-row--highlight {
+.cb-row--highlight {
   background-color: rgba(66, 165, 245, 0.06);
 }
 
-.pap-row-clue--highlight {
+.cb-row-clue--highlight {
   background-color: rgba(66, 165, 245, 0.15);
   border-radius: 4px;
 }
 
-.pap-col-clue--highlight {
+.cb-col-clue--highlight {
   background-color: rgba(66, 165, 245, 0.15);
   border-radius: 4px;
 }
 
-.pap-cell--crosshair > .pap-cell {
+.cb-cell--crosshair > .cb-cell {
   background-color: rgba(66, 165, 245, 0.08);
 }
 
 /* Don't override filled cells with crosshair background */
-.pap-cell--crosshair > .pap-cell.pap-cell--filled {
+.cb-cell--crosshair > .cb-cell.cb-cell--filled {
   /* filled color takes precedence via inline style */
 }
 
 /* ── Keyboard focus indicator ── */
-.pap-cell--focused {
+.cb-cell--focused {
   outline: 3px solid #7c4dff;
   outline-offset: -3px;
   z-index: 2;
 }
 
-.pap-cell--hinted {
+.cb-cell--hinted {
   outline: 3px solid #e65100;
   outline-offset: -3px;
   z-index: 1;
@@ -268,35 +268,35 @@
 }
 
 /* Don't show the browser's default focus ring on the grid wrapper */
-.pap-grid-wrapper:focus {
+.cb-grid-wrapper:focus {
   outline: 2px solid #7c4dff;
   outline-offset: 2px;
   border-radius: 2px;
 }
 
-.pap-grid-wrapper:focus:not(:focus-visible) {
+.cb-grid-wrapper:focus:not(:focus-visible) {
   outline: none;
 }
 
 /* ── Responsive scaling ── */
 @media (max-width: 600px) {
-  .pap-col-clue,
-  .pap-row-clue {
+  .cb-col-clue,
+  .cb-row-clue {
     font-size: 10px;
   }
 
-  .pap-cell__mark {
+  .cb-cell__mark {
     font-size: 12px;
   }
 
-  .pap-line-indicator {
+  .cb-line-indicator {
     width: 16px;
     font-size: 12px;
   }
 }
 
 /* ── Palette bar ── */
-.pap-palette-bar {
+.cb-palette-bar {
   display: flex;
   gap: 8px;
   margin-bottom: 12px;
@@ -306,7 +306,7 @@
   border-radius: 8px;
 }
 
-.pap-palette-swatch {
+.cb-palette-swatch {
   width: 32px;
   height: 32px;
   border: 2px solid #999;
@@ -315,23 +315,23 @@
   transition: all 0.15s;
 }
 
-.pap-palette-swatch:hover {
+.cb-palette-swatch:hover {
   transform: scale(1.1);
   border-color: #333;
 }
 
-.pap-palette-swatch--selected {
+.cb-palette-swatch--selected {
   border-color: #1976d2;
   box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.4);
   transform: scale(1.1);
 }
 
-.pap-palette-swatch:focus-visible {
+.cb-palette-swatch:focus-visible {
   outline: 2px solid #7c4dff;
   outline-offset: 2px;
 }
 
-@keyframes pap-cell-fill {
+@keyframes cb-cell-fill {
   from {
     transform: scale(0.85);
   }
@@ -341,8 +341,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pap-cell--filled,
-  .pap-cell--empty {
+  .cb-cell--filled,
+  .cb-cell--empty {
     animation: none;
   }
 }

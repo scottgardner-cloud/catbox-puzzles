@@ -77,11 +77,11 @@ describe('registry', () => {
     it('also removes associated saved game data', () => {
       const entry = saveCustomPuzzle(crossDefinition)!;
       // Simulate a save existing for this entry
-      localStorage.setItem(`pap-save-${entry.entryId}`, '{"fake":"save"}');
-      expect(localStorage.getItem(`pap-save-${entry.entryId}`)).not.toBeNull();
+      localStorage.setItem(`catbox-nonogram-save-${entry.entryId}`, '{"fake":"save"}');
+      expect(localStorage.getItem(`catbox-nonogram-save-${entry.entryId}`)).not.toBeNull();
 
       deleteCustomPuzzle(entry.entryId);
-      expect(localStorage.getItem(`pap-save-${entry.entryId}`)).toBeNull();
+      expect(localStorage.getItem(`catbox-nonogram-save-${entry.entryId}`)).toBeNull();
     });
   });
 
@@ -108,15 +108,15 @@ describe('registry', () => {
   describe('loadCustomEntries', () => {
     it('skips corrupt localStorage entries', () => {
       // Write corrupt data
-      localStorage.setItem('pap-custom-manifest', JSON.stringify(['bad-id']));
-      localStorage.setItem('pap-custom-bad-id', 'not valid json{{{');
+      localStorage.setItem('catbox-nonogram-custom-manifest', JSON.stringify(['bad-id']));
+      localStorage.setItem('catbox-nonogram-custom-bad-id', 'not valid json{{{');
       expect(loadCustomEntries().length).toBe(0);
     });
 
     it('skips entries with invalid puzzle data', () => {
-      localStorage.setItem('pap-custom-manifest', JSON.stringify(['bad-id']));
+      localStorage.setItem('catbox-nonogram-custom-manifest', JSON.stringify(['bad-id']));
       localStorage.setItem(
-        'pap-custom-bad-id',
+        'catbox-nonogram-custom-bad-id',
         JSON.stringify({
           version: 1,
           puzzle: {

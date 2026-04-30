@@ -437,18 +437,18 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
 
   return (
     <>
-      <div className="pap-back-row">
-        <button type="button" className="pap-btn" onClick={handleBack}>
+      <div className="cb-back-row">
+        <button type="button" className="cb-btn" onClick={handleBack}>
           ← Back to puzzles
         </button>
       </div>
 
-      <div className={`pap-solved${solved ? '' : ' pap-solved--hidden'}`}>
+      <div className={`cb-solved${solved ? '' : ' cb-solved--hidden'}`}>
         🎉 Puzzle Solved! ({formatTime(timer.displayMs)})
       </div>
 
       <div
-        className={`pap-timer${timer.timerStatus === 'idle' ? ' pap-timer--idle' : ''}`}
+        className={`cb-timer${timer.timerStatus === 'idle' ? ' cb-timer--idle' : ''}`}
         aria-label="Solve timer"
       >
         ⏱ {formatTime(timer.displayMs)}
@@ -478,10 +478,10 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         selectedColorId={gameState.selectedColorId}
       />
 
-      <div className="pap-controls">
+      <div className="cb-controls">
         <button
           type="button"
-          className="pap-btn"
+          className="cb-btn"
           onClick={handleUndo}
           disabled={gameState.undoStack.length === 0}
         >
@@ -489,7 +489,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         </button>
         <button
           type="button"
-          className="pap-btn"
+          className="cb-btn"
           onClick={handleRedo}
           disabled={gameState.redoStack.length === 0}
         >
@@ -497,7 +497,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         </button>
         <button
           type="button"
-          className={`pap-btn${checkPulse ? ' pap-btn--pulse' : ''}`}
+          className={`cb-btn${checkPulse ? ' cb-btn--pulse' : ''}`}
           onClick={handleCheck}
           onAnimationEnd={() => setCheckPulse(false)}
         >
@@ -505,17 +505,17 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         </button>
         <button
           type="button"
-          className={`pap-btn pap-btn--hint${hintShake ? ' pap-btn--shake' : ''}`}
+          className={`cb-btn cb-btn--hint${hintShake ? ' cb-btn--shake' : ''}`}
           onClick={handleHint}
           onAnimationEnd={() => setHintShake(false)}
           disabled={solved}
         >
           💡 Hint
         </button>
-        <button type="button" className="pap-btn" onClick={handleSave}>
+        <button type="button" className="cb-btn" onClick={handleSave}>
           💾 Save
         </button>
-        <button type="button" className="pap-btn pap-btn--danger" onClick={handleReset}>
+        <button type="button" className="cb-btn cb-btn--danger" onClick={handleReset}>
           ⟲ Reset
         </button>
         <KeyboardShortcutHelp
@@ -526,7 +526,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
       </div>
 
       {hintExplanation && (
-        <div className="pap-hint-explanation" role="status">
+        <div className="cb-hint-explanation" role="status">
           💡 {hintExplanation}
         </div>
       )}

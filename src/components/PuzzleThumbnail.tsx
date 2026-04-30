@@ -33,7 +33,7 @@ export const PuzzleThumbnail = memo(function PuzzleThumbnail({
   if (status === 'new' || (status === 'in-progress' && !playerBoard)) {
     return (
       <div
-        className="pap-browser__thumbnail pap-browser__thumbnail--placeholder"
+        className="cb-browser__thumbnail cb-browser__thumbnail--placeholder"
         style={{ width: size, height: size }}
         role="img"
         aria-label={`${puzzle.name} — not yet solved`}
@@ -103,7 +103,7 @@ function ProgressCanvas({
       ref={canvasRef}
       width={cols}
       height={rows}
-      className="pap-browser__thumbnail"
+      className="cb-browser__thumbnail"
       style={{ width: size, height: size }}
       role="img"
       aria-label={`${puzzle.name} — in progress`}
@@ -144,7 +144,7 @@ function SolvedCanvas({
       ref={canvasRef}
       width={cols}
       height={rows}
-      className="pap-browser__thumbnail"
+      className="cb-browser__thumbnail"
       style={{ width: size, height: size }}
       role="img"
       aria-label={`${puzzle.name} preview`}

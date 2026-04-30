@@ -4,8 +4,8 @@ import { deleteSave } from '../state/persistence';
 import { getSamplePuzzles } from './samples';
 import type { PuzzleEntry, StoredCustomPuzzle } from './types';
 
-const CUSTOM_PREFIX = 'pap-custom-';
-const MANIFEST_KEY = 'pap-custom-manifest';
+const CUSTOM_PREFIX = 'catbox-nonogram-custom-';
+const MANIFEST_KEY = 'catbox-nonogram-custom-manifest';
 
 /** Wraps built-in sample puzzles as PuzzleEntry objects. */
 export function getBuiltinEntries(): PuzzleEntry[] {

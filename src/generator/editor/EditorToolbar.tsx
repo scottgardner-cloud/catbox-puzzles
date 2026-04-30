@@ -49,12 +49,12 @@ export function EditorToolbar({
   const canExport = state.name.trim().length > 0 && !isChecking;
 
   return (
-    <div className="pap-editor-toolbar">
+    <div className="cb-editor-toolbar">
       {/* Puzzle name */}
-      <div className="pap-editor-toolbar__field">
-        <label htmlFor="pap-editor-name">Puzzle name</label>
+      <div className="cb-editor-toolbar__field">
+        <label htmlFor="cb-editor-name">Puzzle name</label>
         <input
-          id="pap-editor-name"
+          id="cb-editor-name"
           type="text"
           value={state.name}
           onChange={handleNameChange}
@@ -64,12 +64,12 @@ export function EditorToolbar({
       </div>
 
       {/* Puzzle kind (B&W / Color) — disabled in edit mode */}
-      <fieldset className="pap-editor-toolbar__tools">
+      <fieldset className="cb-editor-toolbar__tools">
         <legend>Type</legend>
-        <div className="pap-editor-toolbar__tool-btns">
+        <div className="cb-editor-toolbar__tool-btns">
           <button
             type="button"
-            className={`pap-btn${state.kind === 'bw' ? ' pap-btn--active' : ''}`}
+            className={`cb-btn${state.kind === 'bw' ? ' cb-btn--active' : ''}`}
             onClick={() => dispatch({ type: 'SET_KIND', kind: 'bw' })}
             disabled={state.mode === 'edit'}
             aria-pressed={state.kind === 'bw'}
@@ -78,7 +78,7 @@ export function EditorToolbar({
           </button>
           <button
             type="button"
-            className={`pap-btn${state.kind === 'color' ? ' pap-btn--active' : ''}`}
+            className={`cb-btn${state.kind === 'color' ? ' cb-btn--active' : ''}`}
             onClick={() => dispatch({ type: 'SET_KIND', kind: 'color' })}
             disabled={state.mode === 'edit'}
             aria-pressed={state.kind === 'color'}
@@ -89,10 +89,10 @@ export function EditorToolbar({
       </fieldset>
 
       {/* Grid dimensions */}
-      <div className="pap-editor-toolbar__row">
-        <div className="pap-editor-toolbar__field">
-          <label htmlFor="pap-editor-rows">Rows</label>
-          <select id="pap-editor-rows" value={state.rows} onChange={handleRowsChange}>
+      <div className="cb-editor-toolbar__row">
+        <div className="cb-editor-toolbar__field">
+          <label htmlFor="cb-editor-rows">Rows</label>
+          <select id="cb-editor-rows" value={state.rows} onChange={handleRowsChange}>
             {GRID_SIZE_PRESETS.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -100,10 +100,10 @@ export function EditorToolbar({
             ))}
           </select>
         </div>
-        <span className="pap-editor-toolbar__separator">×</span>
-        <div className="pap-editor-toolbar__field">
-          <label htmlFor="pap-editor-cols">Cols</label>
-          <select id="pap-editor-cols" value={state.cols} onChange={handleColsChange}>
+        <span className="cb-editor-toolbar__separator">×</span>
+        <div className="cb-editor-toolbar__field">
+          <label htmlFor="cb-editor-cols">Cols</label>
+          <select id="cb-editor-cols" value={state.cols} onChange={handleColsChange}>
             {GRID_SIZE_PRESETS.map((s) => (
               <option key={s} value={s}>
                 {s}
@@ -114,20 +114,20 @@ export function EditorToolbar({
       </div>
 
       {/* Grid actions */}
-      <div className="pap-editor-toolbar__actions">
-        <button type="button" className="pap-btn" onClick={() => dispatch({ type: 'CLEAR_GRID' })}>
+      <div className="cb-editor-toolbar__actions">
+        <button type="button" className="cb-btn" onClick={() => dispatch({ type: 'CLEAR_GRID' })}>
           Clear All
         </button>
-        <button type="button" className="pap-btn" onClick={() => dispatch({ type: 'FILL_GRID' })}>
+        <button type="button" className="cb-btn" onClick={() => dispatch({ type: 'FILL_GRID' })}>
           Fill All
         </button>
       </div>
 
       {/* Validation + Export */}
-      <div className="pap-editor-toolbar__actions">
+      <div className="cb-editor-toolbar__actions">
         <button
           type="button"
-          className="pap-btn pap-btn--primary"
+          className="cb-btn cb-btn--primary"
           onClick={onCheckSolvability}
           disabled={isChecking}
         >
@@ -135,7 +135,7 @@ export function EditorToolbar({
         </button>
         <button
           type="button"
-          className="pap-btn pap-btn--primary"
+          className="cb-btn cb-btn--primary"
           onClick={onExport}
           disabled={!canExport}
         >
@@ -145,17 +145,17 @@ export function EditorToolbar({
 
       {/* Save requirements hint */}
       {state.name.trim().length === 0 && (
-        <p className="pap-editor-toolbar__hint">Enter a puzzle name to save.</p>
+        <p className="cb-editor-toolbar__hint">Enter a puzzle name to save.</p>
       )}
 
       {/* Validation status */}
       {state.validationStatus === 'valid' && (
-        <div className="pap-editor-toolbar__status pap-editor-toolbar__status--ok" role="status">
+        <div className="cb-editor-toolbar__status cb-editor-toolbar__status--ok" role="status">
           ✓ Uniquely solvable
         </div>
       )}
       {state.validationStatus === 'invalid' && (
-        <div className="pap-editor-toolbar__status pap-editor-toolbar__status--error" role="alert">
+        <div className="cb-editor-toolbar__status cb-editor-toolbar__status--error" role="alert">
           <p>✗ Validation failed:</p>
           <ul>
             {state.validationErrors.map((err, i) => (
@@ -164,7 +164,7 @@ export function EditorToolbar({
           </ul>
           <button
             type="button"
-            className="pap-btn pap-btn--primary"
+            className="cb-btn cb-btn--primary"
             onClick={onAttemptRepair}
             disabled={isChecking}
             style={{ marginTop: 8 }}
@@ -176,28 +176,25 @@ export function EditorToolbar({
 
       {/* Proposed repair confirmation */}
       {state.proposedRepair && (
-        <div
-          className="pap-editor-toolbar__status pap-editor-toolbar__status--repair"
-          role="status"
-        >
+        <div className="cb-editor-toolbar__status cb-editor-toolbar__status--repair" role="status">
           <p>
             🔧 Repair found: {state.proposedRepair.length} cell
             {state.proposedRepair.length !== 1 ? 's' : ''} would change.
           </p>
-          <p className="pap-editor-toolbar__repair-hint">
+          <p className="cb-editor-toolbar__repair-hint">
             Changed cells are highlighted on the grid.
           </p>
-          <div className="pap-editor-toolbar__actions">
+          <div className="cb-editor-toolbar__actions">
             <button
               type="button"
-              className="pap-btn pap-btn--primary"
+              className="cb-btn cb-btn--primary"
               onClick={() => dispatch({ type: 'ACCEPT_REPAIR' })}
             >
               ✓ Apply Changes
             </button>
             <button
               type="button"
-              className="pap-btn"
+              className="cb-btn"
               onClick={() => dispatch({ type: 'REJECT_REPAIR' })}
             >
               ✗ Cancel

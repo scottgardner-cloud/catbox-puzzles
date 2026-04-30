@@ -25,7 +25,7 @@ export interface CellProps {
 }
 
 /**
- * Renders a single Pix-a-Pix grid cell.
+ * Renders a single nonogram grid cell.
  *
  * - Unknown cells show a neutral background.
  * - Filled cells use the resolved palette color as background.
@@ -44,24 +44,24 @@ export function Cell({
   isFocused,
   isHinted,
 }: CellProps): React.JSX.Element {
-  const classNames = ['pap-cell'];
+  const classNames = ['cb-cell'];
 
   // State class
-  classNames.push(`pap-cell--${state.kind}`);
+  classNames.push(`cb-cell--${state.kind}`);
 
   // Validation class (skip unchecked to avoid noise)
   if (validation !== 'unchecked') {
-    classNames.push(`pap-cell--${validation}`);
+    classNames.push(`cb-cell--${validation}`);
   }
 
   // Keyboard focus indicator
   if (isFocused) {
-    classNames.push('pap-cell--focused');
+    classNames.push('cb-cell--focused');
   }
 
   // Hint highlight
   if (isHinted) {
-    classNames.push('pap-cell--hinted');
+    classNames.push('cb-cell--hinted');
   }
 
   const style: React.CSSProperties = {
@@ -85,7 +85,7 @@ export function Cell({
       aria-colindex={ariaColIndex}
       aria-selected={isFocused || undefined}
     >
-      {state.kind === 'empty' && <span className="pap-cell__mark">×</span>}
+      {state.kind === 'empty' && <span className="cb-cell__mark">×</span>}
     </div>
   );
 }

@@ -95,7 +95,8 @@ describe('Navigation', () => {
     renderApp('/generator');
     expect(screen.getByText('Puzzle Generator')).toBeInTheDocument();
 
-    const puzzlesLink = screen.getByRole('link', { name: /puzzles/i });
+    const nav = screen.getByRole('navigation');
+    const puzzlesLink = within(nav).getByRole('link', { name: /puzzles/i });
     await user.click(puzzlesLink);
 
     expect(screen.getByRole('button', { name: 'Puzzles' })).toBeInTheDocument();
@@ -142,7 +143,7 @@ describe('Navigation', () => {
 describe('Layout', () => {
   it('renders header with app title', () => {
     renderApp('/');
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Pix-a-Pix');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('CatBox Puzzles');
   });
 
   it('renders navigation links', () => {

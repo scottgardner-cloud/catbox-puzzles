@@ -24,12 +24,12 @@ export function PaletteBar({
   if (palette.length <= 1) return null;
 
   return (
-    <div className="pap-palette-bar" role="toolbar" aria-label="Color palette">
+    <div className="cb-palette-bar" role="toolbar" aria-label="Color palette">
       {palette.map((color) => (
         <button
           key={color.id}
           type="button"
-          className={`pap-palette-swatch${color.id === selectedColorId ? ' pap-palette-swatch--selected' : ''}`}
+          className={`cb-palette-swatch${color.id === selectedColorId ? ' cb-palette-swatch--selected' : ''}`}
           style={{ backgroundColor: color.value }}
           onClick={() => onSelectColor(color.id)}
           aria-label={`Select ${color.name}`}

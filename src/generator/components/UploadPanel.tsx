@@ -69,9 +69,9 @@ export function UploadPanel({
   );
 
   return (
-    <section className="pap-gen-upload" aria-label="Image upload">
+    <section className="cb-gen-upload" aria-label="Image upload">
       <div
-        className={`pap-gen-upload__dropzone${isLoading ? ' pap-gen-upload__dropzone--loading' : ''}`}
+        className={`cb-gen-upload__dropzone${isLoading ? ' cb-gen-upload__dropzone--loading' : ''}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onClick={handleClick}
@@ -85,19 +85,19 @@ export function UploadPanel({
         {isLoading ? (
           <p>Loading image…</p>
         ) : previewUrl ? (
-          <div className="pap-gen-upload__preview">
+          <div className="cb-gen-upload__preview">
             <img
               src={previewUrl}
               alt={`Preview of ${fileName ?? 'uploaded image'}`}
-              className="pap-gen-upload__thumbnail"
+              className="cb-gen-upload__thumbnail"
             />
-            <p className="pap-gen-upload__filename">{fileName}</p>
-            <p className="pap-gen-upload__hint">Click or drop to replace</p>
+            <p className="cb-gen-upload__filename">{fileName}</p>
+            <p className="cb-gen-upload__hint">Click or drop to replace</p>
           </div>
         ) : (
-          <div className="pap-gen-upload__placeholder">
+          <div className="cb-gen-upload__placeholder">
             <p>Drop an image here or click to browse</p>
-            <p className="pap-gen-upload__hint">PNG, JPEG, GIF, or WebP</p>
+            <p className="cb-gen-upload__hint">PNG, JPEG, GIF, or WebP</p>
           </div>
         )}
       </div>
@@ -106,7 +106,7 @@ export function UploadPanel({
         type="file"
         accept="image/*"
         onChange={handleInputChange}
-        className="pap-sr-only"
+        className="cb-sr-only"
         tabIndex={-1}
         aria-hidden="true"
       />

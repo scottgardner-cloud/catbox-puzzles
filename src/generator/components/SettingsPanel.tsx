@@ -26,9 +26,9 @@ export function SettingsPanel({
   disabled,
 }: SettingsPanelProps): React.JSX.Element {
   return (
-    <section className="pap-gen-settings" aria-label="Generator settings">
+    <section className="cb-gen-settings" aria-label="Generator settings">
       {/* Puzzle name */}
-      <div className="pap-gen-settings__field">
+      <div className="cb-gen-settings__field">
         <label htmlFor="gen-name">Puzzle name</label>
         <input
           id="gen-name"
@@ -41,9 +41,9 @@ export function SettingsPanel({
       </div>
 
       {/* Grid size */}
-      <fieldset className="pap-gen-settings__fieldset" disabled={disabled}>
+      <fieldset className="cb-gen-settings__fieldset" disabled={disabled}>
         <legend>Grid size</legend>
-        <div className="pap-gen-settings__row">
+        <div className="cb-gen-settings__row">
           <label htmlFor="gen-rows">Rows</label>
           <select
             id="gen-rows"
@@ -73,9 +73,9 @@ export function SettingsPanel({
       </fieldset>
 
       {/* Mode toggle */}
-      <fieldset className="pap-gen-settings__fieldset" disabled={disabled}>
+      <fieldset className="cb-gen-settings__fieldset" disabled={disabled}>
         <legend>Mode</legend>
-        <div className="pap-gen-settings__row">
+        <div className="cb-gen-settings__row">
           <label>
             <input
               type="radio"
@@ -101,7 +101,7 @@ export function SettingsPanel({
 
       {/* B&W threshold */}
       {settings.kind === 'bw' && (
-        <div className="pap-gen-settings__field" aria-label="Threshold settings">
+        <div className="cb-gen-settings__field" aria-label="Threshold settings">
           <label htmlFor="gen-threshold">Threshold: {settings.bwThreshold}</label>
           <input
             id="gen-threshold"
@@ -115,7 +115,7 @@ export function SettingsPanel({
             aria-valuemax={255}
             aria-valuenow={settings.bwThreshold}
           />
-          <span className="pap-gen-settings__field-hint">
+          <span className="cb-gen-settings__field-hint">
             Lower = fewer filled cells (only dark pixels). Higher = more filled cells.
           </span>
         </div>
@@ -124,7 +124,7 @@ export function SettingsPanel({
       {/* Color options */}
       {settings.kind === 'color' && (
         <>
-          <div className="pap-gen-settings__field" aria-label="Color settings">
+          <div className="cb-gen-settings__field" aria-label="Color settings">
             <label htmlFor="gen-colors">Max colors: {settings.maxColors}</label>
             <input
               id="gen-colors"
@@ -140,7 +140,7 @@ export function SettingsPanel({
             />
           </div>
 
-          <div className="pap-gen-settings__field">
+          <div className="cb-gen-settings__field">
             <label htmlFor="gen-bg-mode">Background detection</label>
             <select
               id="gen-bg-mode"
@@ -165,7 +165,7 @@ export function SettingsPanel({
               <option value="alpha">Transparency (PNG)</option>
               <option value="none">No background</option>
             </select>
-            <span className="pap-gen-settings__field-hint">
+            <span className="cb-gen-settings__field-hint">
               {settings.backgroundMode.kind === 'auto' &&
                 'Detects transparent or edge-color backgrounds automatically.'}
               {settings.backgroundMode.kind === 'alpha' &&
@@ -177,10 +177,10 @@ export function SettingsPanel({
       )}
 
       {/* Generate button */}
-      <div className="pap-gen-settings__actions">
+      <div className="cb-gen-settings__actions">
         <button
           type="button"
-          className="pap-btn pap-btn--primary"
+          className="cb-btn cb-btn--primary"
           onClick={onGenerate}
           disabled={disabled || isGenerating}
           aria-busy={isGenerating}
@@ -194,7 +194,7 @@ export function SettingsPanel({
                 : '▶ Generate'}
         </button>
         {settingsChanged && hasResult && (
-          <p className="pap-gen-settings__hint" role="status">
+          <p className="cb-gen-settings__hint" role="status">
             Settings changed — regenerate to update preview.
           </p>
         )}

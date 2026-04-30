@@ -1,6 +1,6 @@
-# Pix-a-Pix
+# CatBox Puzzles
 
-A web-based [nonogram](https://en.wikipedia.org/wiki/Nonogram) (Picross / Pix-a-Pix) puzzle game built with React, TypeScript, and Vite.
+A web-based puzzle collection starting with [nonogram](https://en.wikipedia.org/wiki/Nonogram) puzzles, built with React, TypeScript, and Vite.
 
 Supports both **black-and-white** and **color** puzzles with full keyboard navigation and screen reader accessibility.
 

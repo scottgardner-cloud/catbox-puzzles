@@ -118,28 +118,28 @@ export function ImportPuzzle({ onImport, onClose }: ImportPuzzleProps): React.JS
   );
 
   return (
-    <div className="pap-import__backdrop" onClick={onClose} role="presentation">
+    <div className="cb-import__backdrop" onClick={onClose} role="presentation">
       <div
-        className="pap-import__modal"
+        className="cb-import__modal"
         role="dialog"
         aria-modal="true"
         aria-label="Import puzzle"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="pap-import__header">
+        <div className="cb-import__header">
           <h3>Import Puzzle</h3>
-          <button type="button" className="pap-import__close" onClick={onClose} aria-label="Close">
+          <button type="button" className="cb-import__close" onClick={onClose} aria-label="Close">
             ×
           </button>
         </div>
 
-        <p className="pap-import__description">
+        <p className="cb-import__description">
           Paste a puzzle JSON below, or upload a <code>.json</code> file.
         </p>
 
         <textarea
           ref={textareaRef}
-          className="pap-import__textarea"
+          className="cb-import__textarea"
           value={json}
           onChange={(e) => {
             setJson(e.target.value);
@@ -151,21 +151,21 @@ export function ImportPuzzle({ onImport, onClose }: ImportPuzzleProps): React.JS
         />
 
         {error && (
-          <p className="pap-import__error" role="alert">
+          <p className="cb-import__error" role="alert">
             {error}
           </p>
         )}
 
-        <div className="pap-import__actions">
+        <div className="cb-import__actions">
           <button
             type="button"
-            className="pap-btn pap-import__submit"
+            className="cb-btn cb-import__submit"
             onClick={handleSubmit}
             disabled={json.trim().length === 0}
           >
             Import
           </button>
-          <label className="pap-btn pap-import__upload">
+          <label className="cb-btn cb-import__upload">
             Upload File
             <input
               ref={fileInputRef}
@@ -175,7 +175,7 @@ export function ImportPuzzle({ onImport, onClose }: ImportPuzzleProps): React.JS
               hidden
             />
           </label>
-          <button type="button" className="pap-btn" onClick={onClose}>
+          <button type="button" className="cb-btn" onClick={onClose}>
             Cancel
           </button>
         </div>

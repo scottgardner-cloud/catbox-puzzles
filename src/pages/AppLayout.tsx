@@ -34,34 +34,34 @@ export function AppLayout(): React.JSX.Element {
   const context: LayoutContext = { announce };
 
   return (
-    <div className="pap-app">
-      <header className="pap-header">
+    <div className="cb-app">
+      <header className="cb-header">
         <h1>
-          <Link to="/" className="pap-header__title-link">
-            Pix-a-Pix
+          <Link to="/" className="cb-header__title-link">
+            CatBox Puzzles
           </Link>
         </h1>
-        <nav className="pap-nav">
-          <Link to="/" className="pap-nav__link">
+        <nav className="cb-nav">
+          <Link to="/" className="cb-nav__link">
             Puzzles
           </Link>
-          <Link to="/generator" className="pap-nav__link">
+          <Link to="/generator" className="cb-nav__link">
             Generator
           </Link>
-          <Link to="/editor" className="pap-nav__link">
+          <Link to="/editor" className="cb-nav__link">
             Editor
           </Link>
         </nav>
       </header>
 
-      <main className="pap-main">
+      <main className="cb-main">
         <Outlet context={context} />
       </main>
 
       {/* Visually hidden live region for screen reader announcements */}
       <div
         ref={liveRegionRef}
-        className="pap-sr-only"
+        className="cb-sr-only"
         role="status"
         aria-live="polite"
         aria-atomic="true"

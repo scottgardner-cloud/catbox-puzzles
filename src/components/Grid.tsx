@@ -141,7 +141,7 @@ function adaptiveCellSize(rows: number, cols: number): number {
 }
 
 /**
- * Renders the full Pix-a-Pix puzzle grid including clues, validation
+ * Renders the full nonogram puzzle grid including clues, validation
  * indicators, and the interactive cell grid.
  *
  * Layout (validation indicators are OUTSIDE the clues):
@@ -315,7 +315,7 @@ export function Grid({
   return (
     <div
       ref={gridRef}
-      className="pap-grid-wrapper"
+      className="cb-grid-wrapper"
       style={cursorStyle}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleGridLeave}
@@ -327,16 +327,16 @@ export function Grid({
       tabIndex={0}
     >
       {/* ── Column validation indicators (OUTSIDE, above clues) ── */}
-      <div className="pap-col-header-row">
-        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 24 }} />
+      <div className="cb-col-header-row">
+        <div className="cb-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 24 }} />
         <div
-          className="pap-col-validation"
+          className="cb-col-validation"
           style={{
             gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
           }}
         >
           {colValidation.map((v, ci) => (
-            <div key={ci} className={`pap-line-indicator pap-line-indicator--${v}`}>
+            <div key={ci} className={`cb-line-indicator cb-line-indicator--${v}`}>
               {v === 'correct' ? '✓' : v === 'incorrect' ? '✗' : ''}
             </div>
           ))}
@@ -344,10 +344,10 @@ export function Grid({
       </div>
 
       {/* ── Column clues (closer to grid) ── */}
-      <div className="pap-col-header-row">
-        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 24 }} />
+      <div className="cb-col-header-row">
+        <div className="cb-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 24 }} />
         <div
-          className="pap-col-clues"
+          className="cb-col-clues"
           style={{
             gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
           }}
@@ -355,15 +355,15 @@ export function Grid({
           {colClues.map((clue, ci) => (
             <div
               key={ci}
-              className={`pap-col-clue${hoverCol === ci ? ' pap-col-clue--highlight' : ''}`}
+              className={`cb-col-clue${hoverCol === ci ? ' cb-col-clue--highlight' : ''}`}
             >
               {clue.length === 0 ? (
-                <span className="pap-clue-num">0</span>
+                <span className="cb-clue-num">0</span>
               ) : (
                 clue.map((run, ri) => (
                   <span
                     key={ri}
-                    className="pap-clue-num"
+                    className="cb-clue-num"
                     style={isColorPuzzle ? clueColorStyle(resolveColor(run.colorId)) : undefined}
                   >
                     {run.length}
@@ -376,26 +376,26 @@ export function Grid({
       </div>
 
       {/* ── Row area (validation + clues + cells) ── */}
-      <div className="pap-rows">
+      <div className="cb-rows">
         {board.map((row, ri) => (
-          <div key={ri} className={`pap-row${hoverRow === ri ? ' pap-row--highlight' : ''}`}>
+          <div key={ri} className={`cb-row${hoverRow === ri ? ' cb-row--highlight' : ''}`}>
             {/* Row validation indicator (OUTSIDE, left of clues) */}
-            <div className={`pap-line-indicator pap-line-indicator--${rowValidation[ri]}`}>
+            <div className={`cb-line-indicator cb-line-indicator--${rowValidation[ri]}`}>
               {rowValidation[ri] === 'correct' ? '✓' : rowValidation[ri] === 'incorrect' ? '✗' : ''}
             </div>
 
             {/* Row clues (closer to grid) */}
             <div
-              className={`pap-row-clue${hoverRow === ri ? ' pap-row-clue--highlight' : ''}`}
+              className={`cb-row-clue${hoverRow === ri ? ' cb-row-clue--highlight' : ''}`}
               style={{ minWidth: maxRowClueLen * 24 }}
             >
               {rowClues[ri].length === 0 ? (
-                <span className="pap-clue-num">0</span>
+                <span className="cb-clue-num">0</span>
               ) : (
                 rowClues[ri].map((run, ci) => (
                   <span
                     key={ci}
-                    className="pap-clue-num"
+                    className="cb-clue-num"
                     style={isColorPuzzle ? clueColorStyle(resolveColor(run.colorId)) : undefined}
                   >
                     {run.length}
@@ -406,7 +406,7 @@ export function Grid({
 
             {/* Cells */}
             <div
-              className="pap-cells-row"
+              className="cb-cells-row"
               style={{
                 gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
               }}
@@ -417,12 +417,12 @@ export function Grid({
 
                 const dividerClasses: string[] = [];
                 if ((ci + 1) % 5 === 0 && ci + 1 < cols)
-                  dividerClasses.push('pap-cell--border-right');
+                  dividerClasses.push('cb-cell--border-right');
                 if ((ri + 1) % 5 === 0 && ri + 1 < rows)
-                  dividerClasses.push('pap-cell--border-bottom');
+                  dividerClasses.push('cb-cell--border-bottom');
 
                 // Highlight cells in the hovered row or column
-                if (hoverRow === ri || hoverCol === ci) dividerClasses.push('pap-cell--crosshair');
+                if (hoverRow === ri || hoverCol === ci) dividerClasses.push('cb-cell--crosshair');
 
                 const cellIsFocused = focusRow === ri && focusCol === ci;
 
@@ -454,7 +454,7 @@ export function Grid({
 
             {/* Row run-length indicator (right edge) */}
             <div
-              className={`pap-run-indicator${hoverRow === ri && hoverCol !== null ? '' : ' pap-run-indicator--hidden'}`}
+              className={`cb-run-indicator${hoverRow === ri && hoverCol !== null ? '' : ' cb-run-indicator--hidden'}`}
               style={
                 hoverRow === ri && hoverCol !== null
                   ? runIndicatorStyle(row[hoverCol], resolveColor)
@@ -468,10 +468,10 @@ export function Grid({
       </div>
 
       {/* Column run-length indicators (bottom edge) */}
-      <div className="pap-col-header-row">
-        <div className="pap-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 24 }} />
+      <div className="cb-col-header-row">
+        <div className="cb-col-header-spacer" style={{ minWidth: maxRowClueLen * 24 + 24 }} />
         <div
-          className="pap-col-run-indicators"
+          className="cb-col-run-indicators"
           style={{ gridTemplateColumns: `repeat(${cols}, ${cellSize}px)` }}
         >
           {Array.from({ length: cols }, (_, ci) => {
@@ -480,7 +480,7 @@ export function Grid({
             return (
               <div
                 key={ci}
-                className={`pap-run-indicator${show ? '' : ' pap-run-indicator--hidden'}`}
+                className={`cb-run-indicator${show ? '' : ' cb-run-indicator--hidden'}`}
                 style={
                   show && hoverRow !== null
                     ? runIndicatorStyle(colCells[hoverRow], resolveColor)

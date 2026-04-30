@@ -44,7 +44,7 @@ describe('saveGame / loadGame round-trip', () => {
   });
 
   it('rejects malformed JSON', () => {
-    localStorage.setItem('pap-save-' + entryId, 'not valid json{{{');
+    localStorage.setItem('catbox-nonogram-save-' + entryId, 'not valid json{{{');
     expect(loadGame(entryId)).toBeNull();
   });
 });
@@ -53,26 +53,26 @@ describe('isValidSave (structural validation via loadGame)', () => {
   it('rejects save with invalid board cell shapes', () => {
     const bad = makeValidSave();
     (bad as unknown as Record<string, unknown>).board = [[{ kind: 'bogus' }]];
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify(bad));
     expect(loadGame(entryId)).toBeNull();
   });
 
   it('rejects save with non-object board cells', () => {
     const bad = makeValidSave();
     (bad as unknown as Record<string, unknown>).board = [[42, 'string', null]];
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify(bad));
     expect(loadGame(entryId)).toBeNull();
   });
 
   it('rejects save missing required fields', () => {
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify({ version: 1 }));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify({ version: 1 }));
     expect(loadGame(entryId)).toBeNull();
   });
 
   it('rejects save with wrong version', () => {
     const bad = makeValidSave();
     (bad as unknown as Record<string, unknown>).version = 99;
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify(bad));
     expect(loadGame(entryId)).toBeNull();
   });
 
@@ -80,7 +80,7 @@ describe('isValidSave (structural validation via loadGame)', () => {
     const bad = makeValidSave({
       undoStack: [{ type: 'unknown-action' } as unknown as GameAction],
     });
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify(bad));
     expect(loadGame(entryId)).toBeNull();
   });
 
@@ -98,7 +98,7 @@ describe('isValidSave (structural validation via loadGame)', () => {
         } as unknown as GameAction,
       ],
     });
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify(bad));
     expect(loadGame(entryId)).toBeNull();
   });
 
@@ -109,7 +109,7 @@ describe('isValidSave (structural validation via loadGame)', () => {
     const save = makeValidSave({
       undoStack: [{ type: 'set-cells', changes }],
     });
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify(save));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify(save));
     expect(loadGame(entryId)).not.toBeNull();
   });
 
@@ -124,7 +124,7 @@ describe('isValidSave (structural validation via loadGame)', () => {
         },
       ],
     });
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify(save));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify(save));
     expect(loadGame(entryId)).not.toBeNull();
   });
 });
@@ -303,7 +303,7 @@ describe('timer persistence', () => {
       redoStack: [],
       savedAt: new Date().toISOString(),
     };
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify(legacySave));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify(legacySave));
     const loaded = loadGame(entryId)!;
     expect(loaded).not.toBeNull();
     expect(loaded.elapsedMs).toBe(0);
@@ -320,7 +320,7 @@ describe('timer persistence', () => {
       redoStack: [],
       savedAt: new Date().toISOString(),
     };
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify(legacySave));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify(legacySave));
     const loaded = loadGame(entryId)!;
     const restored = restoreGameState(loaded, crossPuzzle)!;
     expect(restored).not.toBeNull();
@@ -340,7 +340,7 @@ describe('timer persistence', () => {
       elapsedMs: 1000,
       timerStatus: 'bogus',
     };
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify(bad));
     expect(loadGame(entryId)).toBeNull();
   });
 
@@ -356,7 +356,7 @@ describe('timer persistence', () => {
       elapsedMs: 'not-a-number',
       timerStatus: 'idle',
     };
-    localStorage.setItem('pap-save-' + entryId, JSON.stringify(bad));
+    localStorage.setItem('catbox-nonogram-save-' + entryId, JSON.stringify(bad));
     expect(loadGame(entryId)).toBeNull();
   });
 

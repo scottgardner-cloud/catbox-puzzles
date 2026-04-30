@@ -147,7 +147,7 @@ export function EditorGrid({
 
   return (
     <div
-      className="pap-editor-grid-wrapper"
+      className="cb-editor-grid-wrapper"
       onPointerUp={handlePointerUp}
       onContextMenu={handleContextMenu}
       style={
@@ -163,20 +163,20 @@ export function EditorGrid({
       }
     >
       {/* CSS Grid layout: [col-clues] above [row-clues | pixel-grid] */}
-      <div className="pap-editor-grid-layout">
+      <div className="cb-editor-grid-layout">
         {/* Top-left spacer */}
-        <div className="pap-editor-grid__spacer" />
+        <div className="cb-editor-grid__spacer" />
 
         {/* Column clues — aligned to bottom, grow upward */}
-        <div className="pap-editor-grid__col-clues">
+        <div className="cb-editor-grid__col-clues">
           {Array.from({ length: state.cols }, (_, col) => {
             const clue = colClues[col] ?? [];
             return (
-              <div key={col} className="pap-editor-grid__col-clue-stack">
+              <div key={col} className="cb-editor-grid__col-clue-stack">
                 {clue.map((run, i) => (
                   <span
                     key={i}
-                    className="pap-editor-grid__clue-num"
+                    className="cb-editor-grid__clue-num"
                     style={
                       state.kind === 'color'
                         ? { color: getCellColor(run.colorId) ?? undefined }
@@ -187,7 +187,7 @@ export function EditorGrid({
                   </span>
                 ))}
                 {clue.length === 0 && (
-                  <span className="pap-editor-grid__clue-num pap-editor-grid__clue-num--empty">
+                  <span className="cb-editor-grid__clue-num cb-editor-grid__clue-num--empty">
                     0
                   </span>
                 )}
@@ -197,15 +197,15 @@ export function EditorGrid({
         </div>
 
         {/* Row clues — aligned to right, grow leftward */}
-        <div className="pap-editor-grid__row-clues">
+        <div className="cb-editor-grid__row-clues">
           {Array.from({ length: state.rows }, (_, row) => {
             const clue = rowClues[row] ?? [];
             return (
-              <div key={row} className="pap-editor-grid__row-clue-stack">
+              <div key={row} className="cb-editor-grid__row-clue-stack">
                 {clue.map((run, i) => (
                   <span
                     key={i}
-                    className="pap-editor-grid__clue-num"
+                    className="cb-editor-grid__clue-num"
                     style={
                       state.kind === 'color'
                         ? { color: getCellColor(run.colorId) ?? undefined }
@@ -216,7 +216,7 @@ export function EditorGrid({
                   </span>
                 ))}
                 {clue.length === 0 && (
-                  <span className="pap-editor-grid__clue-num pap-editor-grid__clue-num--empty">
+                  <span className="cb-editor-grid__clue-num cb-editor-grid__clue-num--empty">
                     0
                   </span>
                 )}
@@ -227,7 +227,7 @@ export function EditorGrid({
 
         {/* Pixel grid — fixed size, never moves */}
         <div
-          className="pap-editor-grid__cells"
+          className="cb-editor-grid__cells"
           role="grid"
           aria-label="Puzzle editor grid"
           tabIndex={0}
@@ -250,12 +250,12 @@ export function EditorGrid({
                   role="gridcell"
                   aria-label={`Row ${r + 1}, Column ${c + 1}${displayCell ? `, filled ${state.palette.find((p) => p.id === displayCell)?.name ?? ''}` : ', empty'}${repairChange ? ' (proposed repair)' : ''}`}
                   className={[
-                    'pap-editor-grid__cell',
-                    displayCell ? 'pap-editor-grid__cell--filled' : '',
-                    isFocused ? 'pap-editor-grid__cell--focused' : '',
-                    repairChange ? 'pap-editor-grid__cell--repair' : '',
-                    showDividerRight ? 'pap-editor-grid__cell--divider-right' : '',
-                    showDividerBottom ? 'pap-editor-grid__cell--divider-bottom' : '',
+                    'cb-editor-grid__cell',
+                    displayCell ? 'cb-editor-grid__cell--filled' : '',
+                    isFocused ? 'cb-editor-grid__cell--focused' : '',
+                    repairChange ? 'cb-editor-grid__cell--repair' : '',
+                    showDividerRight ? 'cb-editor-grid__cell--divider-right' : '',
+                    showDividerBottom ? 'cb-editor-grid__cell--divider-bottom' : '',
                   ]
                     .filter(Boolean)
                     .join(' ')}

@@ -81,17 +81,17 @@ export function EditorPage(): React.JSX.Element {
   useNavigationGuard(state.isDirty);
 
   return (
-    <div className="pap-editor">
+    <div className="cb-editor">
       <h2>{state.mode === 'edit' ? 'Edit Puzzle' : 'Puzzle Editor'}</h2>
-      <p className="pap-editor__subtitle">
+      <p className="cb-editor__subtitle">
         {state.mode === 'edit'
           ? 'Modify your puzzle and save changes.'
           : 'Paint pixel art, then export as a playable nonogram.'}
       </p>
 
-      <div className="pap-editor__layout">
+      <div className="cb-editor__layout">
         {/* Left panel: toolbar + palette */}
-        <div className="pap-editor__sidebar">
+        <div className="cb-editor__sidebar">
           <EditorToolbar
             state={state}
             dispatch={dispatch}
@@ -104,7 +104,7 @@ export function EditorPage(): React.JSX.Element {
         </div>
 
         {/* Main: paint grid */}
-        <div className="pap-editor__canvas">
+        <div className="cb-editor__canvas">
           <EditorGrid
             state={state}
             dispatch={dispatch}
@@ -116,7 +116,7 @@ export function EditorPage(): React.JSX.Element {
 
       {/* Navigation hint */}
       {state.isDirty && (
-        <p className="pap-editor__unsaved" role="status">
+        <p className="cb-editor__unsaved" role="status">
           You have unsaved changes.
         </p>
       )}

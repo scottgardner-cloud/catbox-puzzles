@@ -1,8 +1,8 @@
-# Pix-a-Pix — Copilot Instructions
+# CatBox Puzzles — Copilot Instructions
 
 ## Project Overview
 
-A web-based Pix-a-Pix (Nonogram/Picross) puzzle game built with React, TypeScript, and Vite.
+A web-based puzzle collection (nonogram and more) built with React, TypeScript, and Vite.
 
 ## Architecture
 
@@ -27,7 +27,7 @@ Three-layer architecture:
 - Engine tests are highest priority — pure logic should have thorough coverage
 - Colocate tests: `engine/validation.ts` → `engine/validation.test.ts`
 
-## Game Rules (Nonogram / Pic-a-Pix)
+## Game Rules (Nonogram)
 
 - Grid puzzle where players fill cells to reveal a picture
 - Clues on rows and columns indicate lengths of consecutive filled blocks

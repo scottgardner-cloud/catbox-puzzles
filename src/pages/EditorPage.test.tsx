@@ -152,7 +152,7 @@ describe('EditorPage', () => {
       // Click first cell to paint
       await user.click(cells[0]);
       // Cell should now have a background color
-      expect(cells[0]).toHaveClass('pap-editor-grid__cell--filled');
+      expect(cells[0]).toHaveClass('cb-editor-grid__cell--filled');
     });
 
     it('supports keyboard navigation', async () => {
@@ -172,7 +172,7 @@ describe('EditorPage', () => {
 
       // The cell at (1,1) should be filled
       const cells = screen.getAllByRole('gridcell');
-      expect(cells[11]).toHaveClass('pap-editor-grid__cell--filled');
+      expect(cells[11]).toHaveClass('cb-editor-grid__cell--filled');
     });
 
     it('can erase cells with Delete key', async () => {
@@ -183,12 +183,12 @@ describe('EditorPage', () => {
 
       // Click to paint
       await user.click(cells[0]);
-      expect(cells[0]).toHaveClass('pap-editor-grid__cell--filled');
+      expect(cells[0]).toHaveClass('cb-editor-grid__cell--filled');
 
       // Focus grid, navigate to cell, and delete
       await user.click(grid);
       await user.keyboard('{Delete}');
-      expect(cells[0]).not.toHaveClass('pap-editor-grid__cell--filled');
+      expect(cells[0]).not.toHaveClass('cb-editor-grid__cell--filled');
     });
   });
 
@@ -216,13 +216,13 @@ describe('EditorPage', () => {
       // Paint a cell first
       const cells = screen.getAllByRole('gridcell');
       await user.click(cells[0]);
-      expect(cells[0]).toHaveClass('pap-editor-grid__cell--filled');
+      expect(cells[0]).toHaveClass('cb-editor-grid__cell--filled');
 
       // Clear all
       await user.click(screen.getByRole('button', { name: /clear all/i }));
       const updatedCells = screen.getAllByRole('gridcell');
       const filledCells = updatedCells.filter((c) =>
-        c.classList.contains('pap-editor-grid__cell--filled'),
+        c.classList.contains('cb-editor-grid__cell--filled'),
       );
       expect(filledCells.length).toBe(0);
     });
@@ -237,9 +237,7 @@ describe('EditorPage', () => {
 
       await user.click(screen.getByRole('button', { name: /fill all/i }));
       const cells = screen.getAllByRole('gridcell');
-      const filledCells = cells.filter((c) =>
-        c.classList.contains('pap-editor-grid__cell--filled'),
-      );
+      const filledCells = cells.filter((c) => c.classList.contains('cb-editor-grid__cell--filled'));
       expect(filledCells.length).toBe(25);
     });
   });
@@ -266,9 +264,7 @@ describe('EditorPage', () => {
 
       // Grid should have filled cells
       const cells = screen.getAllByRole('gridcell');
-      const filledCells = cells.filter((c) =>
-        c.classList.contains('pap-editor-grid__cell--filled'),
-      );
+      const filledCells = cells.filter((c) => c.classList.contains('cb-editor-grid__cell--filled'));
       // Cross pattern: 5 (middle row) + 4 (middle col minus center) = 9
       expect(filledCells.length).toBe(9);
     });

@@ -57,9 +57,9 @@ export function GeneratorPage(): React.JSX.Element {
     gen.status === 'generating' || gen.status === 'saving' || gen.status === 'loading-image';
 
   return (
-    <div className="pap-gen">
+    <div className="cb-gen">
       <h2>Puzzle Generator</h2>
-      <p className="pap-gen__subtitle">Convert an image into a playable nonogram puzzle.</p>
+      <p className="cb-gen__subtitle">Convert an image into a playable nonogram puzzle.</p>
 
       {/* Step 1: Upload */}
       <UploadPanel
@@ -88,17 +88,17 @@ export function GeneratorPage(): React.JSX.Element {
 
       {/* Solvability status */}
       {gen.result?.ok && gen.result.solvability.solvable && (
-        <div className="pap-gen-solvability-ok" role="status">
+        <div className="cb-gen-solvability-ok" role="status">
           <p>✓ Uniquely solvable — this puzzle can be solved with logic alone.</p>
         </div>
       )}
       {gen.result?.ok && !gen.result.solvability.solvable && (
-        <div className="pap-gen-solvability-warning" role="alert">
+        <div className="cb-gen-solvability-warning" role="alert">
           <p>
             <strong>⚠ Solvability warning:</strong> {gen.result.solvability.reason}
           </p>
-          <p className="pap-gen-solvability-warning__hint">{gen.result.solvability.hint}</p>
-          <p className="pap-gen-solvability-warning__note">
+          <p className="cb-gen-solvability-warning__hint">{gen.result.solvability.hint}</p>
+          <p className="cb-gen-solvability-warning__note">
             You can still save this puzzle, but it may require guessing to solve.
           </p>
         </div>
@@ -118,8 +118,8 @@ export function GeneratorPage(): React.JSX.Element {
 
       {/* Standalone reset when no result yet */}
       {hasImage && !gen.result && !gen.error && (
-        <div className="pap-gen__secondary">
-          <button type="button" className="pap-btn" onClick={gen.reset}>
+        <div className="cb-gen__secondary">
+          <button type="button" className="cb-btn" onClick={gen.reset}>
             ↩ Start Over
           </button>
         </div>

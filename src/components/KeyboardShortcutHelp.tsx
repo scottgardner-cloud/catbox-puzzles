@@ -77,7 +77,7 @@ export function KeyboardShortcutHelp({
       <button
         ref={triggerRef}
         type="button"
-        className="pap-btn pap-shortcut-help__trigger"
+        className="cb-btn cb-shortcut-help__trigger"
         onClick={toggle}
         aria-label="Keyboard shortcuts"
         title="Keyboard shortcuts"
@@ -86,20 +86,20 @@ export function KeyboardShortcutHelp({
       </button>
 
       {isOpen && (
-        <div className="pap-shortcut-help__backdrop" onClick={close} role="presentation">
+        <div className="cb-shortcut-help__backdrop" onClick={close} role="presentation">
           <div
-            className="pap-shortcut-help__modal"
+            className="cb-shortcut-help__modal"
             role="dialog"
             aria-modal="true"
             aria-label="Keyboard shortcuts"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="pap-shortcut-help__header">
+            <div className="cb-shortcut-help__header">
               <h3>Keyboard Shortcuts</h3>
               <button
                 ref={closeRef}
                 type="button"
-                className="pap-shortcut-help__close"
+                className="cb-shortcut-help__close"
                 onClick={close}
                 aria-label="Close"
               >
@@ -107,10 +107,10 @@ export function KeyboardShortcutHelp({
               </button>
             </div>
 
-            <h4 className="pap-shortcut-help__section">Grid Navigation</h4>
+            <h4 className="cb-shortcut-help__section">Grid Navigation</h4>
             <ShortcutTable shortcuts={GRID_SHORTCUTS} />
 
-            <h4 className="pap-shortcut-help__section">Global</h4>
+            <h4 className="cb-shortcut-help__section">Global</h4>
             <ShortcutTable shortcuts={GLOBAL_SHORTCUTS} />
           </div>
         </div>
@@ -125,19 +125,19 @@ function ShortcutTable({
   readonly shortcuts: readonly Shortcut[];
 }): React.JSX.Element {
   return (
-    <table className="pap-shortcut-help__table">
+    <table className="cb-shortcut-help__table">
       <tbody>
         {shortcuts.map((s) => (
           <tr key={s.keys}>
-            <td className="pap-shortcut-help__keys">
+            <td className="cb-shortcut-help__keys">
               {s.keys.split(' / ').map((k, i) => (
                 <span key={k}>
-                  {i > 0 && <span className="pap-shortcut-help__sep"> / </span>}
+                  {i > 0 && <span className="cb-shortcut-help__sep"> / </span>}
                   <kbd>{k}</kbd>
                 </span>
               ))}
             </td>
-            <td className="pap-shortcut-help__desc">{s.description}</td>
+            <td className="cb-shortcut-help__desc">{s.description}</td>
           </tr>
         ))}
       </tbody>
