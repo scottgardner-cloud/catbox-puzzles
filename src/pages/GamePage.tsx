@@ -13,10 +13,11 @@ import {
   getHintWithExplanations,
 } from '../engine';
 import type { HintResult, DeductionReason } from '../engine';
+import { useTimer } from '../hooks/useTimer';
 import { getEntryById } from '../puzzles/registry';
 import type { PuzzleEntry } from '../puzzles/types';
 import { saveGame, loadGame, restoreGameState } from '../state/persistence';
-import type { ValidatedPuzzle, CellChange, PlayerCellState, ColorId, TimerStatus } from '../types';
+import type { ValidatedPuzzle, CellChange, PlayerCellState, ColorId } from '../types';
 import { useLayoutContext } from './AppLayout';
 
 type GameState = ReturnType<typeof createInitialGameState>;
@@ -167,77 +168,24 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
     isDirtyRef.current = isDirty;
   });
 
-  // ── Timer state (refs for live tracking, state for display) ──────
-  const runningSinceRef = useRef<number | null>(null);
-  const baseElapsedRef = useRef(gameState.elapsedMs);
-  const timerStatusRef = useRef<TimerStatus>(gameState.timerStatus);
-  const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [displayMs, setDisplayMs] = useState(gameState.elapsedMs);
-
-  /** Flush timer: compute accurate elapsed time from wall-clock delta. */
-  const flushTimer = useCallback((): number => {
-    if (runningSinceRef.current === null) return baseElapsedRef.current;
-    const now = Date.now();
-    const delta = now - runningSinceRef.current;
-    baseElapsedRef.current += delta;
-    runningSinceRef.current = now;
-    return baseElapsedRef.current;
-  }, []);
-
-  /** Start the display-refresh interval (does not touch gameState or dirty flag). */
-  const startTimerInterval = useCallback(() => {
-    if (timerIntervalRef.current !== null) return;
-    runningSinceRef.current = Date.now();
-    timerIntervalRef.current = setInterval(() => {
-      if (runningSinceRef.current === null) return;
-      setDisplayMs(baseElapsedRef.current + (Date.now() - runningSinceRef.current));
-    }, 1000);
-  }, []);
-
-  /** Stop the display-refresh interval. */
-  const stopTimerInterval = useCallback(() => {
-    if (timerIntervalRef.current !== null) {
-      clearInterval(timerIntervalRef.current);
-      timerIntervalRef.current = null;
-    }
-    runningSinceRef.current = null;
-  }, []);
-
-  /** Start timer on first cell interaction. */
-  const ensureTimerRunning = useCallback(() => {
-    if (timerStatusRef.current !== 'idle') return;
-    timerStatusRef.current = 'running';
-    setGameState((s) => ({ ...s, timerStatus: 'running' }));
-    startTimerInterval();
-    setIsDirty(true);
-  }, [startTimerInterval]);
-
-  // Resume timer on mount if it was running and puzzle not solved
-  useEffect(() => {
-    if (timerStatusRef.current === 'running' && !solved) {
-      startTimerInterval();
-    }
-    return () => stopTimerInterval();
-    // Mount/unmount only — refs and solved are correct at mount time
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Sync timer refs when gameState timer fields change (e.g., undo/redo reset)
-  useEffect(() => {
-    if (
-      baseElapsedRef.current !== gameState.elapsedMs ||
-      timerStatusRef.current !== gameState.timerStatus
-    ) {
-      baseElapsedRef.current = gameState.elapsedMs;
-      timerStatusRef.current = gameState.timerStatus;
-      setDisplayMs(gameState.elapsedMs);
-      if (gameState.timerStatus === 'running' && !solved) {
-        startTimerInterval();
-      } else if (gameState.timerStatus !== 'running') {
-        stopTimerInterval();
-      }
-    }
-  }, [gameState.elapsedMs, gameState.timerStatus, solved, startTimerInterval, stopTimerInterval]);
+  // ── Timer (via useTimer hook) ─────────────────────────────────────
+  const timer = useTimer({
+    externalMs: gameState.elapsedMs,
+    externalStatus: gameState.timerStatus,
+    isSolved: solved,
+    onStart: () => {
+      setGameState((s) => ({ ...s, timerStatus: 'running' }));
+      setIsDirty(true);
+    },
+    onSolved: (finalMs) => {
+      setGameState((s) => ({ ...s, timerStatus: 'stopped', elapsedMs: finalMs }));
+      setIsDirty(true);
+      announce(`Puzzle solved in ${formatTime(finalMs)}! Congratulations!`);
+    },
+    onUndoPastSolve: () => {
+      setGameState((s) => ({ ...s, timerStatus: 'running' }));
+    },
+  });
 
   /** Wrap setGameState to also mark dirty. */
   const updateGameState = useCallback((updater: (s: GameState) => GameState) => {
@@ -248,43 +196,43 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
   // ── Auto-save on change (debounced, only if dirty) ──────────────
   useEffect(() => {
     if (!isDirty) return;
-    const timer = setTimeout(() => {
-      const flushedMs = flushTimer();
+    const debounce = setTimeout(() => {
+      const flushedMs = timer.flushTimer();
       saveGame(gameStateRef.current, entry.entryId, {
         elapsedMs: flushedMs,
-        timerStatus: timerStatusRef.current,
+        timerStatus: gameStateRef.current.timerStatus,
       });
     }, SAVE_DEBOUNCE_MS);
-    return () => clearTimeout(timer);
-  }, [gameState, isDirty, entry.entryId, flushTimer]);
+    return () => clearTimeout(debounce);
+  }, [gameState, isDirty, entry.entryId, timer]);
 
   // ── Save on unmount (backup — fires if dirty or timer has unflushed time) ──
   useEffect(() => {
     return () => {
-      if (isDirtyRef.current || runningSinceRef.current !== null) {
-        const flushedMs = flushTimer();
+      if (isDirtyRef.current || timer.hasUnflushedTime()) {
+        const flushedMs = timer.flushTimer();
         saveGame(gameStateRef.current, entry.entryId, {
           elapsedMs: flushedMs,
-          timerStatus: timerStatusRef.current,
+          timerStatus: gameStateRef.current.timerStatus,
         });
       }
     };
-  }, [entry.entryId, flushTimer]);
+  }, [entry.entryId, timer]);
 
   // ── Flush timer on tab close / browser crash (S12) ──────────────
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (isDirtyRef.current || runningSinceRef.current !== null) {
-        const flushedMs = flushTimer();
+      if (isDirtyRef.current || timer.hasUnflushedTime()) {
+        const flushedMs = timer.flushTimer();
         saveGame(gameStateRef.current, entry.entryId, {
           elapsedMs: flushedMs,
-          timerStatus: timerStatusRef.current,
+          timerStatus: gameStateRef.current.timerStatus,
         });
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [entry.entryId, flushTimer]);
+  }, [entry.entryId, timer]);
 
   // ── Drag state (ephemeral UI concern) ───────────────────────────
   const isDragging = useRef(false);
@@ -295,16 +243,16 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
   const handleCellClick = useCallback(
     (row: number, col: number) => {
       if (solved) return;
-      ensureTimerRunning();
+      timer.ensureRunning();
       updateGameState((s) => cycleCell(s, row, col, puzzle));
     },
-    [puzzle, solved, updateGameState, ensureTimerRunning],
+    [puzzle, solved, updateGameState, timer],
   );
 
   const handleDragStart = useCallback(
     (row: number, col: number) => {
       if (solved) return;
-      ensureTimerRunning();
+      timer.ensureRunning();
       isDragging.current = true;
       const current = gameState.board[row][col];
       switch (current.kind) {
@@ -321,7 +269,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
       dragChanges.current = [];
       lastDragCell.current = { row, col };
     },
-    [gameState, solved, ensureTimerRunning],
+    [gameState, solved, timer],
   );
 
   const handleCellDragEnter = useCallback(
@@ -383,12 +331,9 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
     [puzzle, updateGameState],
   );
   const handleReset = useCallback(() => {
-    stopTimerInterval();
-    baseElapsedRef.current = 0;
-    timerStatusRef.current = 'idle';
-    setDisplayMs(0);
+    timer.resetTimer();
     updateGameState((s) => resetBoard(s, puzzle));
-  }, [puzzle, updateGameState, stopTimerInterval]);
+  }, [puzzle, updateGameState, timer]);
   const handleCheck = useCallback(
     () => updateGameState((s) => checkErrors(s, puzzle)),
     [puzzle, updateGameState],
@@ -399,24 +344,24 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
   }, []);
 
   const handleSave = useCallback(() => {
-    const flushedMs = flushTimer();
+    const flushedMs = timer.flushTimer();
     saveGame(gameState, entry.entryId, {
       elapsedMs: flushedMs,
-      timerStatus: timerStatusRef.current,
+      timerStatus: gameState.timerStatus,
     });
     setIsDirty(false);
-  }, [gameState, entry.entryId, flushTimer]);
+  }, [gameState, entry.entryId, timer]);
 
   const handleBack = useCallback(() => {
-    if (isDirtyRef.current || runningSinceRef.current !== null) {
-      const flushedMs = flushTimer();
+    if (isDirtyRef.current || timer.hasUnflushedTime()) {
+      const flushedMs = timer.flushTimer();
       saveGame(gameStateRef.current, entry.entryId, {
         elapsedMs: flushedMs,
-        timerStatus: timerStatusRef.current,
+        timerStatus: gameStateRef.current.timerStatus,
       });
     }
     navigate('/');
-  }, [entry.entryId, navigate, flushTimer]);
+  }, [entry.entryId, navigate, timer]);
 
   // ── Hint state ──────────────────────────────────────────────────
   const [hintCells, setHintCells] = useState<ReadonlySet<string>>(new Set());
@@ -468,27 +413,6 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         break;
     }
   }, [puzzle, gameState.board, solved, announce]);
-
-  // ── Announce solved state + timer transitions ────────────────────
-  const prevSolvedRef = useRef(false);
-  useEffect(() => {
-    if (solved && !prevSolvedRef.current) {
-      // Just solved — flush and stop timer
-      const finalMs = flushTimer();
-      stopTimerInterval();
-      timerStatusRef.current = 'stopped';
-      setGameState((s) => ({ ...s, timerStatus: 'stopped', elapsedMs: finalMs }));
-      setDisplayMs(finalMs);
-      setIsDirty(true);
-      announce(`Puzzle solved in ${formatTime(finalMs)}! Congratulations!`);
-    } else if (!solved && prevSolvedRef.current && timerStatusRef.current === 'stopped') {
-      // Undo past solve — resume timer
-      timerStatusRef.current = 'running';
-      setGameState((s) => ({ ...s, timerStatus: 'running' }));
-      startTimerInterval();
-    }
-    prevSolvedRef.current = solved;
-  }, [solved, announce, flushTimer, stopTimerInterval, startTimerInterval]);
 
   // ── Announce validation results ─────────────────────────────────
   const prevValidationRef = useRef(false);
@@ -546,14 +470,14 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
       </div>
 
       <div className={`pap-solved${solved ? '' : ' pap-solved--hidden'}`}>
-        🎉 Puzzle Solved! ({formatTime(displayMs)})
+        🎉 Puzzle Solved! ({formatTime(timer.displayMs)})
       </div>
 
       <div
-        className={`pap-timer${gameState.timerStatus === 'idle' ? ' pap-timer--idle' : ''}`}
+        className={`pap-timer${timer.timerStatus === 'idle' ? ' pap-timer--idle' : ''}`}
         aria-label="Solve timer"
       >
-        ⏱ {formatTime(displayMs)}
+        ⏱ {formatTime(timer.displayMs)}
       </div>
 
       <PaletteBar
