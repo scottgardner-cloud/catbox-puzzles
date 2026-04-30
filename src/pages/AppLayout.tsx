@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react';
-import { Link, Outlet, useOutletContext } from 'react-router-dom';
+import { Link, Outlet, useLocation, useOutletContext } from 'react-router-dom';
+import { puzzleModules } from '../puzzle-modules';
 import '../shared/styles/app.css';
 
 /** Context provided by AppLayout to child routes via Outlet. */
@@ -17,10 +18,16 @@ export function useLayoutContext(): LayoutContext {
  * Shared application shell rendered around all routes.
  * Provides the header, navigation, screen reader live region,
  * and passes an `announce()` function to child routes via Outlet context.
+ *
+ * Navigation is dynamic: when inside a puzzle type, shows that type's
+ * nav items. At home level, shows registered puzzle types.
  */
 export function AppLayout(): React.JSX.Element {
   const liveRegionRef = useRef<HTMLDivElement>(null);
   const announceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const location = useLocation();
+
+  const currentModule = puzzleModules.find((m) => location.pathname.startsWith(`/${m.id}`));
 
   const announce = useCallback((message: string) => {
     if (!liveRegionRef.current) return;
@@ -42,15 +49,21 @@ export function AppLayout(): React.JSX.Element {
           </Link>
         </h1>
         <nav className="cb-nav">
-          <Link to="/nonogram" className="cb-nav__link">
-            Puzzles
-          </Link>
-          <Link to="/nonogram/generator" className="cb-nav__link">
-            Generator
-          </Link>
-          <Link to="/nonogram/editor" className="cb-nav__link">
-            Editor
-          </Link>
+          {currentModule
+            ? currentModule.navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={`/${currentModule.id}/${item.path}`}
+                  className="cb-nav__link"
+                >
+                  {item.label}
+                </Link>
+              ))
+            : puzzleModules.map((mod) => (
+                <Link key={mod.id} to={`/${mod.id}`} className="cb-nav__link">
+                  {mod.icon} {mod.name}
+                </Link>
+              ))}
         </nav>
       </header>
 
