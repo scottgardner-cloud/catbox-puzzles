@@ -5,7 +5,7 @@ import { GRID_SIZE_PRESETS } from './types';
 interface EditorToolbarProps {
   readonly state: EditorState;
   readonly dispatch: React.Dispatch<EditorAction>;
-  readonly onCheckSolvability: () => Promise<void>;
+  readonly onCheckSolvability: () => Promise<boolean>;
   readonly onAttemptRepair: () => Promise<void>;
   readonly onExport: () => void;
   readonly isChecking: boolean;

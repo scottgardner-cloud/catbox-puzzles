@@ -23,9 +23,14 @@ createRoot(document.getElementById('root')!).render(
           />
           {puzzleModules.map((mod) => (
             <Route key={mod.id} path={`${mod.id}/*`}>
-              {mod.routes.map((route, i) => (
-                <Route key={i} {...route} />
-              ))}
+              {mod.routes.map((route, i) => {
+                const { index, path, element } = route;
+                return index ? (
+                  <Route key={i} index element={element} />
+                ) : (
+                  <Route key={i} path={path} element={element} />
+                );
+              })}
             </Route>
           ))}
           <Route path="*" element={<Navigate to="/" replace />} />

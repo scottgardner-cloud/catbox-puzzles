@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { ColorId, PuzzleDefinition } from '../../types';
+import type { ColorId, PuzzleDefinition, ValidatedPuzzle } from '../../types';
 import { colorId } from '../../types';
 import { validatePuzzleDefinition } from '../../engine/validation';
 import { solvePuzzle } from '../../engine/solver';

@@ -121,6 +121,8 @@ describe('isValidSave (structural validation via loadGame)', () => {
           previousBoard: Array.from({ length: 5 }, () =>
             Array.from({ length: 5 }, () => ({ kind: 'unknown' as const })),
           ),
+          previousElapsedMs: 0,
+          previousTimerStatus: 'idle' as const,
         },
       ],
     });
@@ -225,6 +227,8 @@ describe('restoreGameState (semantic validation)', () => {
         {
           type: 'reset',
           previousBoard: [[{ kind: 'unknown' }]], // 1×1 vs 5×5
+          previousElapsedMs: 0,
+          previousTimerStatus: 'idle' as const,
         },
       ],
     });

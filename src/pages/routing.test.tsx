@@ -18,9 +18,14 @@ function renderApp(initialPath = '/') {
         <Route element={<AppLayout />}>
           <Route path="/" element={<Navigate to={`/${nonogramModule.id}`} replace />} />
           <Route path={`${nonogramModule.id}/*`}>
-            {nonogramModule.routes.map((route, i) => (
-              <Route key={i} {...route} />
-            ))}
+            {nonogramModule.routes.map((route, i) => {
+              const { index, path, element } = route;
+              return index ? (
+                <Route key={i} index element={element} />
+              ) : (
+                <Route key={i} path={path} element={element} />
+              );
+            })}
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
