@@ -13,6 +13,7 @@ import {
   getHintWithExplanations,
 } from '../engine';
 import type { HintResult, DeductionReason } from '../engine';
+import { useAutoSave } from '../hooks/useAutoSave';
 import { useTimer } from '../hooks/useTimer';
 import { getEntryById } from '../puzzles/registry';
 import type { PuzzleEntry } from '../puzzles/types';
@@ -46,9 +47,6 @@ export function GameRoute(): React.JSX.Element {
 
   return <GamePage key={entry.entryId} entry={entry} />;
 }
-
-// ── Save debounce interval (ms) ────────────────────────────────────
-const SAVE_DEBOUNCE_MS = 2000;
 
 /** Format milliseconds as MM:SS or H:MM:SS. */
 function formatTime(ms: number): string {
@@ -193,46 +191,22 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
     setIsDirty(true);
   }, []);
 
-  // ── Auto-save on change (debounced, only if dirty) ──────────────
-  useEffect(() => {
-    if (!isDirty) return;
-    const debounce = setTimeout(() => {
-      const flushedMs = timer.flushTimer();
-      saveGame(gameStateRef.current, entry.entryId, {
-        elapsedMs: flushedMs,
-        timerStatus: gameStateRef.current.timerStatus,
-      });
-    }, SAVE_DEBOUNCE_MS);
-    return () => clearTimeout(debounce);
-  }, [gameState, isDirty, entry.entryId, timer]);
-
-  // ── Save on unmount (backup — fires if dirty or timer has unflushed time) ──
-  useEffect(() => {
-    return () => {
-      if (isDirtyRef.current || timer.hasUnflushedTime()) {
-        const flushedMs = timer.flushTimer();
-        saveGame(gameStateRef.current, entry.entryId, {
-          elapsedMs: flushedMs,
-          timerStatus: gameStateRef.current.timerStatus,
-        });
-      }
-    };
+  // ── Auto-save (debounced + unmount + crash-safety) ───────────────
+  const performSave = useCallback(() => {
+    const flushedMs = timer.flushTimer();
+    saveGame(gameStateRef.current, entry.entryId, {
+      elapsedMs: flushedMs,
+      timerStatus: gameStateRef.current.timerStatus,
+    });
   }, [entry.entryId, timer]);
 
-  // ── Flush timer on tab close / browser crash (S12) ──────────────
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (isDirtyRef.current || timer.hasUnflushedTime()) {
-        const flushedMs = timer.flushTimer();
-        saveGame(gameStateRef.current, entry.entryId, {
-          elapsedMs: flushedMs,
-          timerStatus: gameStateRef.current.timerStatus,
-        });
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [entry.entryId, timer]);
+  useAutoSave({
+    save: performSave,
+    entryId: entry.entryId,
+    isDirty,
+    trigger: gameState,
+    shouldSave: timer.hasUnflushedTime,
+  });
 
   // ── Drag state (ephemeral UI concern) ───────────────────────────
   const isDragging = useRef(false);
