@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLayoutContext } from './AppLayout';
+import { useLayoutContext } from '../../pages/AppLayout';
 import { usePuzzleGenerator } from '../generator/hooks/usePuzzleGenerator';
 import { UploadPanel } from '../generator/components/UploadPanel';
 import { SettingsPanel } from '../generator/components/SettingsPanel';

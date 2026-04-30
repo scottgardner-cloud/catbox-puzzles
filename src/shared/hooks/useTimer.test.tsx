@@ -2,17 +2,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { AppLayout } from '../pages/AppLayout';
-import { GameRoute } from '../pages/GamePage';
-import { getAllEntries } from '../puzzles/registry';
-import type { PuzzleEntry } from '../puzzles/types';
+import { AppLayout } from '../../pages/AppLayout';
+import { GameRoute } from '../../nonogram/pages/GamePage';
+import { getAllEntries } from '../../nonogram/puzzles/registry';
+import type { PuzzleEntry } from '../../nonogram/puzzles/types';
 
 // ── Mocks ───────────────────────────────────────────────────────────
 
 const mockSaveGame = vi.fn();
 const mockLoadGame = vi.fn((): null => null);
 
-vi.mock('../state/persistence', () => ({
+vi.mock('../../nonogram/state/persistence', () => ({
   saveGame: (...args: unknown[]) => mockSaveGame(...args),
   loadGame: () => mockLoadGame(),
   restoreGameState: vi.fn(() => null),

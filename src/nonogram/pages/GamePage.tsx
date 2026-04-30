@@ -13,13 +13,13 @@ import {
   getHintWithExplanations,
 } from '../engine';
 import type { HintResult, DeductionReason } from '../engine';
-import { useAutoSave } from '../hooks/useAutoSave';
-import { useTimer } from '../hooks/useTimer';
+import { useAutoSave } from '../../shared/hooks/useAutoSave';
+import { useTimer } from '../../shared/hooks/useTimer';
 import { getEntryById } from '../puzzles/registry';
 import type { PuzzleEntry } from '../puzzles/types';
 import { saveGame, loadGame, restoreGameState } from '../state/persistence';
 import type { ValidatedPuzzle, CellChange, PlayerCellState, ColorId } from '../types';
-import { useLayoutContext } from './AppLayout';
+import { useLayoutContext } from '../../pages/AppLayout';
 
 type GameState = ReturnType<typeof createInitialGameState>;
 

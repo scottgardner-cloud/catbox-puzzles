@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 import { Link, Outlet, useOutletContext } from 'react-router-dom';
-import '../App.css';
+import '../shared/styles/app.css';
 
 /** Context provided by AppLayout to child routes via Outlet. */
 export interface LayoutContext {

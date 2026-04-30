@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { TimerStatus } from '../types';
+import type { TimerStatus } from '../../nonogram/types';
 
 /** Options for the {@link useTimer} hook. */
 export interface UseTimerOptions {

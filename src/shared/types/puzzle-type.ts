@@ -1,5 +1,5 @@
 import type { RouteObject } from 'react-router-dom';
-import type { PuzzleEntry } from '../puzzles/types';
+import type { PuzzleEntry } from '../../nonogram/puzzles/types';
 
 /**
  * Contract for a puzzle type module in CatBox Puzzles.

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useNavigationGuard } from '../hooks/useNavigationGuard';
-import { useLayoutContext } from './AppLayout';
+import { useNavigationGuard } from '../../shared/hooks/useNavigationGuard';
+import { useLayoutContext } from '../../pages/AppLayout';
 import {
   EditorGrid,
   EditorPalette,

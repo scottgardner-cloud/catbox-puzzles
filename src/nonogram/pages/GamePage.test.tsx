@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { AppLayout } from './AppLayout';
+import { AppLayout } from '../../pages/AppLayout';
 import { GameRoute } from './GamePage';
 import { getAllEntries } from '../puzzles/registry';
 import type { PuzzleEntry } from '../puzzles/types';

@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppLayout, BrowserPage, GameRoute, GeneratorPage } from './index';
-import { getAllEntries } from '../puzzles/registry';
+import { getAllEntries } from '../nonogram/puzzles/registry';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -37,7 +37,7 @@ function getFirstBuiltinEntry() {
 // Mock persistence to isolate routing behavior
 // ---------------------------------------------------------------------------
 
-vi.mock('../state/persistence', () => ({
+vi.mock('../nonogram/state/persistence', () => ({
   saveGame: vi.fn(),
   loadGame: vi.fn(() => null),
   restoreGameState: vi.fn(() => null),
