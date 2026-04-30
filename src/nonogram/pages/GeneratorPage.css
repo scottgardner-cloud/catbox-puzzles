@@ -182,17 +182,6 @@
   margin: 0;
 }
 
-.cb-btn--primary {
-  background: #1976d2;
-  color: #fff;
-  border-color: #1976d2;
-  font-weight: 600;
-}
-
-.cb-btn--primary:hover:not(:disabled) {
-  background: #1565c0;
-}
-
 /* ── Preview grid ─────────────────────────────────── */
 
 .cb-gen-preview {
