@@ -46,7 +46,8 @@ beforeEach(() => {
   localStorage.clear();
 });
 
-// ── Timer tests (extracted from GamePage.test.tsx) ──────────────────
+// ── Timer tests (integration via GamePage — tests hook behavior through
+// the full component rather than renderHook, for realistic coverage) ──
 
 describe('useTimer (via GamePage integration)', () => {
   it('renders timer display', () => {

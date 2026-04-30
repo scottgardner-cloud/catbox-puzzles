@@ -198,7 +198,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
       elapsedMs: flushedMs,
       timerStatus: gameStateRef.current.timerStatus,
     });
-  }, [entry.entryId, timer]);
+  }, [entry.entryId, timer.flushTimer]);
 
   useAutoSave({
     save: performSave,
@@ -220,7 +220,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
       timer.ensureRunning();
       updateGameState((s) => cycleCell(s, row, col, puzzle));
     },
-    [puzzle, solved, updateGameState, timer],
+    [puzzle, solved, updateGameState, timer.ensureRunning],
   );
 
   const handleDragStart = useCallback(
@@ -243,7 +243,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
       dragChanges.current = [];
       lastDragCell.current = { row, col };
     },
-    [gameState, solved, timer],
+    [gameState, solved, timer.ensureRunning],
   );
 
   const handleCellDragEnter = useCallback(
@@ -307,7 +307,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
   const handleReset = useCallback(() => {
     timer.resetTimer();
     updateGameState((s) => resetBoard(s, puzzle));
-  }, [puzzle, updateGameState, timer]);
+  }, [puzzle, updateGameState, timer.resetTimer]);
   const handleCheck = useCallback(
     () => updateGameState((s) => checkErrors(s, puzzle)),
     [puzzle, updateGameState],
@@ -324,7 +324,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
       timerStatus: gameState.timerStatus,
     });
     setIsDirty(false);
-  }, [gameState, entry.entryId, timer]);
+  }, [gameState, entry.entryId, timer.flushTimer]);
 
   const handleBack = useCallback(() => {
     if (isDirtyRef.current || timer.hasUnflushedTime()) {
@@ -335,7 +335,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
       });
     }
     navigate('/');
-  }, [entry.entryId, navigate, timer]);
+  }, [entry.entryId, navigate, timer.flushTimer, timer.hasUnflushedTime]);
 
   // ── Hint state ──────────────────────────────────────────────────
   const [hintCells, setHintCells] = useState<ReadonlySet<string>>(new Set());

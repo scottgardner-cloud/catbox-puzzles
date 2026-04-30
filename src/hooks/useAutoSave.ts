@@ -61,7 +61,8 @@ export function useAutoSave({
       saveRef.current();
     }, debounceMs);
     return () => clearTimeout(timer);
-    // Re-arm on state changes (trigger) and dirty flag
+    // Re-arm on state changes (trigger) and dirty flag.
+    // debounceMs included so consumers could change interval dynamically (not currently used).
   }, [trigger, isDirty, entryId, debounceMs]);
 
   // Save on unmount
