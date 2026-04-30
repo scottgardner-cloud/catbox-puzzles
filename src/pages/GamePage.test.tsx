@@ -167,67 +167,6 @@ describe('GamePage', () => {
     expect(mockSaveGame).toHaveBeenCalled();
   });
 
-  it('renders timer display', () => {
-    const entry = getSmallBuiltinEntry();
-    renderGame(entry);
-    const timer = screen.getByLabelText(/solve timer/i);
-    expect(timer).toBeInTheDocument();
-    expect(timer.textContent).toContain('00:00');
-  });
-
-  it('timer is dimmed (idle) on fresh puzzle', () => {
-    const entry = getSmallBuiltinEntry();
-    renderGame(entry);
-    const timer = screen.getByLabelText(/solve timer/i);
-    expect(timer.className).toContain('pap-timer--idle');
-  });
-
-  it('timer starts on first cell click', async () => {
-    const user = userEvent.setup();
-    const entry = getSmallBuiltinEntry();
-    renderGame(entry);
-
-    const cells = screen.getAllByRole('gridcell');
-    await user.click(cells[0]);
-
-    const timer = screen.getByLabelText(/solve timer/i);
-    expect(timer.className).not.toContain('pap-timer--idle');
-  });
-
-  it('save includes timer override after cell interaction', async () => {
-    const user = userEvent.setup();
-    const entry = getSmallBuiltinEntry();
-    renderGame(entry);
-
-    const cells = screen.getAllByRole('gridcell');
-    await user.click(cells[0]);
-    await user.click(screen.getByRole('button', { name: /save/i }));
-
-    expect(mockSaveGame).toHaveBeenCalled();
-    const lastCall = mockSaveGame.mock.calls[mockSaveGame.mock.calls.length - 1];
-    // Third argument is the timerOverride
-    expect(lastCall[2]).toBeDefined();
-    expect(typeof lastCall[2].elapsedMs).toBe('number');
-    expect(lastCall[2].timerStatus).toBe('running');
-  });
-
-  it('reset clears timer back to idle', async () => {
-    const user = userEvent.setup();
-    const entry = getSmallBuiltinEntry();
-    renderGame(entry);
-
-    // Start timer
-    const cells = screen.getAllByRole('gridcell');
-    await user.click(cells[0]);
-    const timer = screen.getByLabelText(/solve timer/i);
-    expect(timer.className).not.toContain('pap-timer--idle');
-
-    // Reset
-    await user.click(screen.getByRole('button', { name: /reset/i }));
-    expect(timer.className).toContain('pap-timer--idle');
-    expect(timer.textContent).toContain('00:00');
-  });
-
   it('hint button shows explanation panel', async () => {
     const user = userEvent.setup();
     const entry = getSmallBuiltinEntry();

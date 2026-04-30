@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useReducer } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigationGuard } from '../hooks/useNavigationGuard';
 import { useLayoutContext } from './AppLayout';
 import {
   EditorGrid,
@@ -76,16 +77,8 @@ export function EditorPage(): React.JSX.Element {
     }
   }, [state, validation, announce, navigate]);
 
-  // Navigation guard for unsaved changes
-  useEffect(() => {
-    if (!state.isDirty) return;
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = '';
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [state.isDirty]);
+  // Prompt user to confirm navigation when there are unsaved changes
+  useNavigationGuard(state.isDirty);
 
   return (
     <div className="pap-editor">
