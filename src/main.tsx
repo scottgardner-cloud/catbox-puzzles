@@ -1,7 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AppLayout, BrowserPage, GameRoute, GeneratorPage, EditorPage } from './pages';
+import { AppLayout } from './pages';
+import { HomePage } from './pages/HomePage';
+import { puzzleModules } from './puzzle-modules';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
@@ -9,10 +11,23 @@ createRoot(document.getElementById('root')!).render(
     <HashRouter>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<BrowserPage />} />
-          <Route path="/play/:entryId" element={<GameRoute />} />
-          <Route path="/generator" element={<GeneratorPage />} />
-          <Route path="/editor/:entryId?" element={<EditorPage />} />
+          <Route
+            path="/"
+            element={
+              puzzleModules.length === 1 ? (
+                <Navigate to={`/${puzzleModules[0].id}`} replace />
+              ) : (
+                <HomePage modules={puzzleModules} />
+              )
+            }
+          />
+          {puzzleModules.map((mod) => (
+            <Route key={mod.id} path={`${mod.id}/*`}>
+              {mod.routes.map((route, i) => (
+                <Route key={i} {...route} />
+              ))}
+            </Route>
+          ))}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

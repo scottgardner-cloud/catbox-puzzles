@@ -42,13 +42,13 @@ export function AppLayout(): React.JSX.Element {
           </Link>
         </h1>
         <nav className="cb-nav">
-          <Link to="/" className="cb-nav__link">
+          <Link to="/nonogram" className="cb-nav__link">
             Puzzles
           </Link>
-          <Link to="/generator" className="cb-nav__link">
+          <Link to="/nonogram/generator" className="cb-nav__link">
             Generator
           </Link>
-          <Link to="/editor" className="cb-nav__link">
+          <Link to="/nonogram/editor" className="cb-nav__link">
             Editor
           </Link>
         </nav>

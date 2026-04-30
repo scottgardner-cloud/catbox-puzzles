@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AppLayout, BrowserPage, GameRoute, GeneratorPage } from './index';
+import { AppLayout } from './AppLayout';
+import { nonogramModule } from '../nonogram';
 import { getAllEntries } from '../nonogram/puzzles/registry';
 
 // ---------------------------------------------------------------------------
@@ -15,9 +16,12 @@ function renderApp(initialPath = '/') {
     <MemoryRouter initialEntries={[initialPath]}>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<BrowserPage />} />
-          <Route path="/play/:entryId" element={<GameRoute />} />
-          <Route path="/generator" element={<GeneratorPage />} />
+          <Route path="/" element={<Navigate to={`/${nonogramModule.id}`} replace />} />
+          <Route path={`${nonogramModule.id}/*`}>
+            {nonogramModule.routes.map((route, i) => (
+              <Route key={i} {...route} />
+            ))}
+          </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
@@ -55,36 +59,44 @@ beforeEach(() => {
 });
 
 describe('Route rendering', () => {
-  it('renders BrowserPage at /', () => {
+  it('redirects / to /nonogram (single-type redirect)', () => {
     renderApp('/');
-    // Tab button "Puzzles" inside the browser component
+    // Should land on the nonogram browser
     expect(screen.getByRole('button', { name: 'Puzzles' })).toBeInTheDocument();
-    // Should show puzzle cards
+  });
+
+  it('renders BrowserPage at /nonogram', () => {
+    renderApp('/nonogram');
+    expect(screen.getByRole('button', { name: 'Puzzles' })).toBeInTheDocument();
     const entry = getFirstBuiltinEntry();
     expect(screen.getByText(entry.puzzle.name)).toBeInTheDocument();
   });
 
-  it('renders GeneratorPage at /generator', () => {
-    renderApp('/generator');
+  it('renders GeneratorPage at /nonogram/generator', () => {
+    renderApp('/nonogram/generator');
     expect(screen.getByRole('heading', { level: 2, name: 'Puzzle Generator' })).toBeInTheDocument();
   });
 
-  it('renders GameRoute at /play/:entryId with a valid entry', () => {
+  it('renders GameRoute at /nonogram/play/:entryId with a valid entry', () => {
     const entry = getFirstBuiltinEntry();
-    renderApp(`/play/${encodeURIComponent(entry.entryId)}`);
-    // Game page should render the puzzle grid
+    renderApp(`/nonogram/play/${encodeURIComponent(entry.entryId)}`);
     expect(screen.getByRole('grid', { name: /puzzle grid/i })).toBeInTheDocument();
   });
 });
 
 describe('Redirects', () => {
-  it('redirects unknown routes to /', () => {
+  it('redirects unknown routes to /nonogram', () => {
     renderApp('/some/nonexistent/path');
     expect(screen.getByRole('button', { name: 'Puzzles' })).toBeInTheDocument();
   });
 
-  it('redirects invalid entryId to /', () => {
-    renderApp('/play/this-entry-does-not-exist');
+  it('redirects invalid entryId to /nonogram', () => {
+    renderApp('/nonogram/play/this-entry-does-not-exist');
+    expect(screen.getByRole('button', { name: 'Puzzles' })).toBeInTheDocument();
+  });
+
+  it('redirects unknown nonogram subroute to /nonogram', () => {
+    renderApp('/nonogram/garbage');
     expect(screen.getByRole('button', { name: 'Puzzles' })).toBeInTheDocument();
   });
 });
@@ -92,7 +104,7 @@ describe('Redirects', () => {
 describe('Navigation', () => {
   it('header "Puzzles" link navigates to browser page', async () => {
     const user = userEvent.setup();
-    renderApp('/generator');
+    renderApp('/nonogram/generator');
     expect(screen.getByText('Puzzle Generator')).toBeInTheDocument();
 
     const nav = screen.getByRole('navigation');
@@ -106,7 +118,7 @@ describe('Navigation', () => {
 
   it('header "Generator" link navigates to generator page', async () => {
     const user = userEvent.setup();
-    renderApp('/');
+    renderApp('/nonogram');
 
     const generatorLink = screen.getByRole('link', { name: /generator/i });
     await user.click(generatorLink);
@@ -116,7 +128,7 @@ describe('Navigation', () => {
 
   it('clicking a puzzle card navigates to game page', async () => {
     const user = userEvent.setup();
-    renderApp('/');
+    renderApp('/nonogram');
 
     const entry = getFirstBuiltinEntry();
     const card = screen.getByText(entry.puzzle.name).closest('button');
@@ -129,7 +141,7 @@ describe('Navigation', () => {
   it('"← Back to puzzles" button navigates back to browser', async () => {
     const user = userEvent.setup();
     const entry = getFirstBuiltinEntry();
-    renderApp(`/play/${encodeURIComponent(entry.entryId)}`);
+    renderApp(`/nonogram/play/${encodeURIComponent(entry.entryId)}`);
 
     expect(screen.getByRole('grid', { name: /puzzle grid/i })).toBeInTheDocument();
 
@@ -142,26 +154,26 @@ describe('Navigation', () => {
 
 describe('Layout', () => {
   it('renders header with app title', () => {
-    renderApp('/');
+    renderApp('/nonogram');
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('CatBox Puzzles');
   });
 
   it('renders navigation links', () => {
-    renderApp('/');
+    renderApp('/nonogram');
     const nav = screen.getByRole('navigation');
     expect(within(nav).getByText('Puzzles')).toBeInTheDocument();
     expect(within(nav).getByText('Generator')).toBeInTheDocument();
   });
 
   it('renders ARIA live region for screen reader announcements', () => {
-    renderApp('/');
+    renderApp('/nonogram');
     const liveRegion = screen.getByRole('status');
     expect(liveRegion).toHaveAttribute('aria-live', 'polite');
     expect(liveRegion).toHaveAttribute('aria-atomic', 'true');
   });
 
   it('renders main content area', () => {
-    renderApp('/');
+    renderApp('/nonogram');
     expect(screen.getByRole('main')).toBeInTheDocument();
   });
 });
@@ -175,20 +187,16 @@ describe('Puzzle remount on entryId change', () => {
     const firstEntry = entries[0];
     const secondEntry = entries[1];
 
-    // Start at first puzzle
-    renderApp(`/play/${encodeURIComponent(firstEntry.entryId)}`);
+    renderApp(`/nonogram/play/${encodeURIComponent(firstEntry.entryId)}`);
     expect(screen.getByRole('grid', { name: /puzzle grid/i })).toBeInTheDocument();
 
-    // Navigate back to browser
     const backButton = screen.getByRole('button', { name: /back to puzzles/i });
     await user.click(backButton);
 
-    // Select second puzzle
     const secondCard = screen.getByText(secondEntry.puzzle.name).closest('button');
     expect(secondCard).not.toBeNull();
     await user.click(secondCard!);
 
-    // Should render grid (remounted for new puzzle)
     expect(screen.getByRole('grid', { name: /puzzle grid/i })).toBeInTheDocument();
   });
 });

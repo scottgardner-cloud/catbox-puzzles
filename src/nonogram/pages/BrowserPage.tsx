@@ -14,7 +14,7 @@ export function BrowserPage(): React.JSX.Element {
 
   const handleSelectPuzzle = useCallback(
     (entryId: string) => {
-      navigate(`/play/${encodeURIComponent(entryId)}`);
+      navigate(`/nonogram/play/${encodeURIComponent(entryId)}`);
     },
     [navigate],
   );
@@ -31,7 +31,7 @@ export function BrowserPage(): React.JSX.Element {
 
   const handleEditPuzzle = useCallback(
     (entryId: string) => {
-      navigate(`/editor/${encodeURIComponent(entryId)}`);
+      navigate(`/nonogram/editor/${encodeURIComponent(entryId)}`);
     },
     [navigate],
   );
@@ -42,7 +42,7 @@ export function BrowserPage(): React.JSX.Element {
         <button
           type="button"
           className="cb-btn cb-btn--primary"
-          onClick={() => navigate('/editor')}
+          onClick={() => navigate('/nonogram/editor')}
         >
           ✏️ Create New Puzzle
         </button>

@@ -21,14 +21,14 @@ vi.mock('../state/persistence', () => ({
 
 // ── Helpers ─────────────────────────────────────────────────────────
 
-function renderEditor(path = '/editor') {
+function renderEditor(path = '/nonogram/editor') {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<BrowserPage />} />
-          <Route path="/editor/:entryId?" element={<EditorPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/nonogram" element={<BrowserPage />} />
+          <Route path="/nonogram/editor/:entryId?" element={<EditorPage />} />
+          <Route path="*" element={<Navigate to="/nonogram" replace />} />
         </Route>
       </Routes>
     </MemoryRouter>,
@@ -87,7 +87,7 @@ beforeEach(() => {
 
 describe('EditorPage', () => {
   describe('routing', () => {
-    it('renders at /editor', () => {
+    it('renders at /nonogram/editor', () => {
       renderEditor();
       expect(screen.getByText('Puzzle Editor')).toBeInTheDocument();
     });
@@ -95,12 +95,12 @@ describe('EditorPage', () => {
     it('shows edit mode heading when loading existing puzzle', () => {
       const entry = saveCustomPuzzle(createTestPuzzle());
       expect(entry).not.toBeNull();
-      renderEditor(`/editor/${encodeURIComponent(entry!.entryId)}`);
+      renderEditor(`/nonogram/editor/${encodeURIComponent(entry!.entryId)}`);
       expect(screen.getByText('Edit Puzzle')).toBeInTheDocument();
     });
 
     it('redirects to / when editing non-existent puzzle', () => {
-      renderEditor('/editor/custom%3Anonexistent');
+      renderEditor('/nonogram/editor/custom%3Anonexistent');
       // Should redirect to BrowserPage
       expect(screen.queryByText('Puzzle Editor')).not.toBeInTheDocument();
     });
@@ -257,7 +257,7 @@ describe('EditorPage', () => {
       const entry = saveCustomPuzzle(createTestPuzzle());
       expect(entry).not.toBeNull();
 
-      renderEditor(`/editor/${encodeURIComponent(entry!.entryId)}`);
+      renderEditor(`/nonogram/editor/${encodeURIComponent(entry!.entryId)}`);
 
       // Name should be populated
       expect(screen.getByLabelText('Puzzle name')).toHaveValue('Test Cross');

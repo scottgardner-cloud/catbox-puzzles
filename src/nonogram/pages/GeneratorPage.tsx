@@ -43,7 +43,7 @@ export function GeneratorPage(): React.JSX.Element {
     const puzzle = await gen.saveToLibrary();
     if (puzzle) {
       announce(`Puzzle "${puzzle.name}" saved to library.`);
-      navigate('/');
+      navigate('/nonogram');
     } else {
       announce('Failed to save puzzle.');
     }

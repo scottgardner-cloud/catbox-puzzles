@@ -241,3 +241,58 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* ── HomePage ────────────────────────────────────────────────────── */
+
+.cb-home {
+  text-align: center;
+  padding: 32px 0;
+}
+
+.cb-home__heading {
+  font-size: 20px;
+  color: #555;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+.cb-home__grid {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cb-home__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 32px;
+  border: 2px solid #ddd;
+  border-radius: 12px;
+  background: #fff;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.15s;
+  min-width: 140px;
+}
+
+.cb-home__card:hover {
+  border-color: #1976d2;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);
+}
+
+.cb-home__card:focus-visible {
+  outline: 2px solid #7c4dff;
+  outline-offset: 2px;
+}
+
+.cb-home__icon {
+  font-size: 36px;
+}
+
+.cb-home__name {
+  font-size: 16px;
+  font-weight: 600;
+}

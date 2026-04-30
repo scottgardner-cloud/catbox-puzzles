@@ -31,10 +31,10 @@ function getSmallBuiltinEntry(): PuzzleEntry {
 
 function renderGame(entry: PuzzleEntry) {
   return render(
-    <MemoryRouter initialEntries={[`/play/${encodeURIComponent(entry.entryId)}`]}>
+    <MemoryRouter initialEntries={[`/nonogram/play/${encodeURIComponent(entry.entryId)}`]}>
       <Routes>
         <Route element={<AppLayout />}>
-          <Route path="/play/:entryId" element={<GameRoute />} />
+          <Route path="/nonogram/play/:entryId" element={<GameRoute />} />
         </Route>
       </Routes>
     </MemoryRouter>,

@@ -16,7 +16,7 @@ export const nonogramModule: PuzzleTypeModule = {
     { path: 'play/:entryId', element: <GameRoute /> },
     { path: 'generator', element: <GeneratorPage /> },
     { path: 'editor/:entryId?', element: <EditorPage /> },
-    { path: '*', element: <Navigate to="" replace /> },
+    { path: '*', element: <Navigate to=".." replace /> },
   ],
   navItems: [
     { label: 'Puzzles', path: '' },

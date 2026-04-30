@@ -38,7 +38,7 @@ export function EditorPage(): React.JSX.Element {
     const entry = getEntryById(decoded);
     if (!entry || entry.source !== 'custom') {
       announce('Puzzle not found or not editable.');
-      navigate('/', { replace: true });
+      navigate('/nonogram', { replace: true });
       return;
     }
     dispatch({ type: 'LOAD_PUZZLE', state: stateFromPuzzle(decoded, entry.puzzle) });
@@ -71,7 +71,7 @@ export function EditorPage(): React.JSX.Element {
     if (result) {
       dispatch({ type: 'MARK_SAVED' });
       announce(`Puzzle "${state.name || 'Untitled'}" saved to library.`);
-      navigate('/');
+      navigate('/nonogram');
     } else {
       announce('Failed to save puzzle. Check validation.');
     }

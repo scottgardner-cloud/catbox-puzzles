@@ -42,7 +42,7 @@ export function GameRoute(): React.JSX.Element {
   const entry = entryId ? getEntryById(entryId) : undefined;
 
   if (!entry) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/nonogram" replace />;
   }
 
   return <GamePage key={entry.entryId} entry={entry} />;
@@ -334,7 +334,7 @@ function GamePage({ entry }: { readonly entry: PuzzleEntry }): React.JSX.Element
         timerStatus: gameStateRef.current.timerStatus,
       });
     }
-    navigate('/');
+    navigate('/nonogram');
   }, [entry.entryId, navigate, timer.flushTimer, timer.hasUnflushedTime]);
 
   // ── Hint state ──────────────────────────────────────────────────
