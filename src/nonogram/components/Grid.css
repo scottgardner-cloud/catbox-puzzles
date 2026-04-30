@@ -1,0 +1,348 @@
+/* ───────────────────────────────────────────
+   Nonogram Grid Layout
+   ─────────────────────────────────────────── */
+
+.cb-grid-wrapper {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  user-select: none;
+  gap: 2px;
+  cursor: pointer;
+}
+
+/* Wrapper row for column-aligned elements (clues, validation, run indicators) */
+.cb-col-header-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.cb-col-header-spacer {
+  flex-shrink: 0;
+}
+
+/* ── Column clues ── */
+.cb-col-clues {
+  display: grid;
+  gap: 0;
+  justify-self: end;
+}
+
+.cb-col-clue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 2px 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* ── Column validation row ── */
+.cb-col-validation {
+  display: grid;
+  gap: 0;
+  justify-self: end;
+}
+
+/* ── Rows container ── */
+.cb-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.cb-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* ── Row clues ── */
+.cb-row-clue {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  padding-right: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Clue number ── */
+.cb-clue-num {
+  min-width: 14px;
+  text-align: center;
+}
+
+/* ── Cells row (the actual grid) ── */
+.cb-cells-row {
+  display: grid;
+  gap: 0;
+}
+
+/* ── Line validation indicator (row / col) ── */
+.cb-line-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cb-line-indicator--correct {
+  color: #2e7d32;
+}
+
+.cb-line-indicator--incorrect {
+  color: #c62828;
+}
+
+.cb-line-indicator--incomplete {
+  color: transparent;
+}
+
+/* Hidden state: reserve space but don't show content */
+.cb-line-indicator--hidden {
+  visibility: hidden;
+}
+
+.cb-col-validation--hidden {
+  visibility: hidden;
+}
+
+/* ── Cell ── */
+.cb-cell {
+  box-sizing: border-box;
+  border: 1px solid #bbb;
+  cursor: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.1s ease;
+}
+
+.cb-cell:hover {
+  outline: 2px solid #42a5f5;
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+/* State variants */
+.cb-cell--unknown {
+  background-color: #f5f5f5;
+}
+
+.cb-cell--filled {
+  animation: cb-cell-fill 0.12s ease-out;
+}
+
+.cb-cell--empty {
+  background-color: #e0e0e0;
+  animation: cb-cell-fill 0.12s ease-out;
+}
+
+.cb-cell__mark {
+  font-size: 16px;
+  font-weight: 700;
+  color: #616161;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* filled cells get their color via inline style */
+
+/* ── Validation overlays ── */
+.cb-cell--wrong-filled {
+  box-shadow: inset 0 0 0 3px #e53935;
+}
+
+.cb-cell--wrong-empty {
+  box-shadow: inset 0 0 0 3px #e53935;
+}
+
+.cb-cell--wrong-empty .cb-cell__mark {
+  color: #e53935;
+}
+
+.cb-cell--wrong-color {
+  box-shadow: inset 0 0 0 3px #ef6c00;
+}
+
+.cb-cell--correct {
+  box-shadow: inset 0 0 0 2px #43a047;
+}
+
+/* ── 5-cell grid dividers ── */
+.cb-cell--border-right > .cb-cell {
+  border-right: 2px solid #333;
+}
+
+.cb-cell--border-bottom > .cb-cell {
+  border-bottom: 2px solid #333;
+}
+
+/* ── Hidden spacers for alignment (used by wrapper) ── */
+.cb-clue-spacer,
+.cb-clue-spacer-col {
+  /* These are invisible sizing aids rendered outside the visible grid */
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ── Run-length indicators ── */
+.cb-run-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1976d2;
+}
+
+.cb-run-indicator--hidden {
+  visibility: hidden;
+}
+
+.cb-col-run-indicators {
+  display: grid;
+  gap: 0;
+  justify-self: end;
+}
+
+/* Reserve space for column run indicators to prevent layout shift */
+.cb-col-run-indicators .cb-run-indicator {
+  min-height: 24px;
+}
+
+/* ── Row/column hover highlighting ── */
+.cb-row--highlight {
+  background-color: rgba(66, 165, 245, 0.06);
+}
+
+.cb-row-clue--highlight {
+  background-color: rgba(66, 165, 245, 0.15);
+  border-radius: 4px;
+}
+
+.cb-col-clue--highlight {
+  background-color: rgba(66, 165, 245, 0.15);
+  border-radius: 4px;
+}
+
+.cb-cell--crosshair > .cb-cell {
+  background-color: rgba(66, 165, 245, 0.08);
+}
+
+/* Don't override filled cells with crosshair background */
+.cb-cell--crosshair > .cb-cell.cb-cell--filled {
+  /* filled color takes precedence via inline style */
+}
+
+/* ── Keyboard focus indicator ── */
+.cb-cell--focused {
+  outline: 3px solid #7c4dff;
+  outline-offset: -3px;
+  z-index: 2;
+}
+
+.cb-cell--hinted {
+  outline: 3px solid #e65100;
+  outline-offset: -3px;
+  z-index: 1;
+  animation: hint-pulse 1s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  0%,
+  100% {
+    outline-color: #e65100;
+  }
+  50% {
+    outline-color: #ffcc80;
+  }
+}
+
+/* Don't show the browser's default focus ring on the grid wrapper */
+.cb-grid-wrapper:focus {
+  outline: 2px solid #7c4dff;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.cb-grid-wrapper:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Responsive scaling ── */
+@media (max-width: 600px) {
+  .cb-col-clue,
+  .cb-row-clue {
+    font-size: 10px;
+  }
+
+  .cb-cell__mark {
+    font-size: 12px;
+  }
+
+  .cb-line-indicator {
+    width: 16px;
+    font-size: 12px;
+  }
+}
+
+/* ── Palette bar ── */
+.cb-palette-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.cb-palette-swatch {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #999;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cb-palette-swatch:hover {
+  transform: scale(1.1);
+  border-color: #333;
+}
+
+.cb-palette-swatch--selected {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.4);
+  transform: scale(1.1);
+}
+
+.cb-palette-swatch:focus-visible {
+  outline: 2px solid #7c4dff;
+  outline-offset: 2px;
+}
+
+@keyframes cb-cell-fill {
+  from {
+    transform: scale(0.85);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-cell--filled,
+  .cb-cell--empty {
+    animation: none;
+  }
+}

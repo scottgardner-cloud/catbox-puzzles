@@ -1,0 +1,367 @@
+/* Editor page styles */
+
+.cb-editor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 960px;
+}
+
+.cb-editor h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.cb-editor__subtitle {
+  color: #666;
+  margin: -16px 0 0;
+  font-size: 14px;
+}
+
+/* ── Layout ──────────────────────────────────────── */
+
+.cb-editor__layout {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  align-items: flex-start;
+  /* Prevent the grid from pushing the layout wider than the viewport */
+  min-height: 0;
+}
+
+.cb-editor__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 220px;
+  max-width: 260px;
+  /* Sidebar stays in view while grid scrolls */
+  position: sticky;
+  top: 16px;
+  align-self: flex-start;
+}
+
+.cb-editor__canvas {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: auto;
+  /* Stable dimensions — grid scrolls inside, sidebar stays put */
+  min-height: 400px;
+  max-height: calc(100vh - 160px);
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #fafafa;
+  padding: 16px;
+}
+
+/* ── Toolbar ─────────────────────────────────────── */
+
+.cb-editor-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.cb-editor-toolbar__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cb-editor-toolbar__field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+.cb-editor-toolbar__field input[type='text'],
+.cb-editor-toolbar__field select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.cb-editor-toolbar__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.cb-editor-toolbar__separator {
+  font-size: 16px;
+  color: #999;
+  padding-bottom: 8px;
+}
+
+.cb-editor-toolbar__tools {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cb-editor-toolbar__tools legend {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.cb-editor-toolbar__tool-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.cb-editor-toolbar__actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cb-editor-toolbar__hint {
+  font-size: 12px;
+  color: #e65100;
+  margin: 0;
+}
+
+.cb-editor-toolbar__status {
+  font-size: 13px;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.cb-editor-toolbar__status--ok {
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.cb-editor-toolbar__status--error {
+  background: #fff3e0;
+  border: 1px solid #ff9800;
+  color: #333;
+}
+
+.cb-editor-toolbar__status--error p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.cb-editor-toolbar__status--error ul {
+  margin: 4px 0 0;
+  padding-left: 16px;
+  font-size: 12px;
+}
+
+.cb-editor-toolbar__status--repair {
+  background: #fff8e1;
+  border: 1px solid #ff9800;
+  color: #333;
+}
+
+.cb-editor-toolbar__status--repair p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.cb-editor-toolbar__repair-hint {
+  font-size: 12px;
+  font-weight: 400 !important;
+  color: #666;
+  margin-top: 4px !important;
+}
+
+/* ── Palette ─────────────────────────────────────── */
+
+.cb-editor-palette {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.cb-editor-palette__title {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.cb-editor-palette__colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cb-editor-palette__entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.cb-editor-palette__swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cb-editor-palette__swatch--selected {
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px #90caf9;
+}
+
+.cb-editor-palette__swatch:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+.cb-editor-palette__remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #999;
+  padding: 0;
+  line-height: 1;
+}
+
+.cb-editor-palette__remove:hover {
+  color: #d32f2f;
+}
+
+/* ── Custom color picker ─────────────────────────── */
+
+.cb-editor-palette__custom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.cb-editor-palette__custom-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cb-editor-palette__color-input {
+  width: 36px;
+  height: 30px;
+  padding: 2px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cb-editor-palette__name-input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.cb-editor-palette__warning {
+  font-size: 12px;
+  color: #e65100;
+  margin: 0;
+}
+
+/* ── Preset colors ───────────────────────────────── */
+
+.cb-editor-palette__add {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.cb-editor-palette__add-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin: 0;
+}
+
+.cb-editor-palette__add-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.cb-editor-palette__add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fafafa;
+  cursor: pointer;
+  font-size: 12px;
+  color: #333;
+}
+
+.cb-editor-palette__add-btn:hover {
+  background: #f0f0f0;
+  border-color: #bbb;
+}
+
+.cb-editor-palette__add-btn:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 1px;
+}
+
+.cb-editor-palette__add-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.cb-editor-palette__add-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Unsaved indicator ───────────────────────────── */
+
+.cb-editor__unsaved {
+  font-size: 13px;
+  color: #e65100;
+  font-style: italic;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+
+@media (max-width: 720px) {
+  .cb-editor__layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cb-editor__sidebar {
+    min-width: unset;
+    max-width: 100%;
+    width: 100%;
+  }
+}
