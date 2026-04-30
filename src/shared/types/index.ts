@@ -1,2 +1,2 @@
 export type { PuzzleEntry } from './puzzle-entry';
-export type { PuzzleTypeModule, NavItem } from './puzzle-type';
+export type { PuzzleTypeModule, NavItem, BrowserCardOptions, BrowserFilter } from './puzzle-type';
